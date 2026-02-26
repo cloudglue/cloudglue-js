@@ -12,6 +12,7 @@ type ShareableAsset = {
   media_download_url?: string | undefined;
   media_download_expires_at?: (number | null) | undefined;
   share_url?: string | undefined;
+  stream_url?: string | undefined;
   status?: ('pending' | 'processing' | 'completed' | 'failed') | undefined;
   asset_type?: ('file' | 'file_segment') | undefined;
   created_at: number;
@@ -37,6 +38,7 @@ const ShareableAsset: z.ZodType<ShareableAsset> = z
     media_download_url: z.string().optional(),
     media_download_expires_at: z.number().nullish(),
     share_url: z.string().optional(),
+    stream_url: z.string().optional(),
     status: z.enum(['pending', 'processing', 'completed', 'failed']).optional(),
     asset_type: z.enum(['file', 'file_segment']).optional(),
     created_at: z.number(),

@@ -1,10 +1,10 @@
 # Cloudglue JavaScript SDK
 
-[![NPM Version](https://img.shields.io/npm/v/%40aviaryhq%2Fcloudglue-js)](https://www.npmjs.com/package/@aviaryhq/cloudglue-js) 
+[![NPM Version](https://img.shields.io/npm/v/%40cloudglue%2Fcloudglue-js)](https://www.npmjs.com/package/@cloudglue/cloudglue-js)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE.md)
 [![Discord](https://img.shields.io/discord/1366541583272382536?logo=discord&label=Discord)](https://discord.gg/QD5KWFVner)
 
-Cloudglue makes it easy to turn video into LLM ready data. Official JavaScript SDK for the Cloudglue API. 
+Cloudglue makes it easy to turn video into LLM ready data. Official JavaScript SDK for the Cloudglue API.
 
 ## 📖 Resources
 
@@ -18,16 +18,16 @@ Cloudglue makes it easy to turn video into LLM ready data. Official JavaScript S
 ## Installation
 
 ```bash
-npm install @aviaryhq/cloudglue-js
+npm install @cloudglue/cloudglue-js
 ```
 
 ## Quick Start
 
 ```typescript
-import { CloudGlue } from '@aviaryhq/cloudglue-js';
+import { Cloudglue } from '@cloudglue/cloudglue-js';
 
 // Initialize the client
-const client = new CloudGlue({
+const client = new Cloudglue({
   apiKey: process.env.CLOUDGLUE_API_KEY
 });
 
@@ -40,7 +40,7 @@ const chatResponse = await client.chat.createCompletion({
   messages: [
     { role: 'user', content: 'What are the key points discussed in these videos?' }
   ],
-  // Assumes collection already exists, otherwise create one first then reference here by collection id 
+  // Assumes collection already exists, otherwise create one first then reference here by collection id
   collections: ['your_collection_id'],
   include_citations: true,
   force_search: true
@@ -49,10 +49,10 @@ const chatResponse = await client.chat.createCompletion({
 
 ## Configuration
 
-The `CloudGlue` client accepts the following configuration options:
+The `Cloudglue` client accepts the following configuration options:
 
 ```typescript
-interface CloudGlueConfig {
+interface CloudglueConfig {
   apiKey?: string;      // Your API key (can also use CLOUDGLUE_API_KEY env var)
   baseUrl?: string;     // Optional custom base URL
 }
@@ -69,7 +69,7 @@ interface CloudGlueConfig {
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/aviaryhq/cloudglue-js.git
+git clone https://github.com/cloudglue/cloudglue-js.git
 cd cloudglue-js
 ```
 
@@ -110,6 +110,5 @@ This will:
 
 ## Contact
 
-* [Open an Issue](https://github.com/aviaryhq/cloudglue-js/issues/new)
+* [Open an Issue](https://github.com/cloudglue/cloudglue-js/issues/new)
 * [Email](mailto:support@cloudglue.dev)
-

@@ -1,4 +1,4 @@
-export class CloudGlueError extends Error {
+export class CloudglueError extends Error {
   constructor(
     message: string,
     public readonly statusCode?: number,
@@ -7,6 +7,6 @@ export class CloudGlueError extends Error {
     public readonly responseData?: any,
   ) {
     super(message);
-    this.name = 'CloudGlueError';
+    this.name = 'CloudglueError';
   }
 }

@@ -1,5 +1,5 @@
 import { ChatApi } from '../../generated';
-import { CloudGlueError } from '../error';
+import { CloudglueError } from '../error';
 import { schemas as chatSchemas } from '../../generated/Chat';
 import z from 'zod';
 

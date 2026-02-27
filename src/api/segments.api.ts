@@ -1,7 +1,7 @@
 import { SegmentsApi } from '../../generated';
 import { ShotConfig, NarrativeConfig } from '../types';
 import { WaitForReadyOptions } from '../types';
-import { CloudGlueError } from '../error';
+import { CloudglueError } from '../error';
 
 export class EnhancedSegmentsApi {
   constructor(private readonly api: typeof SegmentsApi) {}
@@ -46,7 +46,7 @@ export class EnhancedSegmentsApi {
       // If we've reached a terminal state, return the job
       if (['completed', 'failed', 'not_applicable'].includes(job.status)) {
         if (job.status === 'failed') {
-          throw new CloudGlueError(`Segment job failed: ${jobId}`);
+          throw new CloudglueError(`Segment job failed: ${jobId}`);
         }
         return job;
       }
@@ -56,7 +56,7 @@ export class EnhancedSegmentsApi {
       attempts++;
     }
 
-    throw new CloudGlueError(
+    throw new CloudglueError(
       `Timeout waiting for segment job ${jobId} to process after ${maxAttempts} attempts`,
     );
   }

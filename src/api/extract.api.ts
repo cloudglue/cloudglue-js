@@ -1,5 +1,5 @@
 import { ExtractApi } from '../../generated';
-import { CloudGlueError } from '../error';
+import { CloudglueError } from '../error';
 import {  WaitForReadyOptions } from '../types';
 import { schemas } from '../../generated/Extract';
 import z from 'zod';
@@ -55,7 +55,7 @@ export class EnhancedExtractApi {
    * @param jobId - The ID of the extraction job to wait for
    * @param options - Optional configuration for polling behavior
    * @returns The final extraction job object
-   * @throws {CloudGlueError} If the job fails to process or maxAttempts is reached
+   * @throws {CloudglueError} If the job fails to process or maxAttempts is reached
    */
   async waitForReady(jobId: string, options: WaitForReadyOptions = {}) {
     const { pollingInterval = 5000, maxAttempts = 36 } = options;
@@ -67,7 +67,7 @@ export class EnhancedExtractApi {
       // If we've reached a terminal state, return the job
       if (['completed', 'failed', 'not_applicable'].includes(job.status)) {
         if (job.status === 'failed') {
-          throw new CloudGlueError(`Extraction job failed: ${jobId}`);
+          throw new CloudglueError(`Extraction job failed: ${jobId}`);
         }
         return job;
       }
@@ -77,7 +77,7 @@ export class EnhancedExtractApi {
       attempts++;
     }
 
-    throw new CloudGlueError(
+    throw new CloudglueError(
       `Timeout waiting for extraction job ${jobId} to process after ${maxAttempts} attempts`,
     );
   }

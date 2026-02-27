@@ -29,7 +29,7 @@ npm run generate             # Regenerate clients
 **Layered SDK Pattern:**
 - `/generated/` - Auto-generated Zodios API clients from OpenAPI spec (do not edit manually)
 - `/src/api/` - Enhanced wrapper classes providing user-friendly interfaces over generated clients
-- `/src/client.ts` - Main `CloudGlue` class that orchestrates all 15 API clients
+- `/src/client.ts` - Main `Cloudglue` class that orchestrates all 15 API clients
 - `/src/index.ts` - Public exports
 
 **Code Generation Pipeline:**
@@ -45,7 +45,7 @@ npm run generate             # Regenerate clients
 
 ## API Surface
 
-The `CloudGlue` client exposes these API namespaces:
+The `Cloudglue` client exposes these API namespaces:
 - `files` - Upload, list, delete video files; manage segmentation
 - `collections` - Group videos for chat/search
 - `chat` - LLM chat completions over video collections (model: nimbus-001)
@@ -71,4 +71,4 @@ const result = await client.files.waitForReady(fileId, {
 
 **File Uploads:** Direct Axios calls bypass Zodios for multipart form-data (see `files.api.ts`).
 
-**Error Handling:** Custom `CloudGlueError` class wraps API errors with response metadata.
+**Error Handling:** Custom `CloudglueError` class wraps API errors with response metadata.

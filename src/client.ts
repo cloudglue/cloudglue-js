@@ -1,5 +1,5 @@
 import type { AxiosRequestConfig } from 'axios';
-import type { CloudGlueConfig } from './types';
+import type { CloudglueConfig } from './types';
 import { createApiClient as createFilesApiClient } from '../generated/Files';
 import { createApiClient as createCollectionsApiClient } from '../generated/Collections';
 import { createApiClient as createChatApiClient } from '../generated/Chat';
@@ -19,7 +19,7 @@ import { createApiClient as createResponseApiClient } from '../generated/Respons
 import { ZodiosOptions } from '@zodios/core';
 import { EnhancedWebhooksApi } from './api/webhooks.api';
 import { EnhancedTagsApi } from './api/tags.api';
-import { CloudGlueError } from './error';
+import { CloudglueError } from './error';
 import { EnhancedFilesApi } from './api/files.api';
 import { EnhancedDescribeApi } from './api/describe.api';
 import { EnhancedExtractApi } from './api/extract.api';
@@ -36,10 +36,10 @@ import { EnhancedShareableApi } from './api/shareable.api';
 import { EnhancedResponseApi } from './api/response.api';
 
 /**
- * Main CloudGlue client class that provides access to all API functionality
+ * Main Cloudglue client class that provides access to all API functionality
  * through enhanced, user-friendly interfaces
  */
-export class CloudGlue {
+export class Cloudglue {
   private readonly baseUrl: string;
   private readonly apiKey: string;
   private readonly timeout: number | undefined;
@@ -135,7 +135,7 @@ export class CloudGlue {
    */
   public readonly responses: EnhancedResponseApi;
 
-  constructor(config: CloudGlueConfig = {}) {
+  constructor(config: CloudglueConfig = {}) {
     this.apiKey = config.apiKey || process.env.CLOUDGLUE_API_KEY || '';
     this.baseUrl = config.baseUrl || 'https://api.cloudglue.dev/v1';
     this.timeout = config.timeout || undefined;
@@ -217,7 +217,7 @@ export class CloudGlue {
         (error) => {
           if (error.code === 'ECONNABORTED') {
             return Promise.reject(
-              new CloudGlueError(
+              new CloudglueError(
                 error.message,
                 408,
                 error.config.data,
@@ -231,7 +231,7 @@ export class CloudGlue {
             const data = error.response.data as { error: string };
 
             return Promise.reject(
-              new CloudGlueError(
+              new CloudglueError(
                 data.error,
                 error.response.status,
                 error.config.data,
@@ -243,7 +243,7 @@ export class CloudGlue {
 
           // Something happened in setting up the request that triggered an Error
           return Promise.reject(
-            new CloudGlueError(
+            new CloudglueError(
               error.message,
               error.statusCode ?? 500,
               error.data,

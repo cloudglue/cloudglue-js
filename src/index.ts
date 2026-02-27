@@ -1,5 +1,5 @@
 /**
- * Main CloudGlue client class and configuration types
+ * Main Cloudglue client class and configuration types
  */
 export * from './client';
 

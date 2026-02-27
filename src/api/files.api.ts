@@ -7,7 +7,7 @@ import {
   UpdateFileParams,
   WaitForReadyOptions,
 } from '../types';
-import { CloudGlueError } from '../error';
+import { CloudglueError } from '../error';
 
 type UploadFileParams = {
   file: globalThis.File;
@@ -30,7 +30,7 @@ export class EnhancedFilesApi {
       try {
         queries.filter = JSON.stringify(filter);
       } catch (error) {
-        throw new CloudGlueError(
+        throw new CloudglueError(
           `Failed to serialize filter object: ${error instanceof Error ? error.message : 'Unknown error'}`,
         );
       }
@@ -55,7 +55,7 @@ export class EnhancedFilesApi {
       try {
         formData.append('metadata', JSON.stringify(params.metadata));
       } catch (error) {
-        throw new CloudGlueError(
+        throw new CloudglueError(
           `Failed to serialize metadata object: ${error instanceof Error ? error.message : 'Unknown error'}`,
         );
       }
@@ -243,7 +243,7 @@ export class EnhancedFilesApi {
    * @param fileId - The ID of the file to wait for
    * @param options - Optional configuration for polling behavior
    * @returns The final file object
-   * @throws {CloudGlueError} If the file fails to process or maxAttempts is reached
+   * @throws {CloudglueError} If the file fails to process or maxAttempts is reached
    */
   async waitForReady(fileId: string, options: WaitForReadyOptions = {}) {
     const { pollingInterval = 5000, maxAttempts = 36 } = options;
@@ -255,7 +255,7 @@ export class EnhancedFilesApi {
       // If we've reached a terminal state, return the file
       if (['completed', 'failed', 'not_applicable'].includes(file.status)) {
         if (file.status === 'failed') {
-          throw new CloudGlueError(`File processing failed: ${fileId}`);
+          throw new CloudglueError(`File processing failed: ${fileId}`);
         }
         return file;
       }
@@ -265,7 +265,7 @@ export class EnhancedFilesApi {
       attempts++;
     }
 
-    throw new CloudGlueError(
+    throw new CloudglueError(
       `Timeout waiting for file ${fileId} to process after ${maxAttempts} attempts`,
     );
   }

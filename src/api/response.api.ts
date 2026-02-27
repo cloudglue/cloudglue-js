@@ -1,7 +1,7 @@
 import { ResponseApi } from '../../generated';
 import type { SearchFilter } from '../../generated/common';
 import { WaitForReadyOptions } from '../types';
-import { CloudGlueError } from '../error';
+import { CloudglueError } from '../error';
 
 type ResponseStatus = 'in_progress' | 'completed' | 'failed' | 'cancelled';
 
@@ -252,7 +252,7 @@ export class EnhancedResponseApi {
       } catch {
         // Could not parse error body
       }
-      throw new CloudGlueError(
+      throw new CloudglueError(
         errorMessage,
         response.status,
         JSON.stringify(body),
@@ -262,7 +262,7 @@ export class EnhancedResponseApi {
     }
 
     if (!response.body) {
-      throw new CloudGlueError('Response body is empty — streaming not supported in this environment');
+      throw new CloudglueError('Response body is empty — streaming not supported in this environment');
     }
 
     return parseSSEStream(response.body);
@@ -317,7 +317,7 @@ export class EnhancedResponseApi {
    * @param responseId - The ID of the response to wait for
    * @param options - Optional configuration for polling behavior
    * @returns The final response object
-   * @throws {CloudGlueError} If the response fails or maxAttempts is reached
+   * @throws {CloudglueError} If the response fails or maxAttempts is reached
    */
   async waitForReady(responseId: string, options: WaitForReadyOptions = {}) {
     const { pollingInterval = 5000, maxAttempts = 36 } = options;
@@ -329,7 +329,7 @@ export class EnhancedResponseApi {
       // If we've reached a terminal state, return the response
       if (['completed', 'failed', 'cancelled'].includes(response.status!)) {
         if (response.status === 'failed') {
-          throw new CloudGlueError(
+          throw new CloudglueError(
             `Response generation failed: ${response.error?.message || responseId}`,
           );
         }
@@ -341,7 +341,7 @@ export class EnhancedResponseApi {
       attempts++;
     }
 
-    throw new CloudGlueError(
+    throw new CloudglueError(
       `Timeout waiting for response ${responseId} to complete after ${maxAttempts} attempts`,
     );
   }

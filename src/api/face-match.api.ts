@@ -1,7 +1,7 @@
 import { Face_MatchApi } from '../../generated';
 import { FrameExtractionConfig } from '../types';
 import { WaitForReadyOptions } from '../types';
-import { CloudGlueError } from '../error';
+import { CloudglueError } from '../error';
 
 export class EnhancedFaceMatchApi {
   constructor(private readonly api: typeof Face_MatchApi) {}
@@ -58,7 +58,7 @@ export class EnhancedFaceMatchApi {
 
       if (['completed', 'failed'].includes(job.status)) {
         if (job.status === 'failed') {
-          throw new CloudGlueError(`Face match job failed: ${faceMatchId}`);
+          throw new CloudglueError(`Face match job failed: ${faceMatchId}`);
         }
         return job;
       }
@@ -67,7 +67,7 @@ export class EnhancedFaceMatchApi {
       attempts++;
     }
 
-    throw new CloudGlueError(
+    throw new CloudglueError(
       `Face match job did not complete within ${(maxAttempts * pollingInterval) / 1000} seconds: ${faceMatchId}`,
     );
   }

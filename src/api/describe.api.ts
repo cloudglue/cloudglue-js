@@ -2,7 +2,7 @@ import { DescribeApi } from '../../generated';
 import { Modalities, SegmentationConfig } from '../types';
 import { ThumbnailsConfig } from '../../generated/common';
 import { WaitForReadyOptions } from '../types';
-import { CloudGlueError } from '../error';
+import { CloudglueError } from '../error';
 
 export class EnhancedDescribeApi {
   constructor(private readonly api: typeof DescribeApi) {}
@@ -74,7 +74,7 @@ export class EnhancedDescribeApi {
    * @param jobId - The ID of the description job to wait for
    * @param options - Optional configuration for polling behavior and response format
    * @returns The final description job object
-   * @throws {CloudGlueError} If the job fails to process or maxAttempts is reached
+   * @throws {CloudglueError} If the job fails to process or maxAttempts is reached
    */
   async waitForReady(
     jobId: string,
@@ -95,7 +95,7 @@ export class EnhancedDescribeApi {
       // If we've reached a terminal state, return the job
       if (['completed', 'failed', 'not_applicable'].includes(job.status)) {
         if (job.status === 'failed') {
-          throw new CloudGlueError(`Description job failed: ${jobId}`);
+          throw new CloudglueError(`Description job failed: ${jobId}`);
         }
         return job;
       }
@@ -105,7 +105,7 @@ export class EnhancedDescribeApi {
       attempts++;
     }
 
-    throw new CloudGlueError(
+    throw new CloudglueError(
       `Timeout waiting for description job ${jobId} to process after ${maxAttempts} attempts`,
     );
   }

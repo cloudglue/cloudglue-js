@@ -1,6 +1,6 @@
 # Makefile for generating and packaging the TypeScript SDK
 
-API_SPEC_REPO := git@github.com:aviaryhq/cloudglue-api-spec.git
+API_SPEC_REPO := git@github.com:cloudglue/cloudglue-api-spec.git
 API_SPEC_DIR  := spec
 API_SPEC_FILE := $(API_SPEC_DIR)/spec/openapi.json
 

@@ -1,7 +1,7 @@
 import { Face_DetectionApi } from '../../generated';
 import { FrameExtractionConfig } from '../types';
 import { WaitForReadyOptions } from '../types';
-import { CloudGlueError } from '../error';
+import { CloudglueError } from '../error';
 
 export class EnhancedFaceDetectionApi {
   constructor(private readonly api: typeof Face_DetectionApi) {}
@@ -58,7 +58,7 @@ export class EnhancedFaceDetectionApi {
 
       if (['completed', 'failed'].includes(job.status)) {
         if (job.status === 'failed') {
-          throw new CloudGlueError(
+          throw new CloudglueError(
             `Face detection job failed: ${faceDetectionId}`,
           );
         }
@@ -69,7 +69,7 @@ export class EnhancedFaceDetectionApi {
       attempts++;
     }
 
-    throw new CloudGlueError(
+    throw new CloudglueError(
       `Face detection job did not complete within ${(maxAttempts * pollingInterval) / 1000} seconds: ${faceDetectionId}`,
     );
   }

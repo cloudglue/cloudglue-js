@@ -1,7 +1,7 @@
 import { CollectionsApi } from '../../generated';
 import { Filter, Modalities, SegmentationConfig } from '../types';
 import { ThumbnailsConfig } from '../../generated/common';
-import { CloudGlueError } from '../error';
+import { CloudglueError } from '../error';
 import { WaitForReadyOptions } from '../types';
 import { schemas as collectionsSchemas } from '../../generated/Collections';
 import z from 'zod';
@@ -157,7 +157,7 @@ export class EnhancedCollectionsApi {
       try {
         queries.filter = JSON.stringify(filter);
       } catch (error) {
-        throw new CloudGlueError(
+        throw new CloudglueError(
           `Failed to serialize filter object: ${error instanceof Error ? error.message : 'Unknown error'}`,
         );
       }
@@ -274,7 +274,7 @@ export class EnhancedCollectionsApi {
    * @param fileId - The ID of the video file to wait for
    * @param options - Optional configuration for polling behavior
    * @returns The final collection file object
-   * @throws {CloudGlueError} If the video fails to process or maxAttempts is reached
+   * @throws {CloudglueError} If the video fails to process or maxAttempts is reached
    */
   async waitForReady(
     collectionId: string,
@@ -290,7 +290,7 @@ export class EnhancedCollectionsApi {
       // If we've reached a terminal state, return the video
       if (['completed', 'failed', 'not_applicable'].includes(video.status)) {
         if (video.status === 'failed') {
-          throw new CloudGlueError(
+          throw new CloudglueError(
             `Video processing failed: ${fileId} in collection ${collectionId}`,
           );
         }
@@ -302,7 +302,7 @@ export class EnhancedCollectionsApi {
       attempts++;
     }
 
-    throw new CloudGlueError(
+    throw new CloudglueError(
       `Timeout waiting for video ${fileId} in collection ${collectionId} to process after ${maxAttempts} attempts`,
     );
   }

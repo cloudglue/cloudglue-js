@@ -1,6 +1,6 @@
 import { FramesApi } from '../../generated';
 import { WaitForReadyOptions } from '../types';
-import { CloudGlueError } from '../error';
+import { CloudglueError } from '../error';
 
 export class EnhancedFramesApi {
   constructor(private readonly api: typeof FramesApi) {}
@@ -36,7 +36,7 @@ export class EnhancedFramesApi {
 
       if (['completed', 'failed'].includes(job.status)) {
         if (job.status === 'failed') {
-          throw new CloudGlueError(
+          throw new CloudglueError(
             `Frame extraction job failed: ${frameExtractionId}`,
           );
         }
@@ -47,7 +47,7 @@ export class EnhancedFramesApi {
       attempts++;
     }
 
-    throw new CloudGlueError(
+    throw new CloudglueError(
       `Frame extraction job did not complete within ${(maxAttempts * pollingInterval) / 1000} seconds: ${frameExtractionId}`,
     );
   }

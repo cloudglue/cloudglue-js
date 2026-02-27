@@ -322,9 +322,9 @@ export type EnhancedSourceImage = {
 };
 
 /**
- * Configuration options for initializing the CloudGlue client
+ * Configuration options for initializing the Cloudglue client
  */
-export interface CloudGlueConfig {
+export interface CloudglueConfig {
   // Cloudglue API Key
   apiKey?: string;
   baseUrl?: string;

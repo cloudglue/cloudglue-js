@@ -1,6 +1,6 @@
 import { TranscribeApi } from '../../generated';
 import { ThumbnailsConfig } from '../../generated/common';
-import { CloudGlueError } from '../error';
+import { CloudglueError } from '../error';
 import { SegmentationConfig, WaitForReadyOptions } from '../types';
 
 /**
@@ -74,7 +74,7 @@ export class EnhancedTranscribeApi {
    * @param jobId - The ID of the transcription job to wait for
    * @param options - Optional configuration for polling behavior and response format
    * @returns The final transcription job object
-   * @throws {CloudGlueError} If the job fails to process or maxAttempts is reached
+   * @throws {CloudglueError} If the job fails to process or maxAttempts is reached
    * @deprecated
    */
   async waitForReady(
@@ -96,7 +96,7 @@ export class EnhancedTranscribeApi {
       // If we've reached a terminal state, return the job
       if (['completed', 'failed', 'not_applicable'].includes(job.status)) {
         if (job.status === 'failed') {
-          throw new CloudGlueError(`Transcription job failed: ${jobId}`);
+          throw new CloudglueError(`Transcription job failed: ${jobId}`);
         }
         return job;
       }
@@ -106,7 +106,7 @@ export class EnhancedTranscribeApi {
       attempts++;
     }
 
-    throw new CloudGlueError(
+    throw new CloudglueError(
       `Timeout waiting for transcription job ${jobId} to process after ${maxAttempts} attempts`,
     );
   }

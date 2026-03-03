@@ -5,6 +5,7 @@ export { CollectionsApi } from './Collections';
 export { ChatApi } from './Chat';
 export { TranscribeApi } from './Transcribe';
 export { DescribeApi } from './Describe';
+export { Data_ConnectorsApi } from './Data_Connectors';
 export { WebhooksApi } from './Webhooks';
 export { SearchApi } from './Search';
 export { ResponseApi } from './Response';

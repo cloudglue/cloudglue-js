@@ -11,6 +11,7 @@ export type SearchFilter = Partial<{
     SearchFilterCriteria &
       Partial<{
         path: 'duration_seconds' | 'has_audio';
+        scope: 'file' | 'segment';
       }>
   >;
   file: Array<
@@ -604,7 +605,10 @@ export const SearchFilter = z
     video_info: z.array(
       SearchFilterCriteria.and(
         z
-          .object({ path: z.enum(['duration_seconds', 'has_audio']) })
+          .object({
+            path: z.enum(['duration_seconds', 'has_audio']),
+            scope: z.enum(['file', 'segment']).default('file'),
+          })
           .partial()
           .strict()
           .passthrough()

@@ -182,11 +182,21 @@ export class EnhancedFilesApi {
       offset?: number;
       startTimeAfter?: number;
       endTimeBefore?: number;
+      minDuration?: number;
+      maxDuration?: number;
     },
   ) {
+    const { minDuration, maxDuration, startTimeAfter, endTimeBefore, ...rest } =
+      params;
     return this.api.listFileSegments({
       params: { file_id: fileId },
-      queries: params,
+      queries: {
+        ...rest,
+        start_time_after: startTimeAfter,
+        end_time_before: endTimeBefore,
+        min_duration: minDuration,
+        max_duration: maxDuration,
+      },
     });
   }
 

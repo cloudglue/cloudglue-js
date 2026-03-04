@@ -668,6 +668,16 @@ const endpoints = makeApi([
         schema: z.number().gte(0).optional(),
       },
       {
+        name: 'min_duration',
+        type: 'Query',
+        schema: z.number().gte(0).optional(),
+      },
+      {
+        name: 'max_duration',
+        type: 'Query',
+        schema: z.number().gte(0).optional(),
+      },
+      {
         name: 'limit',
         type: 'Query',
         schema: z.number().int().gte(1).lte(100).optional().default(50),
@@ -679,6 +689,13 @@ const endpoints = makeApi([
       },
     ],
     response: FileSegmentListResponse,
+    errors: [
+      {
+        status: 400,
+        description: `Invalid query parameters (e.g., min_duration &gt; max_duration, start_time_after &gt;&#x3D; end_time_before)`,
+        schema: z.object({ error: z.string() }).strict().passthrough(),
+      },
+    ],
   },
   {
     method: 'get',

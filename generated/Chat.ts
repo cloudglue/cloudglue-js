@@ -62,7 +62,8 @@ type ChatCompletionRequest = {
           valueTextArray?: Array<string> | undefined;
         }>;
         video_info: Array<{
-          path: string;
+          path: 'duration_seconds' | 'has_audio';
+          scope?: ('file' | 'segment') | undefined;
           operator:
             | 'NotEqual'
             | 'Equal'
@@ -162,7 +163,8 @@ const ChatCompletionRequest: z.ZodType<ChatCompletionRequest> = z
         video_info: z.array(
           z
             .object({
-              path: z.string(),
+              path: z.enum(['duration_seconds', 'has_audio']),
+              scope: z.enum(['file', 'segment']).optional().default('file'),
               operator: z.enum([
                 'NotEqual',
                 'Equal',

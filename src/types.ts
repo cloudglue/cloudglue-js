@@ -25,6 +25,7 @@ import { schemas as faceMatchSchemas } from '../generated/Face_Match';
 import { FilterOperator } from './enums';
 import { schemas as tagsSchemas } from '../generated/Tags';
 import { schemas as shareableSchemas } from '../generated/Share';
+import { schemas as dataConnectorsSchemas } from '../generated/Data_Connectors';
 
 /**
  * Represents a video file in the Cloudglue system
@@ -345,6 +346,7 @@ export interface Filter {
   video_info?: Array<{
     path: 'duration_seconds' | 'has_audio';
     operator: FilterOperator;
+    scope?: 'file' | 'segment';
     valueText?: string;
     valueTextArray?: string[];
   }>;
@@ -400,6 +402,18 @@ export type UpdateShareableAssetRequest = z.infer<
 >;
 
 export type Modalities = 'speech' | 'visual_scene_description' | 'scene_text' | 'audio_description' | 'summary' | 'segment_summary' | 'title';
+
+/**
+ * Represents a data connector configured for the account
+ */
+export type DataConnector = z.infer<typeof dataConnectorsSchemas.DataConnector>;
+
+/**
+ * Represents a paginated list of data connectors
+ */
+export type DataConnectorList = z.infer<
+  typeof dataConnectorsSchemas.DataConnectorList
+>;
 
 // Response API types
 import { schemas as responseSchemas } from '../generated/Response';

@@ -31,6 +31,7 @@ type ShotConfig = Partial<{
   detector: 'content' | 'adaptive';
   max_duration_seconds: number;
   min_duration_seconds: number;
+  fill_gaps: boolean;
 }>;
 type Segment = {
   start_time: number;
@@ -59,9 +60,10 @@ type SegmentsListItem = {
 
 const ShotConfig: z.ZodType<ShotConfig> = z
   .object({
-    detector: z.enum(['content', 'adaptive']).default('adaptive'),
-    max_duration_seconds: z.number().int().gte(1).lte(3600).default(300),
-    min_duration_seconds: z.number().int().gte(1).lte(3600).default(1),
+    detector: z.enum(['content', 'adaptive']).optional(),
+    max_duration_seconds: z.number().int().gte(1).lte(600).optional(),
+    min_duration_seconds: z.number().int().gte(1).lte(600).optional(),
+    fill_gaps: z.boolean().optional(),
   })
   .partial()
   .strict()
@@ -207,12 +209,12 @@ const endpoints = makeApi([
       {
         name: 'limit',
         type: 'Query',
-        schema: z.number().int().lte(100).optional().default(50),
+        schema: z.number().int().lte(100).optional(),
       },
       {
         name: 'offset',
         type: 'Query',
-        schema: z.number().int().optional().default(0),
+        schema: z.number().int().optional(),
       },
       {
         name: 'status',

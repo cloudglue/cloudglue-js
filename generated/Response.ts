@@ -132,7 +132,7 @@ const ResponseKnowledgeBase: z.ZodType<ResponseKnowledgeBase> = z
     type: z
       .enum(['general_question_answering', 'entity_backed_knowledge'])
       .optional()
-      .default('general_question_answering'),
+      .optional(),
     collections: z.array(z.string().uuid()).min(1),
     filter: SearchFilter.optional(),
     entity_backed_knowledge_config: EntityBackedKnowledgeConfig.optional(),
@@ -149,8 +149,8 @@ const CreateResponseRequest: z.ZodType<CreateResponseRequest> = z
     include: z
       .array(z.literal('cloudglue_citations.media_descriptions'))
       .optional(),
-    background: z.boolean().optional().default(false),
-    stream: z.boolean().optional().default(false),
+    background: z.boolean().optional(),
+    stream: z.boolean().optional(),
   })
   .strict()
   .passthrough();
@@ -316,12 +316,12 @@ The response can be processed synchronously (default) or asynchronously using th
       {
         name: 'limit',
         type: 'Query',
-        schema: z.number().int().gte(1).lte(100).optional().default(50),
+        schema: z.number().int().gte(1).lte(100).optional(),
       },
       {
         name: 'offset',
         type: 'Query',
-        schema: z.number().int().gte(0).optional().default(0),
+        schema: z.number().int().gte(0).optional(),
       },
       {
         name: 'status',

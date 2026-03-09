@@ -28,11 +28,11 @@ type NewDescribe = {
 const NewDescribe: z.ZodType<NewDescribe> = z
   .object({
     url: z.string(),
-    enable_summary: z.boolean().optional().default(true),
-    enable_speech: z.boolean().optional().default(true),
-    enable_visual_scene_description: z.boolean().optional().default(true),
-    enable_scene_text: z.boolean().optional().default(true),
-    enable_audio_description: z.boolean().optional().default(false),
+    enable_summary: z.boolean().optional(),
+    enable_speech: z.boolean().optional(),
+    enable_visual_scene_description: z.boolean().optional(),
+    enable_scene_text: z.boolean().optional(),
+    enable_audio_description: z.boolean().optional(),
     thumbnails_config: ThumbnailsConfig.optional(),
   })
   .strict()
@@ -92,12 +92,12 @@ const endpoints = makeApi([
       {
         name: 'limit',
         type: 'Query',
-        schema: z.number().int().lte(100).optional().default(20),
+        schema: z.number().int().lte(100).optional(),
       },
       {
         name: 'offset',
         type: 'Query',
-        schema: z.number().int().optional().default(0),
+        schema: z.number().int().optional(),
       },
       {
         name: 'status',
@@ -130,12 +130,12 @@ const endpoints = makeApi([
       {
         name: 'response_format',
         type: 'Query',
-        schema: z.enum(['json', 'markdown']).optional().default('json'),
+        schema: z.enum(['json', 'markdown']).optional(),
       },
       {
         name: 'include_data',
         type: 'Query',
-        schema: z.boolean().optional().default(true),
+        schema: z.boolean().optional(),
       },
       {
         name: 'modalities',
@@ -184,7 +184,7 @@ const endpoints = makeApi([
       {
         name: 'response_format',
         type: 'Query',
-        schema: z.enum(['json', 'markdown']).optional().default('json'),
+        schema: z.enum(['json', 'markdown']).optional(),
       },
       {
         name: 'start_time_seconds',
@@ -212,6 +212,11 @@ const endpoints = makeApi([
             ])
           )
           .optional(),
+      },
+      {
+        name: 'include_thumbnails',
+        type: 'Query',
+        schema: z.boolean().optional(),
       },
     ],
     response: Describe,

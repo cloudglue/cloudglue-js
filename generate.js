@@ -122,6 +122,42 @@ console.log('Fixing nullish/nullable type mismatches...');
 const generatedDir = path.join(__dirname, 'generated');
 const generatedFiles = fs.readdirSync(generatedDir).filter(f => f.endsWith('.ts'));
 
+// Strip .default() from Zod schemas used as input types.
+// The openapi-zod-client generator adds .default() for fields with OpenAPI defaults,
+// but these defaults are applied server-side. Client-side, .default() makes fields
+// required in Zod's output type, which breaks user code that omits optional fields.
+// We replace .X().default(Y) with .X() where X is optional/nullish, and
+// .default(Y) with .optional() where there's no prior optional/nullish.
+console.log('Stripping .default() from object schema fields...');
+for (const file of generatedFiles) {
+    const filePath = path.join(generatedDir, file);
+    let fileContent = fs.readFileSync(filePath, 'utf8');
+
+    // Pattern 1: .nullish().default(VALUE) → .nullish()
+    fileContent = fileContent.replace(/\.nullish\(\)\.default\([^)]*\)/g, '.nullish()');
+
+    // Pattern 2: .optional().default(VALUE) → .optional()
+    fileContent = fileContent.replace(/\.optional\(\)\.default\([^)]*\)/g, '.optional()');
+
+    // Pattern 3: remaining .default(VALUE) → .optional()
+    // Catches any .default() not preceded by .optional() or .nullish()
+    // e.g., z.boolean().default(true) → z.boolean().optional()
+    fileContent = fileContent.replace(
+        /\.default\(([^)]*)\)/g,
+        (match, defaultVal, offset) => {
+            // Check the preceding text on the same line for .optional() or .nullish()
+            const lineStart = fileContent.lastIndexOf('\n', offset) + 1;
+            const before = fileContent.substring(lineStart, offset);
+            if (before.includes('.optional()') || before.includes('.nullish()')) {
+                return match; // already handled by Pattern 1 or 2
+            }
+            return '.optional()';
+        }
+    );
+
+    fs.writeFileSync(filePath, fileContent);
+}
+
 for (const file of generatedFiles) {
     const filePath = path.join(generatedDir, file);
     let fileContent = fs.readFileSync(filePath, 'utf8');

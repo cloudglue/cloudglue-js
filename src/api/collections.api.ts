@@ -184,7 +184,7 @@ export class EnhancedCollectionsApi {
   async getEntities(
     collectionId: string,
     fileId: string,
-    params: { limit?: number; offset?: number } = {},
+    params: { limit?: number; offset?: number; include_thumbnails?: boolean } = {},
   ) {
     return this.api.getEntities({
       params: { collection_id: collectionId, file_id: fileId },
@@ -237,6 +237,7 @@ export class EnhancedCollectionsApi {
       response_format?: 'markdown' | 'json';
       start_time_seconds?: number;
       end_time_seconds?: number;
+      include_thumbnails?: boolean;
     } = {},
   ) {
     return this.api.getMediaDescriptions({

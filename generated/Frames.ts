@@ -22,12 +22,12 @@ const endpoints = makeApi([
       {
         name: 'limit',
         type: 'Query',
-        schema: z.number().int().gte(1).lte(100).optional().default(50),
+        schema: z.number().int().gte(1).lte(100).optional(),
       },
       {
         name: 'offset',
         type: 'Query',
-        schema: z.number().int().gte(0).optional().default(0),
+        schema: z.number().int().gte(0).optional(),
       },
     ],
     response: FrameExtraction,

@@ -33,8 +33,10 @@ type Extract = {
             start_time: number;
             end_time: number;
             entities: {};
+            thumbnail_url: string;
           }>
         >;
+        thumbnail_url: string;
       }>
     | undefined;
   total?: number | undefined;
@@ -75,9 +77,9 @@ const Extract: z.ZodType<Extract> = z
       .object({
         prompt: z.string(),
         schema: z.object({}).partial().strict().passthrough(),
-        enable_video_level_entities: z.boolean().default(false),
-        enable_segment_level_entities: z.boolean().default(true),
-        enable_transcript_mode: z.boolean().default(false),
+        enable_video_level_entities: z.boolean().optional(),
+        enable_segment_level_entities: z.boolean().optional(),
+        enable_transcript_mode: z.boolean().optional(),
       })
       .partial()
       .strict()
@@ -93,11 +95,13 @@ const Extract: z.ZodType<Extract> = z
               start_time: z.number(),
               end_time: z.number(),
               entities: z.object({}).partial().strict().passthrough(),
+              thumbnail_url: z.string().url(),
             })
             .partial()
             .strict()
             .passthrough()
         ),
+        thumbnail_url: z.string().url(),
       })
       .partial()
       .strict()
@@ -125,9 +129,9 @@ const NewExtract: z.ZodType<NewExtract> = z
     url: z.string(),
     prompt: z.string().optional(),
     schema: z.object({}).partial().strict().passthrough().optional(),
-    enable_video_level_entities: z.boolean().optional().default(false),
-    enable_segment_level_entities: z.boolean().optional().default(true),
-    enable_transcript_mode: z.boolean().optional().default(false),
+    enable_video_level_entities: z.boolean().optional(),
+    enable_segment_level_entities: z.boolean().optional(),
+    enable_transcript_mode: z.boolean().optional(),
     thumbnails_config: ThumbnailsConfig.optional(),
   })
   .strict()
@@ -189,12 +193,12 @@ const endpoints = makeApi([
       {
         name: 'limit',
         type: 'Query',
-        schema: z.number().int().lte(100).optional().default(50),
+        schema: z.number().int().lte(100).optional(),
       },
       {
         name: 'offset',
         type: 'Query',
-        schema: z.number().int().optional().default(0),
+        schema: z.number().int().optional(),
       },
       {
         name: 'status',
@@ -227,7 +231,7 @@ const endpoints = makeApi([
       {
         name: 'include_data',
         type: 'Query',
-        schema: z.boolean().optional().default(true),
+        schema: z.boolean().optional(),
       },
     ],
     response: ExtractList,
@@ -269,12 +273,17 @@ const endpoints = makeApi([
       {
         name: 'limit',
         type: 'Query',
-        schema: z.number().int().gte(1).lte(100).optional().default(50),
+        schema: z.number().int().gte(1).lte(100).optional(),
       },
       {
         name: 'offset',
         type: 'Query',
-        schema: z.number().int().gte(0).optional().default(0),
+        schema: z.number().int().gte(0).optional(),
+      },
+      {
+        name: 'include_thumbnails',
+        type: 'Query',
+        schema: z.boolean().optional(),
       },
     ],
     response: Extract,

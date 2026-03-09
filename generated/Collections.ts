@@ -243,6 +243,7 @@ type CollectionMediaDescriptionsList = {
 type MediaDescription = {
   collection_id: string;
   file_id: string;
+  thumbnail_url?: string | undefined;
   content?: string | undefined;
   title?: string | undefined;
   summary?: string | undefined;
@@ -254,6 +255,7 @@ type MediaDescription = {
           summary: string;
           start_time: number;
           end_time: number;
+          thumbnail_url: string;
         }>
       >
     | undefined;
@@ -287,9 +289,9 @@ const Collection: z.ZodType<Collection> = z
       .object({
         prompt: z.string(),
         schema: z.object({}).partial().strict().passthrough(),
-        enable_video_level_entities: z.boolean().default(false),
-        enable_segment_level_entities: z.boolean().default(true),
-        enable_transcript_mode: z.boolean().default(false),
+        enable_video_level_entities: z.boolean().optional(),
+        enable_segment_level_entities: z.boolean().optional(),
+        enable_transcript_mode: z.boolean().optional(),
       })
       .partial()
       .strict()
@@ -297,11 +299,11 @@ const Collection: z.ZodType<Collection> = z
       .optional(),
     transcribe_config: z
       .object({
-        enable_summary: z.boolean().default(true),
-        enable_speech: z.boolean().default(true),
-        enable_scene_text: z.boolean().default(false),
-        enable_visual_scene_description: z.boolean().default(false),
-        enable_audio_description: z.boolean().default(false),
+        enable_summary: z.boolean().optional(),
+        enable_speech: z.boolean().optional(),
+        enable_scene_text: z.boolean().optional(),
+        enable_visual_scene_description: z.boolean().optional(),
+        enable_audio_description: z.boolean().optional(),
       })
       .partial()
       .strict()
@@ -309,11 +311,11 @@ const Collection: z.ZodType<Collection> = z
       .optional(),
     describe_config: z
       .object({
-        enable_summary: z.boolean().default(true),
-        enable_speech: z.boolean().default(true),
-        enable_scene_text: z.boolean().default(true),
-        enable_visual_scene_description: z.boolean().default(true),
-        enable_audio_description: z.boolean().default(false),
+        enable_summary: z.boolean().optional(),
+        enable_speech: z.boolean().optional(),
+        enable_scene_text: z.boolean().optional(),
+        enable_visual_scene_description: z.boolean().optional(),
+        enable_audio_description: z.boolean().optional(),
       })
       .partial()
       .strict()
@@ -328,8 +330,8 @@ const Collection: z.ZodType<Collection> = z
             strategy: z.literal('uniform'),
             uniform_config: z
               .object({
-                frames_per_second: z.number().gte(0.1).lte(30).default(1),
-                max_width: z.number().gte(64).lte(4096).default(1024),
+                frames_per_second: z.number().gte(0.1).lte(30).optional(),
+                max_width: z.number().gte(64).lte(4096).optional(),
               })
               .partial()
               .strict()
@@ -339,7 +341,7 @@ const Collection: z.ZodType<Collection> = z
           .strict()
           .passthrough(),
         thumbnails_config: z
-          .object({ enable_frame_thumbnails: z.boolean().default(true) })
+          .object({ enable_frame_thumbnails: z.boolean().optional() })
           .partial()
           .strict()
           .passthrough(),
@@ -377,11 +379,11 @@ const NewCollection: z.ZodType<NewCollection> = z
     description: z.string().nullish(),
     describe_config: z
       .object({
-        enable_summary: z.boolean().default(true),
-        enable_speech: z.boolean().default(true),
-        enable_scene_text: z.boolean().default(true),
-        enable_visual_scene_description: z.boolean().default(true),
-        enable_audio_description: z.boolean().default(false),
+        enable_summary: z.boolean().optional(),
+        enable_speech: z.boolean().optional(),
+        enable_scene_text: z.boolean().optional(),
+        enable_visual_scene_description: z.boolean().optional(),
+        enable_audio_description: z.boolean().optional(),
       })
       .partial()
       .strict()
@@ -391,9 +393,9 @@ const NewCollection: z.ZodType<NewCollection> = z
       .object({
         prompt: z.string(),
         schema: z.object({}).partial().strict().passthrough(),
-        enable_video_level_entities: z.boolean().default(false),
-        enable_segment_level_entities: z.boolean().default(true),
-        enable_transcript_mode: z.boolean().default(false),
+        enable_video_level_entities: z.boolean().optional(),
+        enable_segment_level_entities: z.boolean().optional(),
+        enable_transcript_mode: z.boolean().optional(),
       })
       .partial()
       .strict()
@@ -401,11 +403,11 @@ const NewCollection: z.ZodType<NewCollection> = z
       .optional(),
     transcribe_config: z
       .object({
-        enable_summary: z.boolean().default(true),
-        enable_speech: z.boolean().default(true),
-        enable_scene_text: z.boolean().default(false),
-        enable_visual_scene_description: z.boolean().default(false),
-        enable_audio_description: z.boolean().default(false),
+        enable_summary: z.boolean().optional(),
+        enable_speech: z.boolean().optional(),
+        enable_scene_text: z.boolean().optional(),
+        enable_visual_scene_description: z.boolean().optional(),
+        enable_audio_description: z.boolean().optional(),
       })
       .partial()
       .strict()
@@ -420,8 +422,8 @@ const NewCollection: z.ZodType<NewCollection> = z
             strategy: z.literal('uniform'),
             uniform_config: z
               .object({
-                frames_per_second: z.number().gte(0.1).lte(30).default(1),
-                max_width: z.number().gte(64).lte(4096).default(1024),
+                frames_per_second: z.number().gte(0.1).lte(30).optional(),
+                max_width: z.number().gte(64).lte(4096).optional(),
               })
               .partial()
               .strict()
@@ -431,7 +433,7 @@ const NewCollection: z.ZodType<NewCollection> = z
           .strict()
           .passthrough(),
         thumbnails_config: z
-          .object({ enable_frame_thumbnails: z.boolean().default(true) })
+          .object({ enable_frame_thumbnails: z.boolean().optional() })
           .partial()
           .strict()
           .passthrough(),
@@ -513,6 +515,7 @@ const MediaDescription: z.ZodType<MediaDescription> = z
   .object({
     collection_id: z.string(),
     file_id: z.string(),
+    thumbnail_url: z.string().url().optional(),
     content: z.string().optional(),
     title: z.string().optional(),
     summary: z.string().optional(),
@@ -525,6 +528,7 @@ const MediaDescription: z.ZodType<MediaDescription> = z
             summary: z.string(),
             start_time: z.number(),
             end_time: z.number(),
+            thumbnail_url: z.string().url(),
           })
           .partial()
           .strict()
@@ -666,6 +670,7 @@ const FileEntities = z
   .object({
     collection_id: z.string(),
     file_id: z.string(),
+    thumbnail_url: z.string().url().optional(),
     entities: z.object({}).partial().strict().passthrough(),
     segment_entities: z.array(
       z
@@ -673,6 +678,7 @@ const FileEntities = z
           start_time: z.number(),
           end_time: z.number(),
           entities: z.object({}).partial().strict().passthrough(),
+          thumbnail_url: z.string().url(),
         })
         .partial()
         .strict()
@@ -820,22 +826,22 @@ const endpoints = makeApi([
       {
         name: 'limit',
         type: 'Query',
-        schema: z.number().int().lte(100).optional().default(50),
+        schema: z.number().int().lte(100).optional(),
       },
       {
         name: 'offset',
         type: 'Query',
-        schema: z.number().int().optional().default(0),
+        schema: z.number().int().optional(),
       },
       {
         name: 'order',
         type: 'Query',
-        schema: z.enum(['name', 'created_at']).optional().default('created_at'),
+        schema: z.enum(['name', 'created_at']).optional(),
       },
       {
         name: 'sort',
         type: 'Query',
-        schema: z.enum(['asc', 'desc']).optional().default('desc'),
+        schema: z.enum(['asc', 'desc']).optional(),
       },
       {
         name: 'collection_type',
@@ -976,12 +982,12 @@ const endpoints = makeApi([
       {
         name: 'limit',
         type: 'Query',
-        schema: z.number().int().lte(100).optional().default(50),
+        schema: z.number().int().lte(100).optional(),
       },
       {
         name: 'offset',
         type: 'Query',
-        schema: z.number().int().optional().default(0),
+        schema: z.number().int().optional(),
       },
       {
         name: 'status',
@@ -1009,12 +1015,12 @@ const endpoints = makeApi([
       {
         name: 'order',
         type: 'Query',
-        schema: z.enum(['added_at', 'filename']).optional().default('added_at'),
+        schema: z.enum(['added_at', 'filename']).optional(),
       },
       {
         name: 'sort',
         type: 'Query',
-        schema: z.enum(['asc', 'desc']).optional().default('desc'),
+        schema: z.enum(['asc', 'desc']).optional(),
       },
       {
         name: 'filter',
@@ -1120,12 +1126,17 @@ const endpoints = makeApi([
       {
         name: 'limit',
         type: 'Query',
-        schema: z.number().int().gte(1).lte(100).optional().default(50),
+        schema: z.number().int().gte(1).lte(100).optional(),
       },
       {
         name: 'offset',
         type: 'Query',
-        schema: z.number().int().gte(0).optional().default(0),
+        schema: z.number().int().gte(0).optional(),
+      },
+      {
+        name: 'include_thumbnails',
+        type: 'Query',
+        schema: z.boolean().optional(),
       },
     ],
     response: FileEntities,
@@ -1167,7 +1178,7 @@ const endpoints = makeApi([
       {
         name: 'response_format',
         type: 'Query',
-        schema: z.enum(['json', 'markdown']).optional().default('json'),
+        schema: z.enum(['json', 'markdown']).optional(),
       },
       {
         name: 'start_time_seconds',
@@ -1231,22 +1242,22 @@ const endpoints = makeApi([
       {
         name: 'limit',
         type: 'Query',
-        schema: z.number().int().lte(100).optional().default(50),
+        schema: z.number().int().lte(100).optional(),
       },
       {
         name: 'offset',
         type: 'Query',
-        schema: z.number().int().optional().default(0),
+        schema: z.number().int().optional(),
       },
       {
         name: 'order',
         type: 'Query',
-        schema: z.enum(['added_at', 'filename']).optional().default('added_at'),
+        schema: z.enum(['added_at', 'filename']).optional(),
       },
       {
         name: 'sort',
         type: 'Query',
-        schema: z.enum(['asc', 'desc']).optional().default('desc'),
+        schema: z.enum(['asc', 'desc']).optional(),
       },
       {
         name: 'added_before',
@@ -1293,22 +1304,22 @@ const endpoints = makeApi([
       {
         name: 'limit',
         type: 'Query',
-        schema: z.number().int().lte(100).optional().default(20),
+        schema: z.number().int().lte(100).optional(),
       },
       {
         name: 'offset',
         type: 'Query',
-        schema: z.number().int().optional().default(0),
+        schema: z.number().int().optional(),
       },
       {
         name: 'order',
         type: 'Query',
-        schema: z.enum(['added_at', 'filename']).optional().default('added_at'),
+        schema: z.enum(['added_at', 'filename']).optional(),
       },
       {
         name: 'sort',
         type: 'Query',
-        schema: z.enum(['asc', 'desc']).optional().default('desc'),
+        schema: z.enum(['asc', 'desc']).optional(),
       },
       {
         name: 'added_before',
@@ -1323,7 +1334,7 @@ const endpoints = makeApi([
       {
         name: 'response_format',
         type: 'Query',
-        schema: z.enum(['json', 'markdown']).optional().default('json'),
+        schema: z.enum(['json', 'markdown']).optional(),
       },
       {
         name: 'modalities',
@@ -1377,22 +1388,22 @@ const endpoints = makeApi([
       {
         name: 'limit',
         type: 'Query',
-        schema: z.number().int().lte(100).optional().default(20),
+        schema: z.number().int().lte(100).optional(),
       },
       {
         name: 'offset',
         type: 'Query',
-        schema: z.number().int().optional().default(0),
+        schema: z.number().int().optional(),
       },
       {
         name: 'order',
         type: 'Query',
-        schema: z.enum(['added_at', 'filename']).optional().default('added_at'),
+        schema: z.enum(['added_at', 'filename']).optional(),
       },
       {
         name: 'sort',
         type: 'Query',
-        schema: z.enum(['asc', 'desc']).optional().default('desc'),
+        schema: z.enum(['asc', 'desc']).optional(),
       },
       {
         name: 'added_before',
@@ -1407,7 +1418,7 @@ const endpoints = makeApi([
       {
         name: 'response_format',
         type: 'Query',
-        schema: z.enum(['json', 'markdown']).optional().default('json'),
+        schema: z.enum(['json', 'markdown']).optional(),
       },
       {
         name: 'modalities',
@@ -1466,7 +1477,7 @@ const endpoints = makeApi([
       {
         name: 'response_format',
         type: 'Query',
-        schema: z.enum(['json', 'markdown']).optional().default('json'),
+        schema: z.enum(['json', 'markdown']).optional(),
       },
       {
         name: 'start_time_seconds',
@@ -1494,6 +1505,11 @@ const endpoints = makeApi([
             ])
           )
           .optional(),
+      },
+      {
+        name: 'include_thumbnails',
+        type: 'Query',
+        schema: z.boolean().optional(),
       },
     ],
     response: MediaDescription,
@@ -1535,12 +1551,12 @@ const endpoints = makeApi([
       {
         name: 'limit',
         type: 'Query',
-        schema: z.number().int().gte(1).lte(100).optional().default(50),
+        schema: z.number().int().gte(1).lte(100).optional(),
       },
       {
         name: 'offset',
         type: 'Query',
-        schema: z.number().int().gte(0).optional().default(0),
+        schema: z.number().int().gte(0).optional(),
       },
     ],
     response: FileFaceDetections,

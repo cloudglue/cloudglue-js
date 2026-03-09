@@ -18,7 +18,7 @@ export class EnhancedExtractApi {
 
   async getExtract(
     jobId: string,
-    params: { limit?: number; offset?: number } = {},
+    params: { limit?: number; offset?: number; include_thumbnails?: boolean } = {},
   ) {
     return this.api.getExtract({
       params: { job_id: jobId },

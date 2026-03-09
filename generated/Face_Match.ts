@@ -68,7 +68,7 @@ const FaceMatchRequest: z.ZodType<FaceMatchRequest> = z
   .object({
     source_image: SourceImage,
     target_video_url: z.string(),
-    max_faces: z.number().int().gte(1).lte(4000).optional().default(50),
+    max_faces: z.number().int().gte(1).lte(4000).optional(),
     face_detection_id: z.string().uuid().optional(),
     frame_extraction_id: z.string().uuid().optional(),
     frame_extraction_config: FrameExtractionConfig.optional(),
@@ -192,12 +192,12 @@ const endpoints = makeApi([
       {
         name: 'limit',
         type: 'Query',
-        schema: z.number().int().gte(1).lte(100).optional().default(50),
+        schema: z.number().int().gte(1).lte(100).optional(),
       },
       {
         name: 'offset',
         type: 'Query',
-        schema: z.number().int().gte(0).optional().default(0),
+        schema: z.number().int().gte(0).optional(),
       },
       {
         name: 'created_before',
@@ -234,12 +234,12 @@ const endpoints = makeApi([
       {
         name: 'limit',
         type: 'Query',
-        schema: z.number().int().gte(1).lte(100).optional().default(50),
+        schema: z.number().int().gte(1).lte(100).optional(),
       },
       {
         name: 'offset',
         type: 'Query',
-        schema: z.number().int().gte(0).optional().default(0),
+        schema: z.number().int().gte(0).optional(),
       },
     ],
     response: FaceMatch,

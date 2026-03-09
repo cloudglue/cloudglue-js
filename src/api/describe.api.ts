@@ -33,6 +33,7 @@ export class EnhancedDescribeApi {
       start_time_seconds?: number;
       end_time_seconds?: number;
       modalities?: Modalities[];
+      include_thumbnails?: boolean;
     } = {
       response_format: 'json',
     },

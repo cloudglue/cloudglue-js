@@ -33,8 +33,10 @@ type Extract = {
             start_time: number;
             end_time: number;
             entities: {};
+            thumbnail_url: string;
           }>
         >;
+        thumbnail_url: string;
       }>
     | undefined;
   total?: number | undefined;
@@ -93,11 +95,13 @@ const Extract: z.ZodType<Extract> = z
               start_time: z.number(),
               end_time: z.number(),
               entities: z.object({}).partial().strict().passthrough(),
+              thumbnail_url: z.string().url(),
             })
             .partial()
             .strict()
             .passthrough()
         ),
+        thumbnail_url: z.string().url(),
       })
       .partial()
       .strict()
@@ -275,6 +279,11 @@ const endpoints = makeApi([
         name: 'offset',
         type: 'Query',
         schema: z.number().int().gte(0).optional().default(0),
+      },
+      {
+        name: 'include_thumbnails',
+        type: 'Query',
+        schema: z.boolean().optional().default(false),
       },
     ],
     response: Extract,

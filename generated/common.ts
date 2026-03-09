@@ -78,6 +78,7 @@ export type SegmentationShotDetectorConfig = {
   min_seconds?: (number | null) | undefined;
   max_seconds?: (number | null) | undefined;
   detector: 'adaptive' | 'content';
+  fill_gaps?: boolean | undefined;
 };
 export type SegmentationManualConfig = {
   segments: Array<
@@ -150,6 +151,7 @@ export type Describe = {
   status: 'pending' | 'processing' | 'completed' | 'failed' | 'not_applicable';
   url?: string | undefined;
   duration_seconds?: (number | null) | undefined;
+  thumbnail_url?: string | undefined;
   created_at?: number | undefined;
   describe_config?:
     | Partial<{
@@ -171,6 +173,7 @@ export type Describe = {
             summary: string;
             start_time: number;
             end_time: number;
+            thumbnail_url: string;
           }>
         >;
       }> &
@@ -345,9 +348,10 @@ export const SegmentationUniformConfig = z
 export const SegmentationShotDetectorConfig = z
   .object({
     threshold: z.number().nullish(),
-    min_seconds: z.number().gte(1).lte(120).nullish(),
-    max_seconds: z.number().gte(1).lte(120).nullish(),
+    min_seconds: z.number().gte(1).lte(600).nullish().default(1),
+    max_seconds: z.number().gte(1).lte(600).nullish().default(300),
     detector: z.enum(['adaptive', 'content']),
+    fill_gaps: z.boolean().optional().default(true),
   })
   .strict()
   .passthrough();
@@ -641,6 +645,7 @@ export const Describe = z
     ]),
     url: z.string().optional(),
     duration_seconds: z.number().optional(),
+    thumbnail_url: z.string().url().optional(),
     created_at: z.number().int().optional(),
     describe_config: z
       .object({
@@ -666,6 +671,7 @@ export const Describe = z
               summary: z.string(),
               start_time: z.number(),
               end_time: z.number(),
+              thumbnail_url: z.string().url(),
             })
             .partial()
             .strict()

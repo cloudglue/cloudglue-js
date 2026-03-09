@@ -213,6 +213,11 @@ const endpoints = makeApi([
           )
           .optional(),
       },
+      {
+        name: 'include_thumbnails',
+        type: 'Query',
+        schema: z.boolean().optional().default(false),
+      },
     ],
     response: Describe,
     errors: [

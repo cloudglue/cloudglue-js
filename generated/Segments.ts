@@ -31,6 +31,7 @@ type ShotConfig = Partial<{
   detector: 'content' | 'adaptive';
   max_duration_seconds: number;
   min_duration_seconds: number;
+  fill_gaps: boolean;
 }>;
 type Segment = {
   start_time: number;
@@ -60,8 +61,9 @@ type SegmentsListItem = {
 const ShotConfig: z.ZodType<ShotConfig> = z
   .object({
     detector: z.enum(['content', 'adaptive']).default('adaptive'),
-    max_duration_seconds: z.number().int().gte(1).lte(3600).default(300),
-    min_duration_seconds: z.number().int().gte(1).lte(3600).default(1),
+    max_duration_seconds: z.number().int().gte(1).lte(600).default(300),
+    min_duration_seconds: z.number().int().gte(1).lte(600).default(1),
+    fill_gaps: z.boolean().default(true),
   })
   .partial()
   .strict()

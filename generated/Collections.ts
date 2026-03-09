@@ -243,6 +243,7 @@ type CollectionMediaDescriptionsList = {
 type MediaDescription = {
   collection_id: string;
   file_id: string;
+  thumbnail_url?: string | undefined;
   content?: string | undefined;
   title?: string | undefined;
   summary?: string | undefined;
@@ -254,6 +255,7 @@ type MediaDescription = {
           summary: string;
           start_time: number;
           end_time: number;
+          thumbnail_url: string;
         }>
       >
     | undefined;
@@ -513,6 +515,7 @@ const MediaDescription: z.ZodType<MediaDescription> = z
   .object({
     collection_id: z.string(),
     file_id: z.string(),
+    thumbnail_url: z.string().url().optional(),
     content: z.string().optional(),
     title: z.string().optional(),
     summary: z.string().optional(),
@@ -525,6 +528,7 @@ const MediaDescription: z.ZodType<MediaDescription> = z
             summary: z.string(),
             start_time: z.number(),
             end_time: z.number(),
+            thumbnail_url: z.string().url(),
           })
           .partial()
           .strict()
@@ -666,6 +670,7 @@ const FileEntities = z
   .object({
     collection_id: z.string(),
     file_id: z.string(),
+    thumbnail_url: z.string().url().optional(),
     entities: z.object({}).partial().strict().passthrough(),
     segment_entities: z.array(
       z
@@ -673,6 +678,7 @@ const FileEntities = z
           start_time: z.number(),
           end_time: z.number(),
           entities: z.object({}).partial().strict().passthrough(),
+          thumbnail_url: z.string().url(),
         })
         .partial()
         .strict()
@@ -1127,6 +1133,11 @@ const endpoints = makeApi([
         type: 'Query',
         schema: z.number().int().gte(0).optional().default(0),
       },
+      {
+        name: 'include_thumbnails',
+        type: 'Query',
+        schema: z.boolean().optional().default(false),
+      },
     ],
     response: FileEntities,
     errors: [
@@ -1494,6 +1505,11 @@ const endpoints = makeApi([
             ])
           )
           .optional(),
+      },
+      {
+        name: 'include_thumbnails',
+        type: 'Query',
+        schema: z.boolean().optional().default(false),
       },
     ],
     response: MediaDescription,

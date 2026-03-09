@@ -182,11 +182,11 @@ const SearchRequest: z.ZodType<SearchRequest> = z
       .partial()
       .strict()
       .passthrough(),
-    limit: z.number().int().gte(1).default(10),
+    limit: z.number().int().gte(1).optional(),
     filter: SearchFilter,
     threshold: z.number(),
     group_by_key: z.literal('file'),
-    sort_by: z.enum(['score', 'item_count']).default('score'),
+    sort_by: z.enum(['score', 'item_count']).optional(),
     search_modalities: SearchModalities.max(5),
     label_filters: z.array(z.string()),
   })
@@ -432,12 +432,12 @@ const endpoints = makeApi([
       {
         name: 'limit',
         type: 'Query',
-        schema: z.number().int().gte(1).lte(100).optional().default(50),
+        schema: z.number().int().gte(1).lte(100).optional(),
       },
       {
         name: 'offset',
         type: 'Query',
-        schema: z.number().int().gte(0).optional().default(0),
+        schema: z.number().int().gte(0).optional(),
       },
       {
         name: 'created_before',

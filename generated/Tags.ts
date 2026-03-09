@@ -79,12 +79,12 @@ const endpoints = makeApi([
       {
         name: 'limit',
         type: 'Query',
-        schema: z.number().int().lte(100).optional().default(50),
+        schema: z.number().int().lte(100).optional(),
       },
       {
         name: 'offset',
         type: 'Query',
-        schema: z.number().int().optional().default(0),
+        schema: z.number().int().optional(),
       },
     ],
     response: ListVideoTagsResponse,

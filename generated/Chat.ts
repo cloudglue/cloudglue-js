@@ -164,7 +164,7 @@ const ChatCompletionRequest: z.ZodType<ChatCompletionRequest> = z
           z
             .object({
               path: z.enum(['duration_seconds', 'has_audio']),
-              scope: z.enum(['file', 'segment']).optional().default('file'),
+              scope: z.enum(['file', 'segment']).optional(),
               operator: z.enum([
                 'NotEqual',
                 'Equal',
@@ -204,7 +204,7 @@ const ChatCompletionRequest: z.ZodType<ChatCompletionRequest> = z
       .strict()
       .passthrough()
       .optional(),
-    temperature: z.number().gte(0).lte(2).optional().default(0.7),
+    temperature: z.number().gte(0).lte(2).optional(),
   })
   .strict()
   .passthrough();
@@ -365,12 +365,12 @@ const endpoints = makeApi([
       {
         name: 'limit',
         type: 'Query',
-        schema: z.number().int().lte(100).optional().default(20),
+        schema: z.number().int().lte(100).optional(),
       },
       {
         name: 'offset',
         type: 'Query',
-        schema: z.number().int().optional().default(0),
+        schema: z.number().int().optional(),
       },
       {
         name: 'created_before',

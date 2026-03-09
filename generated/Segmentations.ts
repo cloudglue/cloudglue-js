@@ -36,12 +36,12 @@ const endpoints = makeApi([
       {
         name: 'limit',
         type: 'Query',
-        schema: z.number().int().gte(1).lte(100).optional().default(10),
+        schema: z.number().int().gte(1).lte(100).optional(),
       },
       {
         name: 'offset',
         type: 'Query',
-        schema: z.number().int().gte(0).optional().default(0),
+        schema: z.number().int().gte(0).optional(),
       },
     ],
     response: Segmentation,
@@ -105,12 +105,12 @@ const endpoints = makeApi([
       {
         name: 'limit',
         type: 'Query',
-        schema: z.number().int().gte(1).lte(100).optional().default(50),
+        schema: z.number().int().gte(1).lte(100).optional(),
       },
       {
         name: 'offset',
         type: 'Query',
-        schema: z.number().int().gte(0).optional().default(0),
+        schema: z.number().int().gte(0).optional(),
       },
       {
         name: 'type',
@@ -147,22 +147,22 @@ const endpoints = makeApi([
       {
         name: 'include_data',
         type: 'Query',
-        schema: z.boolean().optional().default(false),
+        schema: z.boolean().optional(),
       },
       {
         name: 'response_format',
         type: 'Query',
-        schema: z.enum(['json', 'markdown']).optional().default('json'),
+        schema: z.enum(['json', 'markdown']).optional(),
       },
       {
         name: 'limit',
         type: 'Query',
-        schema: z.number().int().gte(1).lte(100).optional().default(50),
+        schema: z.number().int().gte(1).lte(100).optional(),
       },
       {
         name: 'offset',
         type: 'Query',
-        schema: z.number().int().gte(0).optional().default(0),
+        schema: z.number().int().gte(0).optional(),
       },
     ],
     response: DescribeList,

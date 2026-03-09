@@ -150,11 +150,11 @@ const SegmentDescribeJsonData: z.ZodType<SegmentDescribeJsonData> = z
   .passthrough();
 const DescribeConfig: z.ZodType<DescribeConfig> = z
   .object({
-    enable_summary: z.boolean().default(true),
-    enable_speech: z.boolean().default(true),
-    enable_visual_scene_description: z.boolean().default(true),
-    enable_scene_text: z.boolean().default(true),
-    enable_audio_description: z.boolean().default(false),
+    enable_summary: z.boolean().optional(),
+    enable_speech: z.boolean().optional(),
+    enable_visual_scene_description: z.boolean().optional(),
+    enable_scene_text: z.boolean().optional(),
+    enable_audio_description: z.boolean().optional(),
   })
   .partial()
   .strict()
@@ -274,7 +274,7 @@ const FileUpload = z
   .object({
     file: z.instanceof(File),
     metadata: z.object({}).partial().strict().passthrough().optional(),
-    enable_segment_thumbnails: z.boolean().optional().default(false),
+    enable_segment_thumbnails: z.boolean().optional(),
   })
   .strict()
   .passthrough();
@@ -386,12 +386,12 @@ const endpoints = makeApi([
       {
         name: 'limit',
         type: 'Query',
-        schema: z.number().int().lte(100).optional().default(50),
+        schema: z.number().int().lte(100).optional(),
       },
       {
         name: 'offset',
         type: 'Query',
-        schema: z.number().int().optional().default(0),
+        schema: z.number().int().optional(),
       },
       {
         name: 'order',
@@ -399,12 +399,12 @@ const endpoints = makeApi([
         schema: z
           .enum(['created_at', 'filename'])
           .optional()
-          .default('created_at'),
+          .optional(),
       },
       {
         name: 'sort',
         type: 'Query',
-        schema: z.enum(['asc', 'desc']).optional().default('desc'),
+        schema: z.enum(['asc', 'desc']).optional(),
       },
       {
         name: 'filter',
@@ -556,12 +556,12 @@ const endpoints = makeApi([
       {
         name: 'limit',
         type: 'Query',
-        schema: z.number().int().gte(1).lte(100).optional().default(50),
+        schema: z.number().int().gte(1).lte(100).optional(),
       },
       {
         name: 'offset',
         type: 'Query',
-        schema: z.number().int().gte(0).optional().default(0),
+        schema: z.number().int().gte(0).optional(),
       },
     ],
     response: SegmentationList,
@@ -593,7 +593,7 @@ const endpoints = makeApi([
       {
         name: 'is_default',
         type: 'Query',
-        schema: z.boolean().optional().default(false),
+        schema: z.boolean().optional(),
       },
       {
         name: 'segmentation_id',
@@ -603,12 +603,12 @@ const endpoints = makeApi([
       {
         name: 'limit',
         type: 'Query',
-        schema: z.number().int().gte(1).lte(100).optional().default(50),
+        schema: z.number().int().gte(1).lte(100).optional(),
       },
       {
         name: 'offset',
         type: 'Query',
-        schema: z.number().int().gte(0).optional().default(0),
+        schema: z.number().int().gte(0).optional(),
       },
       {
         name: 'type',
@@ -680,12 +680,12 @@ const endpoints = makeApi([
       {
         name: 'limit',
         type: 'Query',
-        schema: z.number().int().gte(1).lte(100).optional().default(50),
+        schema: z.number().int().gte(1).lte(100).optional(),
       },
       {
         name: 'offset',
         type: 'Query',
-        schema: z.number().int().gte(0).optional().default(0),
+        schema: z.number().int().gte(0).optional(),
       },
     ],
     response: FileSegmentListResponse,
@@ -816,27 +816,27 @@ const endpoints = makeApi([
       {
         name: 'status',
         type: 'Query',
-        schema: z.string().optional().default('completed'),
+        schema: z.string().optional(),
       },
       {
         name: 'response_format',
         type: 'Query',
-        schema: z.enum(['json', 'markdown']).optional().default('json'),
+        schema: z.enum(['json', 'markdown']).optional(),
       },
       {
         name: 'include_data',
         type: 'Query',
-        schema: z.boolean().optional().default(false),
+        schema: z.boolean().optional(),
       },
       {
         name: 'limit',
         type: 'Query',
-        schema: z.number().int().gte(1).lte(100).optional().default(50),
+        schema: z.number().int().gte(1).lte(100).optional(),
       },
       {
         name: 'offset',
         type: 'Query',
-        schema: z.number().int().gte(0).optional().default(0),
+        schema: z.number().int().gte(0).optional(),
       },
     ],
     response: SegmentDescribeListResponse,
@@ -873,7 +873,7 @@ const endpoints = makeApi([
       {
         name: 'response_format',
         type: 'Query',
-        schema: z.enum(['json', 'markdown']).optional().default('json'),
+        schema: z.enum(['json', 'markdown']).optional(),
       },
     ],
     response: SegmentDescribe,
@@ -938,12 +938,12 @@ const endpoints = makeApi([
       {
         name: 'limit',
         type: 'Query',
-        schema: z.number().int().gte(1).lte(100).optional().default(50),
+        schema: z.number().int().gte(1).lte(100).optional(),
       },
       {
         name: 'offset',
         type: 'Query',
-        schema: z.number().int().gte(0).optional().default(0),
+        schema: z.number().int().gte(0).optional(),
       },
     ],
     response: FrameExtractionList,

@@ -348,10 +348,10 @@ export const SegmentationUniformConfig = z
 export const SegmentationShotDetectorConfig = z
   .object({
     threshold: z.number().nullish(),
-    min_seconds: z.number().gte(1).lte(600).nullish().default(1),
-    max_seconds: z.number().gte(1).lte(600).nullish().default(300),
+    min_seconds: z.number().gte(1).lte(600).nullish(),
+    max_seconds: z.number().gte(1).lte(600).nullish(),
     detector: z.enum(['adaptive', 'content']),
-    fill_gaps: z.boolean().optional().default(true),
+    fill_gaps: z.boolean().optional(),
   })
   .strict()
   .passthrough();
@@ -370,7 +370,7 @@ export const SegmentationManualConfig = z
 export const NarrativeConfig = z
   .object({
     prompt: z.string(),
-    strategy: z.enum(['comprehensive', 'balanced']).default('balanced'),
+    strategy: z.enum(['comprehensive', 'balanced']).optional(),
     number_of_chapters: z.number().int().gte(1),
     min_chapters: z.number().int().gte(1),
     max_chapters: z.number().int().gte(1),
@@ -381,7 +381,7 @@ export const NarrativeConfig = z
 export const KeyframeConfig = z
   .object({
     frames_per_segment: z.number().gte(0).lte(8),
-    max_width: z.number().gte(144).lte(4320).optional().default(280),
+    max_width: z.number().gte(144).lte(4320).optional(),
   })
   .strict()
   .passthrough();
@@ -600,7 +600,7 @@ export const SearchFilter = z
     metadata: z.array(
       SearchFilterCriteria.and(
         z
-          .object({ scope: z.enum(['file', 'segment']).default('file') })
+          .object({ scope: z.enum(['file', 'segment']).optional() })
           .partial()
           .strict()
           .passthrough()
@@ -611,7 +611,7 @@ export const SearchFilter = z
         z
           .object({
             path: z.enum(['duration_seconds', 'has_audio']),
-            scope: z.enum(['file', 'segment']).default('file'),
+            scope: z.enum(['file', 'segment']).optional(),
           })
           .partial()
           .strict()
@@ -700,14 +700,14 @@ export const DescribeList = z
   .passthrough();
 export const FrameExtractionUniformConfig = z
   .object({
-    frames_per_second: z.number().gte(0.1).lte(30).default(1),
-    max_width: z.number().gte(64).lte(4096).default(1024),
+    frames_per_second: z.number().gte(0.1).lte(30).optional(),
+    max_width: z.number().gte(64).lte(4096).optional(),
   })
   .partial()
   .strict()
   .passthrough();
 export const FrameExtractionThumbnailsConfig = z
-  .object({ enable_frame_thumbnails: z.boolean().default(true) })
+  .object({ enable_frame_thumbnails: z.boolean().optional() })
   .partial()
   .strict()
   .passthrough();

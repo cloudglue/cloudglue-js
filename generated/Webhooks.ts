@@ -134,22 +134,22 @@ const endpoints = makeApi([
       {
         name: 'limit',
         type: 'Query',
-        schema: z.number().int().lte(100).optional().default(50),
+        schema: z.number().int().lte(100).optional(),
       },
       {
         name: 'offset',
         type: 'Query',
-        schema: z.number().int().optional().default(0),
+        schema: z.number().int().optional(),
       },
       {
         name: 'order',
         type: 'Query',
-        schema: z.literal('created_at').optional().default('created_at'),
+        schema: z.literal('created_at').optional(),
       },
       {
         name: 'sort',
         type: 'Query',
-        schema: z.enum(['asc', 'desc']).optional().default('desc'),
+        schema: z.enum(['asc', 'desc']).optional(),
       },
     ],
     response: WebhookList,

@@ -43,6 +43,23 @@ type Extract = {
   limit?: number | undefined;
   offset?: number | undefined;
   error?: string | undefined;
+  chapters?:
+    | Array<{
+        index: number;
+        start_time: number;
+        end_time: number;
+        description: string;
+      }>
+    | undefined;
+  shots?:
+    | Array<{
+        index: number;
+        start_time: number;
+        end_time: number;
+      }>
+    | undefined;
+  total_chapters?: number | undefined;
+  total_shots?: number | undefined;
 };
 type NewExtract = {
   url: string;
@@ -52,6 +69,8 @@ type NewExtract = {
   enable_segment_level_entities?: boolean | undefined;
   enable_transcript_mode?: boolean | undefined;
   thumbnails_config?: ThumbnailsConfig | undefined;
+  include_chapters?: boolean | undefined;
+  include_shots?: boolean | undefined;
 } & FileSegmentationConfig;
 type ExtractList = {
   object: 'list';
@@ -77,9 +96,9 @@ const Extract: z.ZodType<Extract> = z
       .object({
         prompt: z.string(),
         schema: z.object({}).partial().strict().passthrough(),
-        enable_video_level_entities: z.boolean().optional(),
-        enable_segment_level_entities: z.boolean().optional(),
-        enable_transcript_mode: z.boolean().optional(),
+        enable_video_level_entities: z.boolean(),
+        enable_segment_level_entities: z.boolean(),
+        enable_transcript_mode: z.boolean(),
       })
       .partial()
       .strict()
@@ -111,6 +130,33 @@ const Extract: z.ZodType<Extract> = z
     limit: z.number().int().optional(),
     offset: z.number().int().optional(),
     error: z.string().optional(),
+    chapters: z
+      .array(
+        z
+          .object({
+            index: z.number().int().gte(0),
+            start_time: z.number().gte(0),
+            end_time: z.number().gte(0),
+            description: z.string(),
+          })
+          .strict()
+          .passthrough()
+      )
+      .optional(),
+    shots: z
+      .array(
+        z
+          .object({
+            index: z.number().int().gte(0),
+            start_time: z.number().gte(0),
+            end_time: z.number().gte(0),
+          })
+          .strict()
+          .passthrough()
+      )
+      .optional(),
+    total_chapters: z.number().int().gte(0).optional(),
+    total_shots: z.number().int().gte(0).optional(),
   })
   .strict()
   .passthrough();
@@ -133,6 +179,8 @@ const NewExtract: z.ZodType<NewExtract> = z
     enable_segment_level_entities: z.boolean().optional(),
     enable_transcript_mode: z.boolean().optional(),
     thumbnails_config: ThumbnailsConfig.optional(),
+    include_chapters: z.boolean().optional(),
+    include_shots: z.boolean().optional(),
   })
   .strict()
   .passthrough()
@@ -282,6 +330,16 @@ const endpoints = makeApi([
       },
       {
         name: 'include_thumbnails',
+        type: 'Query',
+        schema: z.boolean().optional(),
+      },
+      {
+        name: 'include_chapters',
+        type: 'Query',
+        schema: z.boolean().optional(),
+      },
+      {
+        name: 'include_shots',
         type: 'Query',
         schema: z.boolean().optional(),
       },

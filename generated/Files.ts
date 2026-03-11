@@ -150,11 +150,11 @@ const SegmentDescribeJsonData: z.ZodType<SegmentDescribeJsonData> = z
   .passthrough();
 const DescribeConfig: z.ZodType<DescribeConfig> = z
   .object({
-    enable_summary: z.boolean().optional(),
-    enable_speech: z.boolean().optional(),
-    enable_visual_scene_description: z.boolean().optional(),
-    enable_scene_text: z.boolean().optional(),
-    enable_audio_description: z.boolean().optional(),
+    enable_summary: z.boolean(),
+    enable_speech: z.boolean(),
+    enable_visual_scene_description: z.boolean(),
+    enable_scene_text: z.boolean(),
+    enable_audio_description: z.boolean(),
   })
   .partial()
   .strict()
@@ -396,10 +396,7 @@ const endpoints = makeApi([
       {
         name: 'order',
         type: 'Query',
-        schema: z
-          .enum(['created_at', 'filename'])
-          .optional()
-          .optional(),
+        schema: z.enum(['created_at', 'filename']).optional(),
       },
       {
         name: 'sort',

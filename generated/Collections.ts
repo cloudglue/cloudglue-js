@@ -12,6 +12,7 @@ import { File } from './common';
 import { DescribeOutput } from './common';
 import { DescribeOutputPart } from './common';
 import { SpeechOutputPart } from './common';
+import { WordTimestamp } from './common';
 import { FileSegmentationConfig } from './common';
 
 type Collection = {
@@ -259,6 +260,23 @@ type MediaDescription = {
         }>
       >
     | undefined;
+  chapters?:
+    | Array<{
+        index: number;
+        start_time: number;
+        end_time: number;
+        description: string;
+      }>
+    | undefined;
+  shots?:
+    | Array<{
+        index: number;
+        start_time: number;
+        end_time: number;
+      }>
+    | undefined;
+  total_chapters?: number | undefined;
+  total_shots?: number | undefined;
 } & DescribeOutput;
 type AddCollectionFile = (
   | {
@@ -289,9 +307,9 @@ const Collection: z.ZodType<Collection> = z
       .object({
         prompt: z.string(),
         schema: z.object({}).partial().strict().passthrough(),
-        enable_video_level_entities: z.boolean().optional(),
-        enable_segment_level_entities: z.boolean().optional(),
-        enable_transcript_mode: z.boolean().optional(),
+        enable_video_level_entities: z.boolean(),
+        enable_segment_level_entities: z.boolean(),
+        enable_transcript_mode: z.boolean(),
       })
       .partial()
       .strict()
@@ -299,11 +317,11 @@ const Collection: z.ZodType<Collection> = z
       .optional(),
     transcribe_config: z
       .object({
-        enable_summary: z.boolean().optional(),
-        enable_speech: z.boolean().optional(),
-        enable_scene_text: z.boolean().optional(),
-        enable_visual_scene_description: z.boolean().optional(),
-        enable_audio_description: z.boolean().optional(),
+        enable_summary: z.boolean(),
+        enable_speech: z.boolean(),
+        enable_scene_text: z.boolean(),
+        enable_visual_scene_description: z.boolean(),
+        enable_audio_description: z.boolean(),
       })
       .partial()
       .strict()
@@ -311,11 +329,11 @@ const Collection: z.ZodType<Collection> = z
       .optional(),
     describe_config: z
       .object({
-        enable_summary: z.boolean().optional(),
-        enable_speech: z.boolean().optional(),
-        enable_scene_text: z.boolean().optional(),
-        enable_visual_scene_description: z.boolean().optional(),
-        enable_audio_description: z.boolean().optional(),
+        enable_summary: z.boolean(),
+        enable_speech: z.boolean(),
+        enable_scene_text: z.boolean(),
+        enable_visual_scene_description: z.boolean(),
+        enable_audio_description: z.boolean(),
       })
       .partial()
       .strict()
@@ -330,8 +348,8 @@ const Collection: z.ZodType<Collection> = z
             strategy: z.literal('uniform'),
             uniform_config: z
               .object({
-                frames_per_second: z.number().gte(0.1).lte(30).optional(),
-                max_width: z.number().gte(64).lte(4096).optional(),
+                frames_per_second: z.number().gte(0.1).lte(30),
+                max_width: z.number().gte(64).lte(4096),
               })
               .partial()
               .strict()
@@ -341,7 +359,7 @@ const Collection: z.ZodType<Collection> = z
           .strict()
           .passthrough(),
         thumbnails_config: z
-          .object({ enable_frame_thumbnails: z.boolean().optional() })
+          .object({ enable_frame_thumbnails: z.boolean() })
           .partial()
           .strict()
           .passthrough(),
@@ -379,11 +397,11 @@ const NewCollection: z.ZodType<NewCollection> = z
     description: z.string().nullish(),
     describe_config: z
       .object({
-        enable_summary: z.boolean().optional(),
-        enable_speech: z.boolean().optional(),
-        enable_scene_text: z.boolean().optional(),
-        enable_visual_scene_description: z.boolean().optional(),
-        enable_audio_description: z.boolean().optional(),
+        enable_summary: z.boolean(),
+        enable_speech: z.boolean(),
+        enable_scene_text: z.boolean(),
+        enable_visual_scene_description: z.boolean(),
+        enable_audio_description: z.boolean(),
       })
       .partial()
       .strict()
@@ -393,9 +411,9 @@ const NewCollection: z.ZodType<NewCollection> = z
       .object({
         prompt: z.string(),
         schema: z.object({}).partial().strict().passthrough(),
-        enable_video_level_entities: z.boolean().optional(),
-        enable_segment_level_entities: z.boolean().optional(),
-        enable_transcript_mode: z.boolean().optional(),
+        enable_video_level_entities: z.boolean(),
+        enable_segment_level_entities: z.boolean(),
+        enable_transcript_mode: z.boolean(),
       })
       .partial()
       .strict()
@@ -403,11 +421,11 @@ const NewCollection: z.ZodType<NewCollection> = z
       .optional(),
     transcribe_config: z
       .object({
-        enable_summary: z.boolean().optional(),
-        enable_speech: z.boolean().optional(),
-        enable_scene_text: z.boolean().optional(),
-        enable_visual_scene_description: z.boolean().optional(),
-        enable_audio_description: z.boolean().optional(),
+        enable_summary: z.boolean(),
+        enable_speech: z.boolean(),
+        enable_scene_text: z.boolean(),
+        enable_visual_scene_description: z.boolean(),
+        enable_audio_description: z.boolean(),
       })
       .partial()
       .strict()
@@ -422,8 +440,8 @@ const NewCollection: z.ZodType<NewCollection> = z
             strategy: z.literal('uniform'),
             uniform_config: z
               .object({
-                frames_per_second: z.number().gte(0.1).lte(30).optional(),
-                max_width: z.number().gte(64).lte(4096).optional(),
+                frames_per_second: z.number().gte(0.1).lte(30),
+                max_width: z.number().gte(64).lte(4096),
               })
               .partial()
               .strict()
@@ -433,7 +451,7 @@ const NewCollection: z.ZodType<NewCollection> = z
           .strict()
           .passthrough(),
         thumbnails_config: z
-          .object({ enable_frame_thumbnails: z.boolean().optional() })
+          .object({ enable_frame_thumbnails: z.boolean() })
           .partial()
           .strict()
           .passthrough(),
@@ -535,6 +553,33 @@ const MediaDescription: z.ZodType<MediaDescription> = z
           .passthrough()
       )
       .optional(),
+    chapters: z
+      .array(
+        z
+          .object({
+            index: z.number().int().gte(0),
+            start_time: z.number().gte(0),
+            end_time: z.number().gte(0),
+            description: z.string(),
+          })
+          .strict()
+          .passthrough()
+      )
+      .optional(),
+    shots: z
+      .array(
+        z
+          .object({
+            index: z.number().int().gte(0),
+            start_time: z.number().gte(0),
+            end_time: z.number().gte(0),
+          })
+          .strict()
+          .passthrough()
+      )
+      .optional(),
+    total_chapters: z.number().int().gte(0).optional(),
+    total_shots: z.number().int().gte(0).optional(),
   })
   .strict()
   .passthrough()
@@ -687,6 +732,33 @@ const FileEntities = z
     total: z.number().int(),
     limit: z.number().int(),
     offset: z.number().int(),
+    chapters: z
+      .array(
+        z
+          .object({
+            index: z.number().int().gte(0),
+            start_time: z.number().gte(0),
+            end_time: z.number().gte(0),
+            description: z.string(),
+          })
+          .strict()
+          .passthrough()
+      )
+      .optional(),
+    shots: z
+      .array(
+        z
+          .object({
+            index: z.number().int().gte(0),
+            start_time: z.number().gte(0),
+            end_time: z.number().gte(0),
+          })
+          .strict()
+          .passthrough()
+      )
+      .optional(),
+    total_chapters: z.number().int().gte(0).optional(),
+    total_shots: z.number().int().gte(0).optional(),
   })
   .strict()
   .passthrough();
@@ -1138,6 +1210,16 @@ const endpoints = makeApi([
         type: 'Query',
         schema: z.boolean().optional(),
       },
+      {
+        name: 'include_chapters',
+        type: 'Query',
+        schema: z.boolean().optional(),
+      },
+      {
+        name: 'include_shots',
+        type: 'Query',
+        schema: z.boolean().optional(),
+      },
     ],
     response: FileEntities,
     errors: [
@@ -1206,6 +1288,11 @@ const endpoints = makeApi([
             ])
           )
           .optional(),
+      },
+      {
+        name: 'include_word_timestamps',
+        type: 'Query',
+        schema: z.boolean().optional(),
       },
     ],
     response: RichTranscript,
@@ -1508,6 +1595,21 @@ const endpoints = makeApi([
       },
       {
         name: 'include_thumbnails',
+        type: 'Query',
+        schema: z.boolean().optional(),
+      },
+      {
+        name: 'include_word_timestamps',
+        type: 'Query',
+        schema: z.boolean().optional(),
+      },
+      {
+        name: 'include_chapters',
+        type: 'Query',
+        schema: z.boolean().optional(),
+      },
+      {
+        name: 'include_shots',
         type: 'Query',
         schema: z.boolean().optional(),
       },

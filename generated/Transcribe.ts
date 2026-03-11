@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { DescribeOutput } from './common';
 import { DescribeOutputPart } from './common';
 import { SpeechOutputPart } from './common';
+import { WordTimestamp } from './common';
 import { ThumbnailsConfig } from './common';
 import { FileSegmentationConfig } from './common';
 import { SegmentationConfig } from './common';

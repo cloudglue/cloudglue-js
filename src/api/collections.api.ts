@@ -184,7 +184,7 @@ export class EnhancedCollectionsApi {
   async getEntities(
     collectionId: string,
     fileId: string,
-    params: { limit?: number; offset?: number; include_thumbnails?: boolean } = {},
+    params: { limit?: number; offset?: number; include_thumbnails?: boolean; include_chapters?: boolean; include_shots?: boolean } = {},
   ) {
     return this.api.getEntities({
       params: { collection_id: collectionId, file_id: fileId },
@@ -202,6 +202,7 @@ export class EnhancedCollectionsApi {
       start_time_seconds?: number;
       end_time_seconds?: number;
       modalities?: Modalities[];
+      include_word_timestamps?: boolean;
     } = {},
   ) {
     return this.api.getTranscripts({
@@ -238,6 +239,9 @@ export class EnhancedCollectionsApi {
       start_time_seconds?: number;
       end_time_seconds?: number;
       include_thumbnails?: boolean;
+      include_word_timestamps?: boolean;
+      include_chapters?: boolean;
+      include_shots?: boolean;
     } = {},
   ) {
     return this.api.getMediaDescriptions({

@@ -131,7 +131,6 @@ const ResponseKnowledgeBase: z.ZodType<ResponseKnowledgeBase> = z
   .object({
     type: z
       .enum(['general_question_answering', 'entity_backed_knowledge'])
-      .optional()
       .optional(),
     collections: z.array(z.string().uuid()).min(1),
     filter: SearchFilter.optional(),

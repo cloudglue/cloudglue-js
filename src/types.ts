@@ -17,6 +17,8 @@ import {
   Chapter as ChapterType,
   Describe as DescribeType,
   DescribeList as DescribeListType,
+  WordTimestamp as WordTimestampType,
+  SpeechOutputPart as SpeechOutputPartType,
 } from '../generated/common';
 import { schemas as webhooksSchemas } from '../generated/Webhooks';
 import { FrameExtraction } from '../generated/common';
@@ -257,6 +259,16 @@ export type NarrativeConfig = z.infer<typeof NarrativeConfigType>;
 export type Chapter = z.infer<typeof ChapterType>;
 
 export type ShotConfig = z.infer<typeof segmentsSchemas.ShotConfig>;
+
+/**
+ * Represents word-level timestamp data within a speech segment
+ */
+export type WordTimestamp = z.infer<typeof WordTimestampType>;
+
+/**
+ * Represents a speech output part with optional word-level timestamps
+ */
+export type SpeechOutputPart = z.infer<typeof SpeechOutputPartType>;
 
 export type WebhookEvents = z.infer<(typeof webhooksSchemas)['WebhookEvents']>;
 

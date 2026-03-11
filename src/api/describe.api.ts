@@ -18,6 +18,8 @@ export class EnhancedDescribeApi {
       segmentation_config?: SegmentationConfig;
       segmentation_id?: string;
       thumbnail_config?: ThumbnailsConfig;
+      include_chapters?: boolean;
+      include_shots?: boolean;
     } = {},
   ) {
     return this.api.createDescribe({
@@ -34,6 +36,9 @@ export class EnhancedDescribeApi {
       end_time_seconds?: number;
       modalities?: Modalities[];
       include_thumbnails?: boolean;
+      include_word_timestamps?: boolean;
+      include_chapters?: boolean;
+      include_shots?: boolean;
     } = {
       response_format: 'json',
     },

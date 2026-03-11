@@ -35,6 +35,18 @@ export type SearchFilterCriteria = {
   valueText?: string | undefined;
   valueTextArray?: Array<string> | undefined;
 };
+export type SpeechOutputPart = Partial<{
+  speaker: string;
+  text: string;
+  start_time: number;
+  end_time: number;
+  words: Array<WordTimestamp>;
+}>;
+export type WordTimestamp = {
+  word: string;
+  start_time: number;
+  end_time: number;
+};
 export type DescribeOutput = Partial<{
   visual_scene_description: Array<DescribeOutputPart>;
   scene_text: Array<DescribeOutputPart>;
@@ -42,12 +54,6 @@ export type DescribeOutput = Partial<{
   audio_description: Array<DescribeOutputPart>;
 }>;
 export type DescribeOutputPart = Partial<{
-  text: string;
-  start_time: number;
-  end_time: number;
-}>;
-export type SpeechOutputPart = Partial<{
-  speaker: string;
   text: string;
   start_time: number;
   end_time: number;
@@ -181,6 +187,23 @@ export type Describe = {
     | undefined;
   error?: string | undefined;
   segmentation_id?: string | undefined;
+  chapters?:
+    | Array<{
+        index: number;
+        start_time: number;
+        end_time: number;
+        description: string;
+      }>
+    | undefined;
+  shots?:
+    | Array<{
+        index: number;
+        start_time: number;
+        end_time: number;
+      }>
+    | undefined;
+  total_chapters?: number | undefined;
+  total_shots?: number | undefined;
 };
 export type DescribeList = {
   object: 'list';
@@ -370,7 +393,7 @@ export const SegmentationManualConfig = z
 export const NarrativeConfig = z
   .object({
     prompt: z.string(),
-    strategy: z.enum(['comprehensive', 'balanced']).optional(),
+    strategy: z.enum(['comprehensive', 'balanced']),
     number_of_chapters: z.number().int().gte(1),
     min_chapters: z.number().int().gte(1),
     max_chapters: z.number().int().gte(1),
@@ -557,12 +580,17 @@ export const DescribeOutputPart = z
   .partial()
   .strict()
   .passthrough();
+export const WordTimestamp = z
+  .object({ word: z.string(), start_time: z.number(), end_time: z.number() })
+  .strict()
+  .passthrough();
 export const SpeechOutputPart = z
   .object({
     speaker: z.string(),
     text: z.string(),
     start_time: z.number(),
     end_time: z.number(),
+    words: z.array(WordTimestamp),
   })
   .partial()
   .strict()
@@ -600,7 +628,7 @@ export const SearchFilter = z
     metadata: z.array(
       SearchFilterCriteria.and(
         z
-          .object({ scope: z.enum(['file', 'segment']).optional() })
+          .object({ scope: z.enum(['file', 'segment']) })
           .partial()
           .strict()
           .passthrough()
@@ -611,7 +639,7 @@ export const SearchFilter = z
         z
           .object({
             path: z.enum(['duration_seconds', 'has_audio']),
-            scope: z.enum(['file', 'segment']).optional(),
+            scope: z.enum(['file', 'segment']),
           })
           .partial()
           .strict()
@@ -685,6 +713,33 @@ export const Describe = z
       .optional(),
     error: z.string().optional(),
     segmentation_id: z.string().uuid().optional(),
+    chapters: z
+      .array(
+        z
+          .object({
+            index: z.number().int().gte(0),
+            start_time: z.number().gte(0),
+            end_time: z.number().gte(0),
+            description: z.string(),
+          })
+          .strict()
+          .passthrough()
+      )
+      .optional(),
+    shots: z
+      .array(
+        z
+          .object({
+            index: z.number().int().gte(0),
+            start_time: z.number().gte(0),
+            end_time: z.number().gte(0),
+          })
+          .strict()
+          .passthrough()
+      )
+      .optional(),
+    total_chapters: z.number().int().gte(0).optional(),
+    total_shots: z.number().int().gte(0).optional(),
   })
   .strict()
   .passthrough();
@@ -700,14 +755,14 @@ export const DescribeList = z
   .passthrough();
 export const FrameExtractionUniformConfig = z
   .object({
-    frames_per_second: z.number().gte(0.1).lte(30).optional(),
-    max_width: z.number().gte(64).lte(4096).optional(),
+    frames_per_second: z.number().gte(0.1).lte(30),
+    max_width: z.number().gte(64).lte(4096),
   })
   .partial()
   .strict()
   .passthrough();
 export const FrameExtractionThumbnailsConfig = z
-  .object({ enable_frame_thumbnails: z.boolean().optional() })
+  .object({ enable_frame_thumbnails: z.boolean() })
   .partial()
   .strict()
   .passthrough();

@@ -19,6 +19,7 @@ import { Describe } from './common';
 import { DescribeOutput } from './common';
 import { DescribeOutputPart } from './common';
 import { SpeechOutputPart } from './common';
+import { WordTimestamp } from './common';
 
 const endpoints = makeApi([
   {

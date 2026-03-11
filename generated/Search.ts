@@ -182,11 +182,11 @@ const SearchRequest: z.ZodType<SearchRequest> = z
       .partial()
       .strict()
       .passthrough(),
-    limit: z.number().int().gte(1).optional(),
+    limit: z.number().int().gte(1),
     filter: SearchFilter,
     threshold: z.number(),
     group_by_key: z.literal('file'),
-    sort_by: z.enum(['score', 'item_count']).optional(),
+    sort_by: z.enum(['score', 'item_count']),
     search_modalities: SearchModalities.max(5),
     label_filters: z.array(z.string()),
   })

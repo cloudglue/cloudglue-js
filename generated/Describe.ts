@@ -5,6 +5,7 @@ import { Describe } from './common';
 import { DescribeOutput } from './common';
 import { DescribeOutputPart } from './common';
 import { SpeechOutputPart } from './common';
+import { WordTimestamp } from './common';
 import { ThumbnailsConfig } from './common';
 import { FileSegmentationConfig } from './common';
 import { SegmentationConfig } from './common';
@@ -23,6 +24,8 @@ type NewDescribe = {
   enable_scene_text?: boolean | undefined;
   enable_audio_description?: boolean | undefined;
   thumbnails_config?: ThumbnailsConfig | undefined;
+  include_chapters?: boolean | undefined;
+  include_shots?: boolean | undefined;
 } & FileSegmentationConfig;
 
 const NewDescribe: z.ZodType<NewDescribe> = z
@@ -34,6 +37,8 @@ const NewDescribe: z.ZodType<NewDescribe> = z
     enable_scene_text: z.boolean().optional(),
     enable_audio_description: z.boolean().optional(),
     thumbnails_config: ThumbnailsConfig.optional(),
+    include_chapters: z.boolean().optional(),
+    include_shots: z.boolean().optional(),
   })
   .strict()
   .passthrough()
@@ -215,6 +220,21 @@ const endpoints = makeApi([
       },
       {
         name: 'include_thumbnails',
+        type: 'Query',
+        schema: z.boolean().optional(),
+      },
+      {
+        name: 'include_word_timestamps',
+        type: 'Query',
+        schema: z.boolean().optional(),
+      },
+      {
+        name: 'include_chapters',
+        type: 'Query',
+        schema: z.boolean().optional(),
+      },
+      {
+        name: 'include_shots',
         type: 'Query',
         schema: z.boolean().optional(),
       },

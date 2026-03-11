@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { DescribeOutput } from './common';
 import { DescribeOutputPart } from './common';
 import { SpeechOutputPart } from './common';
+import { WordTimestamp } from './common';
 import { SearchFilter } from './common';
 import { SearchFilterCriteria } from './common';
 

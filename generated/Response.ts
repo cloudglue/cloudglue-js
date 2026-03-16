@@ -20,8 +20,10 @@ type CreateResponseRequest = {
   input: string | Array<ResponseInputMessage>;
   instructions?: (string | null) | undefined;
   temperature?: number | undefined;
-  knowledge_base: ResponseKnowledgeBase;
+  knowledge_base?: ResponseKnowledgeBase | undefined;
   include?: Array<'cloudglue_citations.media_descriptions'> | undefined;
+  tools?: Array<ResponseToolDefinition> | undefined;
+  max_output_tokens?: number | undefined;
   background?: boolean | undefined;
   stream?: boolean | undefined;
 };
@@ -37,7 +39,7 @@ type ResponseOutputContent = Partial<{
 }>;
 type ResponseAnnotation = {
   type: 'cloudglue_citation';
-  collection_id: string;
+  collection_id?: string | undefined;
   file_id: string;
   segment_id?: string | undefined;
   start_time: number;
@@ -68,7 +70,12 @@ type ResponseInputContent = {
   type: 'input_text';
   text: string;
 };
-type ResponseKnowledgeBase = {
+type ResponseKnowledgeBase =
+  | KnowledgeBaseCollections
+  | KnowledgeBaseFiles
+  | KnowledgeBaseDefault;
+type KnowledgeBaseCollections = {
+  source?: 'collections' | undefined;
   type?: ('general_question_answering' | 'entity_backed_knowledge') | undefined;
   collections: Array<string>;
   filter?: SearchFilter | undefined;
@@ -82,6 +89,20 @@ type EntityCollectionConfig = {
   name?: string | undefined;
   description?: string | undefined;
   collection_id: string;
+};
+type KnowledgeBaseFiles = {
+  source: 'files';
+  files: Array<string>;
+};
+type KnowledgeBaseDefault = {
+  source: 'default';
+};
+type ResponseToolDefinition = {
+  type: 'function';
+  name: string;
+  description?: string | undefined;
+  parameters: {};
+  strict?: boolean | undefined;
 };
 type ResponseList = Partial<{
   object: 'list';
@@ -127,8 +148,9 @@ const EntityBackedKnowledgeConfig: z.ZodType<EntityBackedKnowledgeConfig> = z
   })
   .strict()
   .passthrough();
-const ResponseKnowledgeBase: z.ZodType<ResponseKnowledgeBase> = z
+const KnowledgeBaseCollections: z.ZodType<KnowledgeBaseCollections> = z
   .object({
+    source: z.literal('collections').optional(),
     type: z
       .enum(['general_question_answering', 'entity_backed_knowledge'])
       .optional(),
@@ -138,16 +160,41 @@ const ResponseKnowledgeBase: z.ZodType<ResponseKnowledgeBase> = z
   })
   .strict()
   .passthrough();
+const KnowledgeBaseFiles: z.ZodType<KnowledgeBaseFiles> = z
+  .object({ source: z.literal('files'), files: z.array(z.string()).min(1) })
+  .strict()
+  .passthrough();
+const KnowledgeBaseDefault: z.ZodType<KnowledgeBaseDefault> = z
+  .object({ source: z.literal('default') })
+  .strict()
+  .passthrough();
+const ResponseKnowledgeBase: z.ZodType<ResponseKnowledgeBase> = z.union([
+  KnowledgeBaseCollections,
+  KnowledgeBaseFiles,
+  KnowledgeBaseDefault,
+]);
+const ResponseToolDefinition: z.ZodType<ResponseToolDefinition> = z
+  .object({
+    type: z.literal('function'),
+    name: z.string().min(1),
+    description: z.string().optional(),
+    parameters: z.object({}).partial().strict().passthrough(),
+    strict: z.boolean().optional(),
+  })
+  .strict()
+  .passthrough();
 const CreateResponseRequest: z.ZodType<CreateResponseRequest> = z
   .object({
     model: z.string().min(1),
     input: z.union([z.string(), z.array(ResponseInputMessage)]),
     instructions: z.string().optional(),
     temperature: z.number().gte(0).lte(2).optional(),
-    knowledge_base: ResponseKnowledgeBase,
+    knowledge_base: ResponseKnowledgeBase.optional(),
     include: z
       .array(z.literal('cloudglue_citations.media_descriptions'))
       .optional(),
+    tools: z.array(ResponseToolDefinition).optional(),
+    max_output_tokens: z.number().int().gte(1).lte(128000).optional(),
     background: z.boolean().optional(),
     stream: z.boolean().optional(),
   })
@@ -156,7 +203,7 @@ const CreateResponseRequest: z.ZodType<CreateResponseRequest> = z
 const ResponseAnnotation: z.ZodType<ResponseAnnotation> = z
   .object({
     type: z.literal('cloudglue_citation'),
-    collection_id: z.string().uuid(),
+    collection_id: z.string().uuid().optional(),
     file_id: z.string().uuid(),
     segment_id: z.string().uuid().optional(),
     start_time: z.number(),
@@ -256,7 +303,11 @@ export const schemas = {
   ResponseInputMessage,
   EntityCollectionConfig,
   EntityBackedKnowledgeConfig,
+  KnowledgeBaseCollections,
+  KnowledgeBaseFiles,
+  KnowledgeBaseDefault,
   ResponseKnowledgeBase,
+  ResponseToolDefinition,
   CreateResponseRequest,
   ResponseAnnotation,
   ResponseOutputContent,

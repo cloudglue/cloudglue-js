@@ -5,6 +5,43 @@ import { CloudglueError } from '../error';
 
 type ResponseStatus = 'in_progress' | 'completed' | 'failed' | 'cancelled';
 
+export type ResponseKnowledgeBaseCollections = {
+  source?: 'collections';
+  type?: 'general_question_answering' | 'entity_backed_knowledge';
+  collections: string[];
+  filter?: SearchFilter;
+  entity_backed_knowledge_config?: {
+    entity_collections: Array<{
+      name: string;
+      description: string;
+      collection_id: string;
+    }>;
+    description?: string;
+  };
+};
+
+export type ResponseKnowledgeBaseFiles = {
+  source: 'files';
+  files: string[];
+};
+
+export type ResponseKnowledgeBaseDefault = {
+  source: 'default';
+};
+
+export type ResponseKnowledgeBaseParam =
+  | ResponseKnowledgeBaseCollections
+  | ResponseKnowledgeBaseFiles
+  | ResponseKnowledgeBaseDefault;
+
+export interface ResponseToolDefinition {
+  type: 'function';
+  name: string;
+  description?: string;
+  parameters: Record<string, any>;
+  strict?: boolean;
+}
+
 export interface CreateResponseParams {
   /** The model to use for the response */
   model: 'nimbus-001' | 'nimbus-002-preview' | (string & {});
@@ -20,22 +57,14 @@ export interface CreateResponseParams {
   instructions?: string;
   /** Temperature for response generation (0-2, default 0.7) */
   temperature?: number;
-  /** Knowledge base configuration specifying collections to search */
-  knowledge_base: {
-    type?: 'general_question_answering' | 'entity_backed_knowledge';
-    collections: string[];
-    filter?: SearchFilter;
-    entity_backed_knowledge_config?: {
-      entity_collections: Array<{
-        name: string;
-        description: string;
-        collection_id: string;
-      }>;
-      description?: string;
-    };
-  };
+  /** Knowledge base configuration - supports collections, individual files, or default index */
+  knowledge_base?: ResponseKnowledgeBaseParam;
   /** Include additional data in response annotations */
   include?: Array<'cloudglue_citations.media_descriptions'>;
+  /** Tool definitions for function calling */
+  tools?: ResponseToolDefinition[];
+  /** Maximum number of output tokens (1-128000) */
+  max_output_tokens?: number;
   /** Run the response generation in background (async) */
   background?: boolean;
   /** Enable server-sent events streaming */

@@ -168,6 +168,7 @@ export type Describe = {
         enable_audio_description: boolean;
       }>
     | undefined;
+  use_in_default_index?: boolean | undefined;
   data?:
     | (Partial<{
         content: string;
@@ -687,6 +688,7 @@ export const Describe = z
       .strict()
       .passthrough()
       .optional(),
+    use_in_default_index: z.boolean().optional(),
     data: z
       .object({
         content: z.string(),

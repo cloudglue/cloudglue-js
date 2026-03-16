@@ -20,6 +20,7 @@ export class EnhancedDescribeApi {
       thumbnail_config?: ThumbnailsConfig;
       include_chapters?: boolean;
       include_shots?: boolean;
+      use_in_default_index?: boolean;
     } = {},
   ) {
     return this.api.createDescribe({
@@ -72,6 +73,22 @@ export class EnhancedDescribeApi {
 
   async deleteDescribe(jobId: string) {
     return this.api.deleteDescribe(undefined, { params: { job_id: jobId } });
+  }
+
+  /**
+   * Update an existing describe job.
+   * Currently supports toggling the `use_in_default_index` flag, which controls
+   * whether the file is searchable in the default index for deep search and response APIs.
+   *
+   * @param jobId - The ID of the describe job to update
+   * @param params - Update parameters
+   * @returns The updated describe job
+   */
+  async updateDescribe(
+    jobId: string,
+    params: { use_in_default_index: boolean },
+  ) {
+    return this.api.updateDescribe(params, { params: { job_id: jobId } });
   }
   /**
    * Waits for a description job to be ready by polling the getDescribe endpoint until

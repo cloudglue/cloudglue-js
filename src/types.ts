@@ -28,6 +28,7 @@ import { FilterOperator } from './enums';
 import { schemas as tagsSchemas } from '../generated/Tags';
 import { schemas as shareableSchemas } from '../generated/Share';
 import { schemas as dataConnectorsSchemas } from '../generated/Data_Connectors';
+import { schemas as deepSearchSchemas } from '../generated/Deep_Search';
 
 /**
  * Represents a video file in the Cloudglue system
@@ -427,6 +428,20 @@ export type DataConnectorList = z.infer<
   typeof dataConnectorsSchemas.DataConnectorList
 >;
 
+/**
+ * Represents a file available in a connected data source
+ */
+export type DataConnectorFile = z.infer<
+  typeof dataConnectorsSchemas.DataConnectorFile
+>;
+
+/**
+ * Represents a paginated list of data connector files
+ */
+export type DataConnectorFileList = z.infer<
+  typeof dataConnectorsSchemas.DataConnectorFileList
+>;
+
 // Response API types
 import { schemas as responseSchemas } from '../generated/Response';
 
@@ -479,6 +494,34 @@ export type ResponseKnowledgeBase = z.infer<
 >;
 
 /**
+ * Represents a collections-based knowledge base for the Response API
+ */
+export type KnowledgeBaseCollections = z.infer<
+  typeof responseSchemas.KnowledgeBaseCollections
+>;
+
+/**
+ * Represents a files-based knowledge base for the Response API
+ */
+export type KnowledgeBaseFiles = z.infer<
+  typeof responseSchemas.KnowledgeBaseFiles
+>;
+
+/**
+ * Represents a default index knowledge base for the Response API
+ */
+export type KnowledgeBaseDefault = z.infer<
+  typeof responseSchemas.KnowledgeBaseDefault
+>;
+
+/**
+ * Represents a tool definition for the Response API
+ */
+export type ResponseToolDefinition = z.infer<
+  typeof responseSchemas.ResponseToolDefinition
+>;
+
+/**
  * Represents an entity collection configuration for entity-backed knowledge
  */
 export type EntityCollectionConfig = z.infer<
@@ -496,6 +539,10 @@ export type EntityBackedKnowledgeConfig = z.infer<
 export type {
   CreateResponseParams,
   ListResponsesParams,
+  ResponseKnowledgeBaseCollections,
+  ResponseKnowledgeBaseFiles,
+  ResponseKnowledgeBaseDefault,
+  ResponseKnowledgeBaseParam,
   ResponseCreatedEvent,
   ResponseOutputItemAddedEvent,
   ResponseContentPartAddedEvent,
@@ -507,3 +554,46 @@ export type {
   ResponseErrorEvent,
   ResponseStreamEventType,
 } from './api/response.api';
+
+// Deep Search types
+/**
+ * Represents a deep search object
+ */
+export type DeepSearch = z.infer<typeof deepSearchSchemas.DeepSearch>;
+
+/**
+ * Represents a deep search result
+ */
+export type DeepSearchResult = z.infer<typeof deepSearchSchemas.DeepSearchResult>;
+
+/**
+ * Represents a deep search usage summary
+ */
+export type DeepSearchUsage = z.infer<typeof deepSearchSchemas.DeepSearchUsage>;
+
+/**
+ * Represents a paginated list of deep searches
+ */
+export type DeepSearchList = z.infer<typeof deepSearchSchemas.DeepSearchList>;
+
+/**
+ * Represents a deep search list item
+ */
+export type DeepSearchListItem = z.infer<typeof deepSearchSchemas.DeepSearchListItem>;
+
+// Re-export Deep Search streaming event types and params from the deep-search API wrapper
+export type {
+  CreateDeepSearchParams,
+  ListDeepSearchesParams,
+  DeepSearchKnowledgeBase,
+  DeepSearchCreatedEvent,
+  DeepSearchTextDeltaEvent,
+  DeepSearchTextDoneEvent,
+  DeepSearchResultAddedEvent,
+  DeepSearchCompletedEvent,
+  DeepSearchErrorEvent,
+  DeepSearchStreamEventType,
+} from './api/deep-search.api';
+
+// Re-export Data Connector file browsing params
+export type { ListDataConnectorFilesParams } from './api/data-connectors.api';

@@ -17,6 +17,7 @@ import { createApiClient as createTagsApiClient } from '../generated/Tags';
 import { createApiClient as createShareableApiClient } from '../generated/Share';
 import { createApiClient as createResponseApiClient } from '../generated/Response';
 import { createApiClient as createDataConnectorsApiClient } from '../generated/Data_Connectors';
+import { createApiClient as createDeepSearchApiClient } from '../generated/Deep_Search';
 import { ZodiosOptions } from '@zodios/core';
 import { EnhancedWebhooksApi } from './api/webhooks.api';
 import { EnhancedTagsApi } from './api/tags.api';
@@ -36,6 +37,7 @@ import { EnhancedCollectionsApi } from './api/collections.api';
 import { EnhancedShareableApi } from './api/shareable.api';
 import { EnhancedResponseApi } from './api/response.api';
 import { EnhancedDataConnectorsApi } from './api/data-connectors.api';
+import { EnhancedDeepSearchApi } from './api/deep-search.api';
 
 /**
  * Main Cloudglue client class that provides access to all API functionality
@@ -139,9 +141,15 @@ export class Cloudglue {
 
   /**
    * Data Connectors API for listing configured data connectors
-   * Provides methods for viewing active data connector integrations
+   * Provides methods for viewing active data connector integrations and browsing files
    */
   public readonly dataConnectors: EnhancedDataConnectorsApi;
+
+  /**
+   * Deep Search API for agentic retrieval and LLM-summarized search
+   * Provides methods for creating, managing, and streaming deep searches across video collections
+   */
+  public readonly deepSearch: EnhancedDeepSearchApi;
 
   constructor(config: CloudglueConfig = {}) {
     this.apiKey = config.apiKey || process.env.CLOUDGLUE_API_KEY || '';
@@ -201,6 +209,10 @@ export class Cloudglue {
       this.baseUrl,
       sharedConfig,
     );
+    const deepSearchApi = createDeepSearchApiClient(
+      this.baseUrl,
+      sharedConfig,
+    );
     // Configure base URL and axios config for all clients
     [
       filesApi,
@@ -220,6 +232,7 @@ export class Cloudglue {
       shareableApi,
       responseApi,
       dataConnectorsApi,
+      deepSearchApi,
     ].forEach((client) => {
       Object.assign(client.axios.defaults, axiosConfig);
 
@@ -286,5 +299,6 @@ export class Cloudglue {
     this.shareable = new EnhancedShareableApi(shareableApi);
     this.responses = new EnhancedResponseApi(responseApi);
     this.dataConnectors = new EnhancedDataConnectorsApi(dataConnectorsApi);
+    this.deepSearch = new EnhancedDeepSearchApi(deepSearchApi);
   }
 }

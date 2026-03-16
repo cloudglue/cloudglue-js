@@ -26,6 +26,7 @@ type NewDescribe = {
   thumbnails_config?: ThumbnailsConfig | undefined;
   include_chapters?: boolean | undefined;
   include_shots?: boolean | undefined;
+  use_in_default_index?: boolean | undefined;
 } & FileSegmentationConfig;
 
 const NewDescribe: z.ZodType<NewDescribe> = z
@@ -39,6 +40,7 @@ const NewDescribe: z.ZodType<NewDescribe> = z
     thumbnails_config: ThumbnailsConfig.optional(),
     include_chapters: z.boolean().optional(),
     include_shots: z.boolean().optional(),
+    use_in_default_index: z.boolean().optional(),
   })
   .strict()
   .passthrough()
@@ -267,6 +269,41 @@ const endpoints = makeApi([
       },
     ],
     response: z.object({ id: z.string() }).strict().passthrough(),
+    errors: [
+      {
+        status: 404,
+        description: `Job not found`,
+        schema: z.object({ error: z.string() }).strict().passthrough(),
+      },
+      {
+        status: 500,
+        description: `An unexpected error occurred on the server`,
+        schema: z.object({ error: z.string() }).strict().passthrough(),
+      },
+    ],
+  },
+  {
+    method: 'patch',
+    path: '/describe/:job_id',
+    alias: 'updateDescribe',
+    description: `Toggle the &#x60;use_in_default_index&#x60; flag on an existing describe job. Enabling this makes the file searchable by default in the deep search and response APIs.`,
+    requestFormat: 'json',
+    parameters: [
+      {
+        name: 'body',
+        type: 'Body',
+        schema: z
+          .object({ use_in_default_index: z.boolean() })
+          .strict()
+          .passthrough(),
+      },
+      {
+        name: 'job_id',
+        type: 'Path',
+        schema: z.string(),
+      },
+    ],
+    response: Describe,
     errors: [
       {
         status: 404,

@@ -73,13 +73,19 @@ export interface DeepSearchErrorEvent {
   };
 }
 
+export interface DeepSearchGenericEvent {
+  type: string;
+  [key: string]: any;
+}
+
 export type DeepSearchStreamEventType =
   | DeepSearchCreatedEvent
   | DeepSearchTextDeltaEvent
   | DeepSearchTextDoneEvent
   | DeepSearchResultAddedEvent
   | DeepSearchCompletedEvent
-  | DeepSearchErrorEvent;
+  | DeepSearchErrorEvent
+  | DeepSearchGenericEvent;
 
 /**
  * Process buffered lines, yielding parsed SSE events.

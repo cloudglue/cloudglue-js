@@ -187,15 +187,17 @@ export class EnhancedDeepSearchApi {
     const url = `${baseURL}/deepSearch`;
 
     const h = this.api.axios.defaults.headers as Record<string, any>;
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Accept: 'text/event-stream',
+    };
+    if (h['Authorization']) headers['Authorization'] = h['Authorization'];
+    if (h['x-sdk-client']) headers['x-sdk-client'] = h['x-sdk-client'];
+    if (h['x-sdk-version']) headers['x-sdk-version'] = h['x-sdk-version'];
+
     const response = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'text/event-stream',
-        Authorization: h['Authorization'] as string,
-        'x-sdk-client': h['x-sdk-client'] as string,
-        'x-sdk-version': h['x-sdk-version'] as string,
-      },
+      headers,
       body: JSON.stringify(body),
     });
 
@@ -285,9 +287,16 @@ export class EnhancedDeepSearchApi {
 
     while (attempts < maxAttempts) {
       const deepSearch = await this.getDeepSearch(deepSearchId);
+      const status = deepSearch.status;
 
-      if (['completed', 'failed', 'cancelled'].includes(deepSearch.status!)) {
-        if (deepSearch.status === 'failed') {
+      if (!status) {
+        throw new CloudglueError(
+          `Deep search ${deepSearchId} returned without status`,
+        );
+      }
+
+      if (['completed', 'failed', 'cancelled'].includes(status)) {
+        if (status === 'failed') {
           throw new CloudglueError(
             `Deep search failed: ${deepSearch.error?.message || deepSearchId}`,
           );

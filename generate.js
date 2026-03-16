@@ -336,4 +336,117 @@ for (const file of generatedFiles) {
     fs.writeFileSync(filePath, fileContent);
 }
 
+// Fix nullable object/Partial fields inside Partial<{...}> types
+// The generator produces `metadata: {};` but the Zod schema has `.nullable()`
+// so the type should be `metadata: {} | null;`
+for (const file of generatedFiles) {
+    const filePath = path.join(generatedDir, file);
+    let fileContent = fs.readFileSync(filePath, 'utf8');
+
+    // Find all fields with .nullable() in Zod schemas using multi-line search
+    // This handles both single-line and multi-line z.object(...).nullable() patterns
+    const nullableObjFields = new Set();
+    const lines = fileContent.split('\n');
+    for (let i = 0; i < lines.length; i++) {
+        if (lines[i].includes('.nullable()')) {
+            // Walk backwards to find the field name
+            for (let j = i; j >= Math.max(0, i - 20); j--) {
+                const fieldMatch = lines[j].match(/^\s+(\w+):\s*(?:z\b|z\s*$)/);
+                if (fieldMatch) {
+                    nullableObjFields.add(fieldMatch[1]);
+                    break;
+                }
+                // Also match: field: SomeSchemaName.nullable()
+                const directMatch = lines[j].match(/^\s+(\w+):\s*\w+\.nullable\(\)/);
+                if (directMatch) {
+                    nullableObjFields.add(directMatch[1]);
+                    break;
+                }
+            }
+        }
+    }
+
+    if (nullableObjFields.size === 0) continue;
+
+    for (const fieldName of nullableObjFields) {
+        // Fix `field: {};` -> `field: {} | null;` inside Partial<{...}>
+        fileContent = fileContent.replace(
+            new RegExp(`(\\s+${fieldName}:\\s*\\{\\})(\\s*;)`, 'g'),
+            (fullMatch, before, after) => {
+                if (fullMatch.includes('| null')) return fullMatch;
+                return `${before} | null${after}`;
+            }
+        );
+
+        // Fix multi-line Partial<{...}> fields: find the field and its closing `}>;`
+        // and add `| null` before the semicolon
+        const fieldLines = fileContent.split('\n');
+        const newLines = [];
+        let inField = false;
+        let braceDepth = 0;
+
+        for (let i = 0; i < fieldLines.length; i++) {
+            const line = fieldLines[i];
+
+            // Check if this line starts the field definition with Partial<
+            if (!inField && line.match(new RegExp(`^\\s+${fieldName}:\\s*Partial<`))) {
+                inField = true;
+                braceDepth = 0;
+                // Count braces on this line
+                braceDepth += (line.match(/\{/g) || []).length;
+                braceDepth -= (line.match(/\}/g) || []).length;
+
+                // Single-line case
+                if (line.includes('>;') && !line.includes('| null')) {
+                    newLines.push(line.replace('>;', '> | null;'));
+                    inField = false;
+                } else {
+                    newLines.push(line);
+                }
+                continue;
+            }
+
+            if (inField) {
+                braceDepth += (line.match(/\{/g) || []).length;
+                braceDepth -= (line.match(/\}/g) || []).length;
+
+                // Found the closing of the Partial type
+                if (braceDepth <= 0 && line.match(/\}>\s*;/)) {
+                    if (!line.includes('| null')) {
+                        newLines.push(line.replace('}>;', '}> | null;'));
+                    } else {
+                        newLines.push(line);
+                    }
+                    inField = false;
+                } else {
+                    newLines.push(line);
+                }
+            } else {
+                newLines.push(line);
+            }
+        }
+        fileContent = newLines.join('\n');
+    }
+
+    fs.writeFileSync(filePath, fileContent);
+}
+
+// Fix z.discriminatedUnion with optional discriminator by replacing with z.union
+// When source is optional on one variant, discriminatedUnion fails type-checking
+for (const file of generatedFiles) {
+    const filePath = path.join(generatedDir, file);
+    let fileContent = fs.readFileSync(filePath, 'utf8');
+    // Replace discriminatedUnion with union when source field is optional
+    fileContent = fileContent.replace(
+        /z\.discriminatedUnion\('source',\s*\[/g,
+        'z.union(['
+    );
+    // Add explicit type annotation for ResponseKnowledgeBase if present
+    fileContent = fileContent.replace(
+        /^const ResponseKnowledgeBase = z\.union/m,
+        'const ResponseKnowledgeBase: z.ZodType<ResponseKnowledgeBase> = z.union'
+    );
+    fs.writeFileSync(filePath, fileContent);
+}
+
 console.log('Generation complete!'); 

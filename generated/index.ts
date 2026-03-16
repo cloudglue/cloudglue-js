@@ -9,6 +9,7 @@ export { Data_ConnectorsApi } from './Data_Connectors';
 export { WebhooksApi } from './Webhooks';
 export { SearchApi } from './Search';
 export { ResponseApi } from './Response';
+export { Deep_SearchApi } from './Deep_Search';
 export { SegmentationsApi } from './Segmentations';
 export { FramesApi } from './Frames';
 export { SegmentsApi } from './Segments';

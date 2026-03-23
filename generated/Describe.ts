@@ -191,7 +191,16 @@ const endpoints = makeApi([
       {
         name: 'response_format',
         type: 'Query',
-        schema: z.enum(['json', 'markdown']).optional(),
+        schema: z
+          .enum([
+            'json',
+            'markdown',
+            'speech_srt',
+            'speech_vtt',
+            'speech_markdown',
+            'speech_text',
+          ])
+          .optional(),
       },
       {
         name: 'start_time_seconds',

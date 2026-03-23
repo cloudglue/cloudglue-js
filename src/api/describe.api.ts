@@ -32,7 +32,7 @@ export class EnhancedDescribeApi {
   async getDescribe(
     jobId: string,
     options: {
-      response_format?: 'json' | 'markdown';
+      response_format?: 'json' | 'markdown' | 'speech_srt' | 'speech_vtt' | 'speech_markdown' | 'speech_text';
       start_time_seconds?: number;
       end_time_seconds?: number;
       modalities?: Modalities[];
@@ -102,7 +102,7 @@ export class EnhancedDescribeApi {
   async waitForReady(
     jobId: string,
     options: WaitForReadyOptions & {
-      response_format?: 'json' | 'markdown';
+      response_format?: 'json' | 'markdown' | 'speech_srt' | 'speech_vtt' | 'speech_markdown' | 'speech_text';
     } = {},
   ) {
     const {

@@ -4,7 +4,7 @@ CloudGlue turns video into LLM-ready data. This SDK (`@cloudglue/cloudglue-js`) 
 
 ## Mental Model
 
-```
+```text
 Files (upload video/audio)
   → Processing (describe, extract, face detection)
     → Collections (group processed files)

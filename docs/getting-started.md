@@ -14,7 +14,7 @@ import { Cloudglue } from '@cloudglue/cloudglue-js';
 const client = new Cloudglue({
   apiKey: process.env.CLOUDGLUE_API_KEY,  // or pass directly: 'cg-...'
   baseUrl: 'https://api.cloudglue.dev/v1', // default, optional
-  timeout: undefined,                       // optional request timeout in ms
+  // timeout: 30000,                        // optional request timeout in ms
 });
 ```
 

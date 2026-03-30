@@ -74,10 +74,11 @@ type Modalities =
 ## Segmentation Config
 
 ```typescript
-type SegmentationConfig = {
-  type: 'uniform' | 'shot_detector' | 'narrative';
-  // Additional type-specific config fields
-};
+// Simplified — see src/types.ts for full type-specific fields
+type SegmentationConfig =
+  | { type: 'uniform'; segment_duration?: number }
+  | { type: 'shot_detector' }
+  | { type: 'narrative' };
 ```
 
 ## Thumbnail Types
@@ -94,8 +95,15 @@ type ResponseKnowledgeBaseCollections = {
   source?: 'collections';
   type?: 'general_question_answering' | 'entity_backed_knowledge';
   collections: string[];
-  filter?: SearchFilter;
-  entity_backed_knowledge_config?: { ... };
+  filter?: SearchFilter;  // SearchFilter is from generated/common.ts; Filter (from src/types.ts) is used for list/search queries
+  entity_backed_knowledge_config?: {
+    description?: string;
+    entity_collections: Array<{
+      name: string;
+      description: string;
+      collection_id: string;
+    }>;
+  };
 };
 
 // File-based

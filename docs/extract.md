@@ -18,7 +18,7 @@ const job = await client.extract.createExtract(
       },
     },
     segment_level: true,              // default: true (per-segment extraction)
-    enable_transcript_mode: false,    // extract from transcript only
+    enable_transcript_mode: false,    // set true for transcript-only extraction
     // segmentation_config, segmentation_id, thumbnail_config also available
   }
 );

@@ -94,5 +94,5 @@ await client.describe.updateDescribe(jobId, { use_in_default_index: false });
 | `markdown` | Human-readable markdown |
 | `speech_srt` | SRT subtitle format |
 | `speech_vtt` | WebVTT subtitle format |
-| `speech_markdown` | Speech as markdown |
+| `speech_markdown` | Speech as Markdown |
 | `speech_text` | Plain text speech only |

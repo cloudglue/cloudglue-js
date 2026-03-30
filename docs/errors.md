@@ -34,7 +34,7 @@ try {
 
 `waitForReady()` methods throw `CloudglueError` when max attempts are reached:
 
-```
+```text
 Timeout waiting for file abc123 to process after 36 attempts
 ```
 
@@ -50,7 +50,7 @@ await client.files.waitForReady(fileId, {
 
 `waitForReady()` also throws when a job fails:
 
-```
+```text
 File processing failed: abc123
 ```
 

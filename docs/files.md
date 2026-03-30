@@ -59,7 +59,7 @@ const segmentations = await client.files.listFileSegmentations(fileId, { limit: 
 
 // Create a new segmentation
 await client.files.createFileSegmentation(fileId, {
-  type: 'shot_detector',  // or 'uniform', 'narrative'
+  strategy: 'shot-detector',  // or 'uniform', 'narrative'
 });
 
 // List segments

@@ -68,7 +68,7 @@ const describes = await client.segmentations.listSegmentationDescribes(segmentat
 | Type | Description |
 |------|-------------|
 | `uniform` | Fixed-duration segments |
-| `shot_detector` | Scene-change detection |
+| `shot-detector` | Scene-change detection |
 | `narrative` | Chapter-based (semantic) segmentation |
 
 ## Webhooks

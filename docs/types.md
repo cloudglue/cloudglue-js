@@ -75,10 +75,15 @@ type Modalities =
 
 ```typescript
 // Simplified — see src/types.ts for full type-specific fields
-type SegmentationConfig =
-  | { type: 'uniform'; segment_duration?: number }
-  | { type: 'shot_detector' }
-  | { type: 'narrative' };
+type SegmentationConfig = {
+  strategy: 'uniform' | 'shot-detector' | 'manual' | 'narrative';
+  uniform_config?: { window_seconds: number; hop_seconds?: number };
+  shot_detector_config?: { threshold?: number; min_seconds?: number; max_seconds?: number; detector: 'adaptive' | 'content'; fill_gaps?: boolean };
+  narrative_config?: NarrativeConfig;
+  keyframe_config?: KeyframeConfig;
+  start_time_seconds?: number;
+  end_time_seconds?: number;
+};
 ```
 
 ## Thumbnail Types

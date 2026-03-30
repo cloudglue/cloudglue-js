@@ -18,9 +18,9 @@ const collection = await client.collections.createCollection({
   name: 'My Videos',
   collection_type: 'media-descriptions',  // default
   // Optional configs:
-  // segmentation_config: { type: 'shot_detector' },
+  // default_segmentation_config: { strategy: 'shot-detector' },
   // describe_config: { enable_speech: true, enable_visual_scene_description: true },
-  // thumbnails_config: { ... },
+  // default_thumbnails_config: { ... },
 });
 ```
 

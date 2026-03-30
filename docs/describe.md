@@ -19,7 +19,7 @@ const job = await client.describe.createDescribe(
     include_shots: true,               // shots use shot_detector segmentation
     use_in_default_index: true,        // makes file searchable via default index for Responses API / Deep Search
     segmentation_config: {
-      type: 'shot_detector',          // or 'uniform', 'narrative'
+      strategy: 'shot-detector',      // or 'uniform', 'narrative'
     },
     // thumbnail_config: { ... },
     // segmentation_id: 'existing_seg_id',  // use existing segmentation

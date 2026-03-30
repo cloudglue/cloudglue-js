@@ -42,15 +42,22 @@ const matches = await client.faceMatch.getFaceMatch(job.id, { limit: 50 });
 await client.faceMatch.deleteFaceMatch(job.id);
 ```
 
-## Segments (Segmentation Jobs)
+## Segments
 
-Create and manage standalone segmentation jobs on videos. This is distinct from `client.segmentations` (which reads/manages existing segmentations on files).
+Create intelligent segments for video or audio files based on shot detection or narrative analysis.
+
+**Important:**
+- YouTube URLs and audio files only support `narrative` criteria (shot detection requires direct video file access)
+- YouTube URLs and audio files automatically use the `balanced` narrative strategy
+
+### Shot-Based Segmentation
+
+Detect scene changes in video files. Not available for YouTube URLs or audio files.
 
 ```typescript
-// Create a shot-based segmentation job
-const job = await client.segments.createSegmentJob({
-  url: 'https://example.com/video.mp4',
-  criteria: 'shot',  // 'shot' or 'narrative'
+const result = await client.segments.createSegmentJob({
+  url: 'https://example.com/video.mp4',  // HTTP URL, cloudglue:// URI, or data connector URI
+  criteria: 'shot',
   shot_config: {
     detector: 'adaptive',              // 'adaptive' or 'content'
     min_duration_seconds: 2,           // 1-600
@@ -59,28 +66,45 @@ const job = await client.segments.createSegmentJob({
   },
 });
 
-// Create a narrative (chapter) segmentation job
-const narrativeJob = await client.segments.createSegmentJob({
+const ready = await client.segments.waitForReady(result.id);
+// ready.shots — array of detected shots with start_time and end_time
+```
+
+### Narrative Segmentation (Chapters)
+
+Generate semantic chapters. Supports video files, audio files, and YouTube URLs.
+
+```typescript
+const result = await client.segments.createSegmentJob({
   url: 'https://example.com/video.mp4',
   criteria: 'narrative',
-  // narrative_config: { ... },
+  narrative_config: {
+    strategy: 'comprehensive',       // 'comprehensive' (default for video) or 'balanced' (default for YouTube/audio)
+    number_of_chapters: 5,           // target chapter count (auto-calculated if omitted)
+    min_chapters: 3,                 // optional minimum
+    max_chapters: 8,                 // optional maximum
+    // prompt: 'custom instructions for chapter generation',
+  },
 });
 
-// Wait for completion
-const result = await client.segments.waitForReady(job.id);
-// result.segments, result.shots, result.chapters available depending on criteria
+const ready = await client.segments.waitForReady(result.id);
+// ready.chapters — array of chapters with start_time, end_time, and description
+```
 
-// Get a segment job
-const segJob = await client.segments.getSegmentJob(jobId);
+**Narrative strategies:**
+- `comprehensive` — deep VLM analysis of video (default for non-YouTube video files; not available for YouTube or audio)
+- `balanced` — multi-modal analysis (default for YouTube URLs and audio files; auto-selected, other strategies rejected)
 
-// List segment jobs
+### List, Get, Delete
+
+```typescript
 const jobs = await client.segments.listSegmentJobs({
-  criteria: 'shot',
+  criteria: 'shot',         // 'shot' or 'narrative'
   status: 'completed',
   limit: 10,
 });
 
-// Delete
+const seg = await client.segments.getSegmentJob(jobId);
 await client.segments.deleteSegmentJob(jobId);
 ```
 

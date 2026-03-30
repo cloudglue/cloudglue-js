@@ -18,8 +18,8 @@ const connectors = await client.dataConnectors.list();
 const files = await client.dataConnectors.listFiles(connectorId, {
   limit: 50,                   // 1-100
   page_token: 'next_page...',  // pagination token from previous response
-  from: '2025-01-01T00:00:00Z',
-  to: '2025-06-01T00:00:00Z',
+  from: '2025-01-01',           // YYYY-MM-DD format
+  to: '2025-06-01',
   // Provider-specific filters:
   folder_id: 'folder_123',    // Google Drive, Dropbox
   path: '/recordings/',        // path-based sources

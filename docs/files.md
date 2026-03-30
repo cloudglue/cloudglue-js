@@ -26,8 +26,8 @@ const files = await client.files.listFiles({
   offset: 0,
   order: 'created_at',                 // 'created_at' | 'filename'
   sort: 'desc',                        // 'asc' | 'desc'
-  created_before: '2025-01-01T00:00:00Z',
-  created_after: '2024-01-01T00:00:00Z',
+  created_before: '2025-01-01',  // YYYY-MM-DD format
+  created_after: '2024-01-01',
   filter: {                            // optional metadata/property filters
     metadata: [{
       path: 'project',

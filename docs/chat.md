@@ -11,7 +11,7 @@ const response = await client.chat.createCompletion({
     { role: 'system', content: 'You are a helpful video analyst.' },
     { role: 'user', content: 'What topics are discussed in these videos?' },
   ],
-  collections: ['collection_id_1', 'collection_id_2'],
+  collections: ['collection_id'],  // nimbus-001 supports one collection at a time
   include_citations: true,
   force_search: true,
 });
@@ -25,7 +25,7 @@ console.log(response.choices[0].message.content);
 |-----------|------|-------------|
 | `model` | `string` | Must be `'nimbus-001'` |
 | `messages` | `ChatMessage[]` | Array of `{ role, content }` messages |
-| `collections` | `string[]` | Collection IDs to query |
+| `collections` | `string[]` | Collection IDs to query (one collection at a time) |
 | `include_citations` | `boolean` | Include source citations in response |
 | `force_search` | `boolean` | Force search even if query seems general |
 
@@ -36,13 +36,12 @@ const completion = await client.chat.getCompletion(completionId);
 
 const completions = await client.chat.listCompletions({
   limit: 10,
-  created_after: '2025-01-01T00:00:00Z',
+  created_after: '2025-01-01',  // YYYY-MM-DD format
 });
 ```
 
-## When to Use Chat vs Responses API
+## Chat API is being phased out
 
-- **Chat API**: Simple Q&A over collections, synchronous, no streaming
-- **Responses API**: Streaming, background jobs, function calling, entity-backed knowledge, file-level knowledge bases, OpenAI-compatible format
+The Chat API is being replaced by the **Responses API** (`client.responses`). Use the Responses API for all new projects — it supports streaming, background jobs, function calling, entity-backed knowledge, file-level knowledge bases, and an OpenAI-compatible format.
 
-For new projects, prefer the **Responses API** (`client.responses`).
+The Chat API remains available for existing integrations but should not be used for new development.

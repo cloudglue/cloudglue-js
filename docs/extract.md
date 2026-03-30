@@ -17,9 +17,10 @@ const job = await client.extract.createExtract(
         timestamp: { type: 'string' },
       },
     },
-    segment_level: true,              // default: true (per-segment extraction)
-    enable_transcript_mode: false,    // set true for transcript-only extraction
-    // segmentation_config, segmentation_id, thumbnail_config also available
+    enable_segment_level_entities: true,   // per-segment extraction (default behavior)
+    enable_video_level_entities: false,    // set true for whole-video extraction instead
+    enable_transcript_mode: false,         // set true for transcript-only extraction
+    // segmentation_config, segmentation_id, thumbnails_config also available
   }
 );
 ```
@@ -57,7 +58,7 @@ await client.extract.deleteExtract(jobId);
 
 ## Extraction Modes
 
-- **Segment-level** (`segment_level: true`, default): Extracts entities per video segment. Each segment produces its own structured output.
-- **Video-level** (`segment_level: false`): Extracts entities for the entire video as a single output.
+- **Segment-level** (`enable_segment_level_entities: true`): Extracts entities per video segment. Each segment produces its own structured output. This is the default.
+- **Video-level** (`enable_video_level_entities: true`): Extracts entities for the entire video as a single output.
 
-These modes are mutually exclusive.
+These modes are mutually exclusive — set one to `true` and the other to `false`.

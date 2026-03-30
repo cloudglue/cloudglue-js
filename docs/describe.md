@@ -21,7 +21,7 @@ const job = await client.describe.createDescribe(
     segmentation_config: {
       strategy: 'shot-detector',      // or 'uniform', 'narrative'
     },
-    // thumbnail_config: { ... },
+    // thumbnails_config: { ... },
     // segmentation_id: 'existing_seg_id',  // use existing segmentation
   }
 );

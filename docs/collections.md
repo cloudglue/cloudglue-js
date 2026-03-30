@@ -76,8 +76,8 @@ await client.collections.deleteVideo(collectionId, fileId);
 // Get entities (for 'entities' collection type)
 const entities = await client.collections.getEntities(collectionId, fileId, {
   include_thumbnails: true,
-  include_chapters: true,
-  include_shots: true,
+  include_chapters: true,            // requires narrative segmentation
+  include_shots: true,               // requires shot_detector segmentation
 });
 
 // Get media descriptions (for 'media-descriptions' type)
@@ -85,7 +85,7 @@ const descriptions = await client.collections.getMediaDescriptions(collectionId,
   response_format: 'markdown',  // or 'json'
   include_thumbnails: true,
   include_word_timestamps: true,
-  include_chapters: true,
+  include_chapters: true,            // requires narrative segmentation
 });
 
 // Get transcripts (for 'rich-transcripts' type)

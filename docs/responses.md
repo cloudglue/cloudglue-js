@@ -1,6 +1,6 @@
 # Responses API
 
-OpenAI Responses-compatible API for chat completions with video knowledge bases. Supports streaming, background jobs, function calling, and entity-backed knowledge.
+OpenAI Responses-compatible API for chat completions with video knowledge bases. Supports streaming, background jobs, and entity-backed knowledge. This is the recommended API for querying video content (preferred over the Chat API).
 
 ## Models
 
@@ -45,7 +45,7 @@ knowledge_base: {
 ```
 
 ### Default Index
-Files with `use_in_default_index: true` in their describe jobs.
+Includes files with `use_in_default_index: true` in their describe jobs, as well as videos that have been added to any collection.
 ```typescript
 knowledge_base: {
   source: 'default',
@@ -133,30 +133,6 @@ const bg = await client.responses.createResponse({
 });
 
 const result = await client.responses.waitForReady(bg.id);
-```
-
-## Function Calling (Tools)
-
-```typescript
-const response = await client.responses.createResponse({
-  model: 'nimbus-001',
-  input: 'Find the latest product demo.',
-  knowledge_base: { source: 'collections', collections: ['col_id'] },
-  tools: [
-    {
-      type: 'function',
-      name: 'get_product_info',
-      description: 'Look up product details',
-      parameters: {
-        type: 'object',
-        properties: {
-          product_name: { type: 'string' },
-        },
-        required: ['product_name'],
-      },
-    },
-  ],
-});
 ```
 
 ## List, Get, Delete, Cancel

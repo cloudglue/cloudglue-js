@@ -15,9 +15,9 @@ const job = await client.describe.createDescribe(
     enable_scene_text: true,
     enable_audio_description: true,
     enable_summary: true,
-    include_chapters: true,
-    include_shots: true,
-    use_in_default_index: true,       // makes file searchable via default index for Responses API / Deep Search
+    include_chapters: true,            // chapters use narrative segmentation
+    include_shots: true,               // shots use shot_detector segmentation
+    use_in_default_index: true,        // makes file searchable via default index for Responses API / Deep Search
     segmentation_config: {
       type: 'shot_detector',          // or 'uniform', 'narrative'
     },
@@ -47,8 +47,8 @@ const describe = await client.describe.getDescribe(jobId, {
   end_time_seconds: 60,
   include_thumbnails: true,
   include_word_timestamps: true,
-  include_chapters: true,
-  include_shots: true,
+  include_chapters: true,            // requires narrative segmentation on the file
+  include_shots: true,               // requires shot_detector segmentation on the file
 });
 ```
 

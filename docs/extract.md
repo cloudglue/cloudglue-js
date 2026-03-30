@@ -37,8 +37,8 @@ const extract = await client.extract.getExtract(jobId, {
   limit: 50,
   offset: 0,
   include_thumbnails: true,
-  include_chapters: true,
-  include_shots: true,
+  include_chapters: true,            // requires narrative segmentation
+  include_shots: true,               // requires shot_detector segmentation
 });
 ```
 

@@ -4,7 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Cloudglue JavaScript SDK - TypeScript SDK for the Cloudglue API, which turns video into LLM-ready data. The SDK provides type-safe clients for file management, video transcription, chat completions, semantic search, and more.
+Cloudglue JavaScript SDK - TypeScript SDK for the Cloudglue API, which turns video into LLM-ready data. The SDK provides type-safe clients for file management, video description, extraction, chat completions, semantic search, and more.
+
+## Embedded Docs
+
+The `docs/` directory contains agent-friendly documentation that ships with the npm package. These are the primary reference for SDK usage — see `docs/overview.md` for the full file listing and mental model. When making changes to the SDK API surface, update the corresponding doc in `docs/`.
 
 ## Commands
 

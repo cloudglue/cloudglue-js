@@ -43,7 +43,7 @@ Internally, the SDK uses:
 | `client.search` | Semantic search | `searchContent` |
 | `client.deepSearch` | Agentic retrieval with LLM summary | `createDeepSearch`, `createStreamingDeepSearch`, `waitForReady` |
 | `client.segmentations` | Video segmentation | `getSegmentation`, `deleteSegmentation` |
-| `client.segments` | Manage video segments | CRUD operations on segments |
+| `client.segments` | Standalone segmentation jobs | `createSegmentJob`, `getSegmentJob`, `waitForReady` |
 | `client.frames` | Frame extraction | Frame management |
 | `client.faceDetection` | Detect faces in video | `createFaceDetection`, `waitForReady` |
 | `client.faceMatch` | Match faces across videos | `createFaceMatch`, `waitForReady` |

@@ -11,7 +11,15 @@ type DataConnectorList = {
 type DataConnector = {
   id: string;
   object: 'data_connector';
-  type: 's3' | 'dropbox' | 'google-drive' | 'zoom' | 'gong' | 'recall' | 'gcs';
+  type:
+    | 's3'
+    | 'dropbox'
+    | 'google-drive'
+    | 'zoom'
+    | 'gong'
+    | 'recall'
+    | 'gcs'
+    | 'grain';
   created_at: number;
   updated_at: number;
   metadata: {};
@@ -53,6 +61,7 @@ const DataConnector: z.ZodType<DataConnector> = z
       'gong',
       'recall',
       'gcs',
+      'grain',
     ]),
     created_at: z.number().int(),
     updated_at: z.number().int(),
@@ -169,6 +178,21 @@ const endpoints = makeApi([
       },
       {
         name: 'prefix',
+        type: 'Query',
+        schema: z.string().optional(),
+      },
+      {
+        name: 'title_search',
+        type: 'Query',
+        schema: z.string().optional(),
+      },
+      {
+        name: 'team',
+        type: 'Query',
+        schema: z.string().optional(),
+      },
+      {
+        name: 'meeting_type',
         type: 'Query',
         schema: z.string().optional(),
       },

@@ -149,6 +149,7 @@ export type File = {
         | 'gong'
         | 'recall'
         | 'gcs'
+        | 'grain'
       )
     | undefined;
 };
@@ -487,6 +488,7 @@ export const File = z
         'gong',
         'recall',
         'gcs',
+        'grain',
       ])
       .optional(),
   })

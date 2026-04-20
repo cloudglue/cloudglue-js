@@ -9,6 +9,8 @@ import {
 } from '../types';
 import { CloudglueError } from '../error';
 
+import type { AxiosResponse } from 'axios';
+
 type UploadFileParams = {
   file: globalThis.File;
   metadata?: Record<string, any>;
@@ -68,7 +70,7 @@ export class EnhancedFilesApi {
     }
 
     // Use axios directly to bypass Zodios validation
-    return this.api.axios({
+    return this.api.axios<AxiosResponse<File>>({
       method: 'post',
       url: '/files',
       data: formData,

@@ -1,15 +1,14 @@
 {
   "compilerOptions": {
     "target": "es2020",
-    "module": "Node16",
+    "module": "commonjs",
     "declaration": true,
     "outDir": "./dist",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "Node16",
-    "types": ["node"]
+    "moduleResolution": "bundler"
   },
   "include": ["generated/**/*", "src/**/*", "env.d.ts"],
   "exclude": ["node_modules", "dist"]

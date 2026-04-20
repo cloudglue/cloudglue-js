@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import type { AxiosRequestConfig } from 'axios';
 import type { CloudglueConfig } from './types';
 import { createApiClient as createFilesApiClient } from '../generated/Files';

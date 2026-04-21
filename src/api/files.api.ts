@@ -41,7 +41,7 @@ export class EnhancedFilesApi {
     return this.api.listFiles({ queries });
   }
 
-  async uploadFile(params: UploadFileParams) {
+  async uploadFile(params: UploadFileParams): Promise<AxiosResponse> {
     // File uploads require special handling for multipart/form-data that the generated Zodios client doesn't handle automatically.
     // We need to:
     // 1. Create a FormData object and append the file with the correct field name
@@ -70,7 +70,7 @@ export class EnhancedFilesApi {
     }
 
     // Use axios directly to bypass Zodios validation
-    return this.api.axios<AxiosResponse<File>>({
+    return this.api.axios({
       method: 'post',
       url: '/files',
       data: formData,

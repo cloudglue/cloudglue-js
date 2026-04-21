@@ -8,7 +8,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node"
+    "moduleResolution": "bundler"
   },
   "include": ["generated/**/*", "src/**/*", "env.d.ts"],
   "exclude": ["node_modules", "dist"]

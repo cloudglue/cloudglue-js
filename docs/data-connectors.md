@@ -4,7 +4,7 @@ Browse files available in connected external data sources. Data connectors are c
 
 ## Supported Connectors
 
-S3, Google Cloud Storage (GCS), Dropbox, Google Drive, Zoom, Gong, Recall
+S3, Google Cloud Storage (GCS), Dropbox, Google Drive, Zoom, Gong, Recall, Grain
 
 ## List Connectors
 
@@ -25,6 +25,9 @@ const files = await client.dataConnectors.listFiles(connectorId, {
   path: '/recordings/',        // path-based sources
   bucket: 'my-bucket',        // S3, GCS
   prefix: 'videos/',          // S3, GCS
+  title_search: 'video-title', // Grain
+  team: 'team-name',           // Grain
+  meeting_type: 'type-123'     // Grain
 });
 ```
 

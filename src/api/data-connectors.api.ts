@@ -17,6 +17,12 @@ export interface ListDataConnectorFilesParams {
   bucket?: string;
   /** Filter by key prefix (S3, GCS) */
   prefix?: string;
+  /** Filter by title (Grain) */
+  title_search?: string;
+  /** Filter by team (Grain) */
+  team?: string;
+  /** Filter by meeting type (Grain) */
+  meeting_type?: string;
 }
 
 export class EnhancedDataConnectorsApi {

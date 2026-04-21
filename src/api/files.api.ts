@@ -9,6 +9,8 @@ import {
 } from '../types';
 import { CloudglueError } from '../error';
 
+import type { AxiosResponse } from 'axios';
+
 type UploadFileParams = {
   file: globalThis.File;
   metadata?: Record<string, any>;
@@ -39,7 +41,7 @@ export class EnhancedFilesApi {
     return this.api.listFiles({ queries });
   }
 
-  async uploadFile(params: UploadFileParams) {
+  async uploadFile(params: UploadFileParams): Promise<AxiosResponse> {
     // File uploads require special handling for multipart/form-data that the generated Zodios client doesn't handle automatically.
     // We need to:
     // 1. Create a FormData object and append the file with the correct field name

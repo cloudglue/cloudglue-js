@@ -96,7 +96,7 @@ export type SegmentationManualConfig = {
 };
 export type NarrativeConfig = Partial<{
   prompt: string;
-  strategy: 'comprehensive' | 'balanced';
+  strategy: 'comprehensive' | 'balanced' | 'transcript';
   number_of_chapters: number;
   min_chapters: number;
   max_chapters: number;
@@ -395,7 +395,7 @@ export const SegmentationManualConfig = z
 export const NarrativeConfig = z
   .object({
     prompt: z.string(),
-    strategy: z.enum(['comprehensive', 'balanced']),
+    strategy: z.enum(['comprehensive', 'balanced', 'transcript']),
     number_of_chapters: z.number().int().gte(1),
     min_chapters: z.number().int().gte(1),
     max_chapters: z.number().int().gte(1),

@@ -149,7 +149,7 @@ const endpoints = makeApi([
 **Audio File Support:**
 
 - Audio files support **narrative** criteria only (shot detection is not available for audio).
-- Audio files automatically use the &#x27;balanced&#x27; strategy.
+- Audio files default to the &#x27;balanced&#x27; strategy and may opt into &#x27;transcript&#x27;.
 
 **Note: YouTube URLs and audio files are supported for narrative-based segmentation only.** Shot-based segmentation requires direct video file access. Use Cloudglue Files, HTTP URLs, or files from data connectors for shot-based segmentation.
 
@@ -157,8 +157,9 @@ const endpoints = makeApi([
 
 - **comprehensive** (default for non-YouTube/non-audio files): Uses a VLM to deeply analyze logical segments of video. Only available for video files (not YouTube or audio).
 - **balanced** (default for YouTube videos and audio files): Balanced analysis approach using multiple modalities. Supports YouTube URLs and audio files.
+- **transcript**: Cheap and fast speech-transcript-based segmentation. Requires a transcript and returns an error when none is available — use &#x60;balanced&#x60; for silent or visual-only content (or &#x60;comprehensive&#x60; for non-YouTube/non-audio video files).
 
-**YouTube URLs and Audio Files**: Automatically use the &#x27;balanced&#x27; strategy. The strategy field is ignored, and other strategies will be rejected with an error.
+**YouTube URLs and Audio Files**: Only the &#x27;balanced&#x27; and &#x27;transcript&#x27; strategies are accepted. &#x27;comprehensive&#x27; will be rejected with an error.
 
 **Chapter Count Parameters:**
 
@@ -179,7 +180,7 @@ const endpoints = makeApi([
     errors: [
       {
         status: 400,
-        description: `Invalid request, missing required parameters, unsupported URL type (e.g., YouTube URLs with shot-based segmentation), or unsupported strategy for YouTube URLs (YouTube URLs only support &#x27;balanced&#x27; strategy)`,
+        description: `Invalid request, missing required parameters, unsupported URL type (e.g., YouTube URLs with shot-based segmentation), or unsupported strategy for YouTube URLs and audio files (only &#x27;balanced&#x27; and &#x27;transcript&#x27; are accepted)`,
         schema: z.object({ error: z.string() }).strict().passthrough(),
       },
       {

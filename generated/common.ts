@@ -150,6 +150,7 @@ export type File = {
         | 'recall'
         | 'gcs'
         | 'grain'
+        | 'loom'
       )
     | undefined;
 };
@@ -489,6 +490,7 @@ export const File = z
         'recall',
         'gcs',
         'grain',
+        'loom',
       ])
       .optional(),
   })

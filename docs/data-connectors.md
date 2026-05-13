@@ -1,6 +1,6 @@
 # Data Connectors API
 
-Browse files available in connected external data sources. Data connectors are configured in the CloudGlue dashboard — this API lets you list connectors and browse their files.
+Browse files available in connected external data sources. Data connectors are configured in the Cloudglue dashboard — this API lets you list connectors and browse their files.
 
 ## Supported Connectors
 
@@ -31,4 +31,4 @@ const files = await client.dataConnectors.listFiles(connectorId, {
 });
 ```
 
-Files returned include URIs compatible with CloudGlue's import system — use them with `client.collections.addMediaByUrl()` or `client.describe.createDescribe()`.
+Files returned include URIs compatible with Cloudglue's import system — use them with `client.collections.addMediaByUrl()` or `client.describe.createDescribe()`.

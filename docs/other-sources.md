@@ -4,7 +4,7 @@ Use any publicly available video URL directly with Cloudglue. Accepted by most A
 
 ## Supported URLs
 
-Video urls that point to a video file, as well as, public YouTube, TikTok, and Loom urls. 
+Video URLs that point to a video file, as well as public YouTube, TikTok, and Loom URLs. 
 
 ## Using URLs with Cloudglue
 

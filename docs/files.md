@@ -1,6 +1,6 @@
 # Files API
 
-Manage video and audio files in CloudGlue.
+Manage video and audio files in Cloudglue.
 
 ## Upload a File
 

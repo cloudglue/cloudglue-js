@@ -1,17 +1,17 @@
-# CloudGlue JS SDK
+# Cloudglue JS SDK
 
-CloudGlue turns video into LLM-ready data. This SDK (`@cloudglue/cloudglue-js`) provides type-safe TypeScript clients for uploading, analyzing, searching, and querying video content.
+Cloudglue turns video into LLM-ready data. This SDK (`@cloudglue/cloudglue-js`) provides type-safe TypeScript clients for uploading, analyzing, searching, and querying video content.
 
 ## Mental Model
 
 ```text
-Files (upload video/audio)
+Files (upload video/audio, video URL, data connector URI)
   → Processing (describe, extract, face detection)
     → Collections (group processed files)
       → Querying (chat, search, deep search, responses API)
 ```
 
-1. **Upload** a video file or provide a URL
+1. **Upload** a video file, provide a URL, or provide a data connector URI
 2. **Process** it with describe (multimodal descriptions) or extract (structured data)
 3. **Organize** files into collections
 4. **Query** collections via chat, search, deep search, or the Responses API

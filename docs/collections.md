@@ -32,7 +32,7 @@ await client.collections.addMedia(collectionId, fileId, {
   // Optional: override collection-level configs for this file
 });
 
-// Add by URL (CloudGlue will download and process)
+// Add by URL (Cloudglue will download and process)
 await client.collections.addMediaByUrl({
   collectionId,
   url: 'https://example.com/video.mp4',

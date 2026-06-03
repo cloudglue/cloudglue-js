@@ -179,7 +179,12 @@ for (const file of generatedFiles) {
         const nullishIndex = match.index;
         // Look backwards from .nullish()/.nullable() to find the field name
         // We're looking for: field_name: z... or field_name: SomeType...
-        const beforeNullish = fileContent.substring(Math.max(0, nullishIndex - 1000), nullishIndex);
+        // Align the 1000-char window to a line boundary so it never begins
+        // mid-line — otherwise the `^` anchor in the regexes below could match a
+        // truncated line fragment as a line-start field and pick a false owner.
+        const rawStart = Math.max(0, nullishIndex - 1000);
+        const windowStart = rawStart === 0 ? 0 : fileContent.lastIndexOf('\n', rawStart) + 1;
+        const beforeNullish = fileContent.substring(windowStart, nullishIndex);
         // Get the indent level of the .nullish() line
         const lineStart = fileContent.lastIndexOf('\n', nullishIndex - 1) + 1;
         const lineBeforeNullish = fileContent.substring(lineStart, nullishIndex);

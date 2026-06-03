@@ -9,6 +9,8 @@ import { NarrativeConfig } from './common';
 import { KeyframeConfig } from './common';
 import { ThumbnailsConfig } from './common';
 import { File } from './common';
+import { SourceMetadata } from './common';
+import { GrainSourceMetadata } from './common';
 import { DescribeOutput } from './common';
 import { DescribeOutputPart } from './common';
 import { SpeechOutputPart } from './common';

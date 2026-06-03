@@ -189,8 +189,12 @@ for (const file of generatedFiles) {
         // Pattern matches: field_name: z (with newline and whitespace before a dot, or directly z.)
         // Handles both z\n      .object() and z.object() styles
         const fieldMatches = [...beforeNullish.matchAll(/(?:^|\n|,)(\s*)(\w+)\s*:\s*z\s*\n\s*\./g)];
-        // Also match single-line z.field() patterns
-        const singleLineMatches = [...beforeNullish.matchAll(/(?:^|\n|,)(\s*)(\w+)\s*:\s*z\./g)];
+        // Also match single-line z.field() patterns.
+        // Anchor to line-start only (no `,`): top-level fields are always on their
+        // own line, whereas comma-preceded matches are inline object members
+        // (e.g. `name`/`scope` in `z.object({ id: ..., name: ..., scope: ... })`)
+        // which would otherwise be mistaken for the nullish field.
+        const singleLineMatches = [...beforeNullish.matchAll(/(?:^|\n)(\s*)(\w+)\s*:\s*z\./g)];
         fieldMatches.push(...singleLineMatches);
         
         if (fieldMatches.length > 0) {
@@ -349,8 +353,15 @@ for (const file of generatedFiles) {
     const lines = fileContent.split('\n');
     for (let i = 0; i < lines.length; i++) {
         if (lines[i].includes('.nullable()')) {
+            // The owning field is indented at most as much as its `.nullable()`
+            // line; inner sub-fields of the object (e.g. `user_id` inside an
+            // `assignee` object) are indented MORE. Skip those deeper matches so
+            // we attribute `.nullable()` to the real field, not a nested one.
+            const nullableIndent = (lines[i].match(/^(\s*)/) || ['', ''])[1].length;
             // Walk backwards to find the field name
             for (let j = i; j >= Math.max(0, i - 20); j--) {
+                const indent = (lines[j].match(/^(\s*)/) || ['', ''])[1].length;
+                if (indent > nullableIndent) continue;
                 const fieldMatch = lines[j].match(/^\s+(\w+):\s*(?:z\b|z\s*$)/);
                 if (fieldMatch) {
                     nullableObjFields.add(fieldMatch[1]);

@@ -1,6 +1,10 @@
 import { makeApi, Zodios, type ZodiosOptions } from '@zodios/core';
 import { z } from 'zod';
 
+import { File } from './common';
+import { SourceMetadata } from './common';
+import { GrainSourceMetadata } from './common';
+
 type DataConnectorList = {
   object: 'list';
   data: Array<DataConnector>;
@@ -47,6 +51,10 @@ type DataConnectorFile = {
       [key: string]: any;
     }
   >;
+};
+type SourceMetadataResponse = {
+  object: 'source_metadata';
+  source_metadata: SourceMetadata;
 };
 
 const DataConnector: z.ZodType<DataConnector> = z
@@ -105,12 +113,20 @@ const DataConnectorFileList: z.ZodType<DataConnectorFileList> = z
   })
   .strict()
   .passthrough();
+const SourceMetadataResponse: z.ZodType<SourceMetadataResponse> = z
+  .object({
+    object: z.literal('source_metadata'),
+    source_metadata: SourceMetadata,
+  })
+  .strict()
+  .passthrough();
 
 export const schemas = {
   DataConnector,
   DataConnectorList,
   DataConnectorFile,
   DataConnectorFileList,
+  SourceMetadataResponse,
 };
 
 const endpoints = makeApi([
@@ -212,6 +228,90 @@ const endpoints = makeApi([
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
+        schema: z.object({ error: z.string() }).strict().passthrough(),
+      },
+      {
+        status: 502,
+        description: `Error communicating with the external service`,
+        schema: z.object({ error: z.string() }).strict().passthrough(),
+      },
+    ],
+  },
+  {
+    method: 'post',
+    path: '/data-connectors/:id/sync',
+    alias: 'syncDataConnectorFile',
+    description: `Materialize a connector URI (e.g. &#x60;grain://recording/&lt;id&gt;&#x60;) into a Cloudglue file without starting a downstream job. Idempotent: syncing the same URI returns the existing file. For Grain, the file&#x27;s &#x60;source_metadata&#x60; is populated from the recording.`,
+    requestFormat: 'json',
+    parameters: [
+      {
+        name: 'body',
+        type: 'Body',
+        schema: z.object({ url: z.string() }).strict().passthrough(),
+      },
+      {
+        name: 'id',
+        type: 'Path',
+        schema: z.string().uuid(),
+      },
+    ],
+    response: File,
+    errors: [
+      {
+        status: 400,
+        description: `Bad request (e.g. URL source does not match the connector type)`,
+        schema: z.object({ error: z.string() }).strict().passthrough(),
+      },
+      {
+        status: 404,
+        description: `Data connector not found`,
+        schema: z.object({ error: z.string() }).strict().passthrough(),
+      },
+      {
+        status: 500,
+        description: `An unexpected error occurred on the server`,
+        schema: z.object({ error: z.string() }).strict().passthrough(),
+      },
+      {
+        status: 502,
+        description: `Error communicating with the external service`,
+        schema: z.object({ error: z.string() }).strict().passthrough(),
+      },
+    ],
+  },
+  {
+    method: 'get',
+    path: '/data-connectors/:id/source-metadata',
+    alias: 'getDataConnectorSourceMetadata',
+    description: `Fetch source metadata for a connector URI directly from the upstream source, without creating a Cloudglue file. Currently supported for Grain; other connector types return 501.`,
+    requestFormat: 'json',
+    parameters: [
+      {
+        name: 'id',
+        type: 'Path',
+        schema: z.string().uuid(),
+      },
+      {
+        name: 'url',
+        type: 'Query',
+        schema: z.string(),
+      },
+    ],
+    response: SourceMetadataResponse,
+    errors: [
+      {
+        status: 400,
+        description: `Bad request (e.g. URL source does not match the connector type)`,
+        schema: z.object({ error: z.string() }).strict().passthrough(),
+      },
+      {
+        status: 404,
+        description: `Data connector not found`,
+        schema: z.object({ error: z.string() }).strict().passthrough(),
+      },
+      {
+        status: 501,
+        description: `Source metadata lookup is not implemented for this connector type`,
         schema: z.object({ error: z.string() }).strict().passthrough(),
       },
       {

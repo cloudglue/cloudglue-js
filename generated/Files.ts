@@ -1,7 +1,7 @@
 import { makeApi, Zodios, type ZodiosOptions } from '@zodios/core';
 import { z } from 'zod';
 import { File as CloudglueFile } from "./common";
-import { Segmentation, SegmentationConfig, SegmentationUniformConfig, SegmentationShotDetectorConfig, SegmentationManualConfig, NarrativeConfig, KeyframeConfig, ThumbnailsConfig, Shot, Chapter, ThumbnailList, Thumbnail, ThumbnailType, ListVideoTagsResponse, PaginationResponse, VideoTag, FrameExtraction, FrameExtractionConfig, FrameExtractionUniformConfig, FrameExtractionThumbnailsConfig } from "./common";
+import { SourceMetadata, GrainSourceMetadata, Segmentation, SegmentationConfig, SegmentationUniformConfig, SegmentationShotDetectorConfig, SegmentationManualConfig, NarrativeConfig, KeyframeConfig, ThumbnailsConfig, Shot, Chapter, ThumbnailList, Thumbnail, ThumbnailType, ListVideoTagsResponse, PaginationResponse, VideoTag, FrameExtraction, FrameExtractionConfig, FrameExtractionUniformConfig, FrameExtractionThumbnailsConfig } from "./common";
 
 type FileList = {
   object: 'list';

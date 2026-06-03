@@ -135,7 +135,7 @@ export type File = {
         has_audio: boolean | null;
       }>
     | undefined;
-  thumbnail_url?: string | undefined;
+  thumbnail_url?: (string | null) | undefined;
   source?:
     | (
         | 'video'
@@ -152,6 +152,89 @@ export type File = {
         | 'grain'
         | 'loom'
       )
+    | null
+    | undefined;
+  source_metadata?: (SourceMetadata | null) | undefined;
+};
+export type SourceMetadata = GrainSourceMetadata;
+export type GrainSourceMetadata = {
+  source_type: 'grain';
+  grain_recording_id: string;
+  title: string;
+  start_datetime: string;
+  end_datetime: string;
+  duration_ms: number;
+  media_type: 'audio' | 'transcript' | 'video';
+  upstream_source:
+    | 'aircall'
+    | 'local_capture'
+    | 'meet'
+    | 'teams'
+    | 'upload'
+    | 'webex'
+    | 'zoom'
+    | 'other';
+  grain_url: string;
+  thumbnail_url?: (string | null) | undefined;
+  tags: Array<string>;
+  teams: Array<
+    Partial<{
+      id: string;
+      name: string;
+    }>
+  >;
+  meeting_type?:
+    | Partial<{
+        id: string;
+        name: string;
+        scope: string;
+      }>
+    | null
+    | undefined;
+  participants?:
+    | Array<
+        Partial<{
+          id: string;
+          name: string;
+          email: string | null;
+          scope: 'internal' | 'external' | 'unknown';
+          confirmed_attendee: boolean;
+          hs_contact_id: string | null;
+        }>
+      >
+    | undefined;
+  highlights?: Array<{}> | undefined;
+  ai_summary?:
+    | Partial<{
+        text: string;
+      }>
+    | undefined;
+  ai_action_items?:
+    | Array<
+        Partial<{
+          status: 'pending' | 'completed';
+          timestamp_ms: number;
+          text: string;
+          assignee: Partial<{
+            id: string;
+            name: string;
+            user_id: string | null;
+          }> | null;
+        }>
+      >
+    | undefined;
+  ai_template_sections?: Array<{}> | undefined;
+  calendar_event?:
+    | Partial<{
+        ical_uid: string;
+      }>
+    | null
+    | undefined;
+  hubspot?:
+    | Partial<{
+        hubspot_company_ids: Array<string>;
+        hubspot_deal_ids: Array<string>;
+      }>
     | undefined;
 };
 export type Describe = {
@@ -159,7 +242,7 @@ export type Describe = {
   status: 'pending' | 'processing' | 'completed' | 'failed' | 'not_applicable';
   url?: string | undefined;
   duration_seconds?: (number | null) | undefined;
-  thumbnail_url?: string | undefined;
+  thumbnail_url?: (string | null) | undefined;
   created_at?: number | undefined;
   describe_config?:
     | Partial<{
@@ -233,7 +316,7 @@ export type Segmentation = {
               id: string;
               start_time: number;
               end_time: number;
-              thumbnail_url?: string | undefined;
+              thumbnail_url?: (string | null) | undefined;
             }>
           | undefined;
         shots?: Array<Shot> | undefined;
@@ -283,7 +366,7 @@ export type FrameExtraction = {
           | Array<{
               id: string;
               timestamp: number;
-              thumbnail_url?: string | undefined;
+              thumbnail_url?: (string | null) | undefined;
             }>
           | undefined;
         total: number;
@@ -432,6 +515,111 @@ export const FileSegmentationConfig = z
   .partial()
   .strict()
   .passthrough();
+export const GrainSourceMetadata = z
+  .object({
+    source_type: z.literal('grain'),
+    grain_recording_id: z.string(),
+    title: z.string(),
+    start_datetime: z.string().datetime({ offset: true }),
+    end_datetime: z.string().datetime({ offset: true }),
+    duration_ms: z.number().int(),
+    media_type: z.enum(['audio', 'transcript', 'video']),
+    upstream_source: z.enum([
+      'aircall',
+      'local_capture',
+      'meet',
+      'teams',
+      'upload',
+      'webex',
+      'zoom',
+      'other',
+    ]),
+    grain_url: z.string(),
+    thumbnail_url: z.string().nullish(),
+    tags: z.array(z.string()),
+    teams: z.array(
+      z
+        .object({ id: z.string(), name: z.string() })
+        .partial()
+        .strict()
+        .passthrough()
+    ),
+    meeting_type: z
+      .object({ id: z.string(), name: z.string(), scope: z.string() })
+      .partial()
+      .strict()
+      .passthrough()
+      .nullish(),
+    participants: z
+      .array(
+        z
+          .object({
+            id: z.string(),
+            name: z.string(),
+            email: z.string().nullable(),
+            scope: z.enum(['internal', 'external', 'unknown']),
+            confirmed_attendee: z.boolean(),
+            hs_contact_id: z.string().nullable(),
+          })
+          .partial()
+          .strict()
+          .passthrough()
+      )
+      .optional(),
+    highlights: z
+      .array(z.object({}).partial().strict().passthrough())
+      .optional(),
+    ai_summary: z
+      .object({ text: z.string() })
+      .partial()
+      .strict()
+      .passthrough()
+      .optional(),
+    ai_action_items: z
+      .array(
+        z
+          .object({
+            status: z.enum(['pending', 'completed']),
+            timestamp_ms: z.number().int(),
+            text: z.string(),
+            assignee: z
+              .object({
+                id: z.string(),
+                name: z.string(),
+                user_id: z.string().nullable(),
+              })
+              .partial()
+              .strict()
+              .passthrough()
+              .nullable(),
+          })
+          .partial()
+          .strict()
+          .passthrough()
+      )
+      .optional(),
+    ai_template_sections: z
+      .array(z.object({}).partial().strict().passthrough())
+      .optional(),
+    calendar_event: z
+      .object({ ical_uid: z.string() })
+      .partial()
+      .strict()
+      .passthrough()
+      .nullish(),
+    hubspot: z
+      .object({
+        hubspot_company_ids: z.array(z.string()),
+        hubspot_deal_ids: z.array(z.string()),
+      })
+      .partial()
+      .strict()
+      .passthrough()
+      .optional(),
+  })
+  .strict()
+  .passthrough();
+export const SourceMetadata = GrainSourceMetadata;
 export const File = z
   .object({
     id: z.string(),
@@ -493,6 +681,7 @@ export const File = z
         'loom',
       ])
       .optional(),
+    source_metadata: SourceMetadata.nullish(),
   })
   .strict()
   .passthrough();

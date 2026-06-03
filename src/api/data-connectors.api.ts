@@ -47,4 +47,37 @@ export class EnhancedDataConnectorsApi {
       queries: params,
     });
   }
+
+  /**
+   * Fetch source metadata for a connector URI directly from the upstream
+   * source, without creating a Cloudglue file. Currently supported for Grain;
+   * other connector types return 501.
+   *
+   * @param connectorId - The ID of the data connector
+   * @param url - Connector URI to look up (must match the connector's type)
+   * @returns The source metadata for the URI
+   */
+  async getSourceMetadata(connectorId: string, url: string) {
+    return this.api.getDataConnectorSourceMetadata({
+      params: { id: connectorId },
+      queries: { url },
+    });
+  }
+
+  /**
+   * Materialize a connector URI (e.g. `grain://recording/<id>`) into a
+   * Cloudglue file without starting a downstream job. Idempotent: syncing the
+   * same URI returns the existing file. For Grain, the file's `source_metadata`
+   * is populated from the recording.
+   *
+   * @param connectorId - The ID of the data connector
+   * @param url - Connector URI to sync (must match the connector's type)
+   * @returns The resulting Cloudglue file
+   */
+  async syncFile(connectorId: string, url: string) {
+    return this.api.syncDataConnectorFile(
+      { url },
+      { params: { id: connectorId } },
+    );
+  }
 }

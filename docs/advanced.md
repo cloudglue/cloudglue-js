@@ -154,6 +154,9 @@ const describes = await client.segmentations.listSegmentationDescribes(segmentat
 ## Shareable Assets
 
 ```typescript
-// Create public sharing links via client.shareable
+// Create sharing links via client.shareable
+// visibility defaults to 'public' (viewable by anyone with the link);
+// pass visibility: 'private' for account-restricted, token-gated playback.
+// A file (or segment) can have at most one active share per visibility.
 // See source: src/api/shareable.api.ts
 ```

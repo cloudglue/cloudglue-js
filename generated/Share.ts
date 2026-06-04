@@ -8,6 +8,7 @@ type ShareableAsset = {
   title?: string | undefined;
   description?: string | undefined;
   metadata?: {} | undefined;
+  visibility?: ('public' | 'private') | undefined;
   preview_url?: string | undefined;
   media_download_url?: string | undefined;
   media_download_expires_at?: (number | null) | undefined;
@@ -34,6 +35,7 @@ const ShareableAsset: z.ZodType<ShareableAsset> = z
     title: z.string().optional(),
     description: z.string().optional(),
     metadata: z.object({}).partial().strict().passthrough().optional(),
+    visibility: z.enum(['public', 'private']).optional(),
     preview_url: z.string().optional(),
     media_download_url: z.string().optional(),
     media_download_expires_at: z.number().nullish(),
@@ -63,6 +65,7 @@ const CreateShareableAssetRequest = z
     title: z.string().optional(),
     description: z.string().optional(),
     metadata: z.object({}).partial().strict().passthrough().optional(),
+    visibility: z.enum(['public', 'private']).optional(),
   })
   .strict()
   .passthrough();
@@ -88,7 +91,7 @@ const endpoints = makeApi([
     method: 'post',
     path: '/share',
     alias: 'createShareableAsset',
-    description: `Create a publicly available shareable asset`,
+    description: `Create a shareable asset. Public assets (the default) are viewable by anyone with the link; private assets are restricted to members of the owning account and stream via a signed, token-gated playback url. A file (or file segment) can have at most one active share per visibility — one public and one private — each with its own stable URL; creating a second of the same visibility returns 409.`,
     requestFormat: 'json',
     parameters: [
       {
@@ -158,6 +161,11 @@ const endpoints = makeApi([
         name: 'created_after',
         type: 'Query',
         schema: z.string().optional(),
+      },
+      {
+        name: 'visibility',
+        type: 'Query',
+        schema: z.enum(['public', 'private']).optional(),
       },
     ],
     response: ShareableAssetListResponse,

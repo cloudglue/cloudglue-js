@@ -10,6 +10,7 @@ export class EnhancedShareableApi {
     createdAfter?: string;
     fileId?: string;
     fileSegmentId?: string;
+    visibility?: 'public' | 'private';
   }) {
     return this.api.listShareableAssets({ queries: data });
   }
@@ -20,6 +21,7 @@ export class EnhancedShareableApi {
     title?: string;
     description?: string;
     metadata?: Record<string, unknown>;
+    visibility?: 'public' | 'private';
   }) {
     return this.api.createShareableAsset(data);
   }
@@ -56,6 +58,7 @@ export class EnhancedShareableApi {
       offset?: number;
       createdBefore?: string;
       createdAfter?: string;
+      visibility?: 'public' | 'private';
     },
   ) {
     return this.api.listShareableAssets({
@@ -71,6 +74,7 @@ export class EnhancedShareableApi {
       offset?: number;
       createdBefore?: string;
       createdAfter?: string;
+      visibility?: 'public' | 'private';
     },
   ) {
     return this.api.listShareableAssets({

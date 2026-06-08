@@ -192,7 +192,7 @@ export type GrainSourceMetadata = {
     | null
     | undefined;
   participants?:
-    | Array<
+    | (Array<
         Partial<{
           id: string;
           name: string;
@@ -201,16 +201,17 @@ export type GrainSourceMetadata = {
           confirmed_attendee: boolean;
           hs_contact_id: string | null;
         }>
-      >
+      > | null)
     | undefined;
-  highlights?: Array<{}> | undefined;
+  highlights?: (Array<{}> | null) | undefined;
   ai_summary?:
     | Partial<{
         text: string;
       }>
+    | null
     | undefined;
   ai_action_items?:
-    | Array<
+    | (Array<
         Partial<{
           status: 'pending' | 'completed';
           timestamp_ms: number;
@@ -221,9 +222,9 @@ export type GrainSourceMetadata = {
             user_id: string | null;
           }> | null;
         }>
-      >
+      > | null)
     | undefined;
-  ai_template_sections?: Array<{}> | undefined;
+  ai_template_sections?: (Array<{}> | null) | undefined;
   calendar_event?:
     | Partial<{
         ical_uid: string;
@@ -235,6 +236,7 @@ export type GrainSourceMetadata = {
         hubspot_company_ids: Array<string>;
         hubspot_deal_ids: Array<string>;
       }>
+    | null
     | undefined;
 };
 export type Describe = {
@@ -565,16 +567,16 @@ export const GrainSourceMetadata = z
           .strict()
           .passthrough()
       )
-      .optional(),
+      .nullish(),
     highlights: z
       .array(z.object({}).partial().strict().passthrough())
-      .optional(),
+      .nullish(),
     ai_summary: z
       .object({ text: z.string() })
       .partial()
       .strict()
       .passthrough()
-      .optional(),
+      .nullish(),
     ai_action_items: z
       .array(
         z
@@ -597,10 +599,10 @@ export const GrainSourceMetadata = z
           .strict()
           .passthrough()
       )
-      .optional(),
+      .nullish(),
     ai_template_sections: z
       .array(z.object({}).partial().strict().passthrough())
-      .optional(),
+      .nullish(),
     calendar_event: z
       .object({ ical_uid: z.string() })
       .partial()
@@ -615,7 +617,7 @@ export const GrainSourceMetadata = z
       .partial()
       .strict()
       .passthrough()
-      .optional(),
+      .nullish(),
   })
   .strict()
   .passthrough();

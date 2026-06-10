@@ -15,3 +15,9 @@ export * from '../generated';
 export type * from './types';
 
 export * from './enums';
+
+/**
+ * URL classification and normalization utilities mirroring the API's
+ * server-side URL handling
+ */
+export * from './url-utils';

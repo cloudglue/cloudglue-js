@@ -30,6 +30,8 @@ Internally, the SDK uses:
 - **Axios** for HTTP transport (file uploads use axios directly for multipart/form-data)
 - Server-side validation only (`validate: false`)
 
+The SDK also exports standalone URL helpers (`classifyVideoUrl`, `normalizeVideoUrl`) that classify video URLs and rewrite common share links (Google Drive, S3, GCS, Loom) into API-accepted forms — see [Other Sources](./other-sources.md).
+
 ## API Namespace Reference
 
 | Namespace | Purpose | Key Methods |
@@ -47,7 +49,7 @@ Internally, the SDK uses:
 | `client.frames` | Frame extraction | Frame management |
 | `client.faceDetection` | Detect faces in video | `createFaceDetection`, `waitForReady` |
 | `client.faceMatch` | Match faces across videos | `createFaceMatch`, `waitForReady` |
-| `client.dataConnectors` | Browse connected data sources | `list`, `listFiles` |
+| `client.dataConnectors` | Browse & sync connected data sources | `list`, `listFiles`, `syncFile`, `syncUrl`, `getSourceMetadata` |
 | `client.webhooks` | Event notifications | CRUD operations |
 | `client.tags` | Video tagging | CRUD operations |
 | `client.shareable` | Public sharing links | CRUD operations |

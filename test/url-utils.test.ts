@@ -162,6 +162,16 @@ describe('normalizeVideoUrl rewrites', () => {
       'dropbox:///video.mp4',
       'dropbox',
     ],
+    [
+      'https://www.dropbox.com/home/?preview=video.mp4',
+      'dropbox:///video.mp4',
+      'dropbox',
+    ],
+    [
+      'https://www.dropbox.com/home/test%20with%20spaces/?preview=runyourway.mp4',
+      'dropbox:///test with spaces/runyourway.mp4',
+      'dropbox',
+    ],
     // Loom variants → canonical share URL
     [
       'https://loom.com/share/0281766fa2d04bb788eaf19e65135184',

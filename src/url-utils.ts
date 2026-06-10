@@ -190,7 +190,8 @@ function rewriteDropboxPreviewUrl(parsed: URL): string | null {
     if (!file) return null;
     const folder = tryDecodeURIComponent(parsed.pathname.slice('/home'.length));
     if (folder === null) return null;
-    return `dropbox://${folder}/${file}`;
+    // Trailing slash ('/home/', '/home/folder/') would otherwise double up
+    return `dropbox://${folder.replace(/\/+$/, '')}/${file}`;
   }
   return null;
 }

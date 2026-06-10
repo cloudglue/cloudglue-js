@@ -77,6 +77,16 @@ describe('normalizeVideoUrl rewrites', () => {
       'gdrive://file/1a2bC3dE4fG5hI6jK7lM',
       'google-drive',
     ],
+    [
+      'https://drive.google.com/open/?id=1a2bC3dE4fG5hI6jK7lM',
+      'gdrive://file/1a2bC3dE4fG5hI6jK7lM',
+      'google-drive',
+    ],
+    [
+      'https://drive.google.com/uc/?id=1a2bC3dE4fG5hI6jK7lM',
+      'gdrive://file/1a2bC3dE4fG5hI6jK7lM',
+      'google-drive',
+    ],
     // S3 virtual-hosted style
     [
       'https://my-bucket.s3.amazonaws.com/folder/video.mp4',
@@ -185,6 +195,10 @@ describe('normalizeVideoUrl pass-throughs', () => {
     'https://example.com/video.mp4',
     // dropbox /home without a preview file has nothing to rewrite to
     'https://www.dropbox.com/home/test%20with%20spaces',
+    // malformed percent-encoding must pass through, not throw URIError
+    'https://my-bucket.s3.amazonaws.com/bad%zzkey.mp4',
+    'https://storage.googleapis.com/my-bucket/bad%zzkey.mp4',
+    'https://www.dropbox.com/preview/bad%zzpath/video.mp4',
     // dropbox URIs pass through verbatim — never rewritten client-side
     'dropbox:///test/video.mp4',
     'dropbox://test/video.mp4',

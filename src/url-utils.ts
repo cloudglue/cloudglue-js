@@ -73,6 +73,16 @@ function tryParseUrl(url: string): URL | null {
   }
 }
 
+// Returns null on malformed percent-sequences (e.g. '%zz') so rewrites can
+// bail out and pass the URL through instead of throwing URIError
+function tryDecodeURIComponent(value: string): string | null {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Classify a URL the way the Cloudglue API will. Returns null when the input
  * is not an http(s) URL or a recognized URI scheme.
@@ -111,7 +121,7 @@ function rewriteGoogleDriveUrl(parsed: URL): string | null {
   if (parsed.hostname !== 'drive.google.com') return null;
   const fileMatch = parsed.pathname.match(/^\/file\/d\/([a-zA-Z0-9_-]+)/);
   if (fileMatch) return `gdrive://file/${fileMatch[1]}`;
-  if (parsed.pathname === '/open' || parsed.pathname === '/uc') {
+  if (/^\/(open|uc)\/?$/.test(parsed.pathname)) {
     const id = parsed.searchParams.get('id');
     if (id && /^[a-zA-Z0-9_-]+$/.test(id)) return `gdrive://file/${id}`;
   }
@@ -128,12 +138,13 @@ function rewriteS3Url(parsed: URL): string | null {
   // Path style: s3.amazonaws.com/<bucket>/<key>, s3.<region>.amazonaws.com/<bucket>/<key>
   const pathStyle = host.match(/^s3(?:[.-][a-z0-9-]+)*\.amazonaws\.com$/);
   if (virtualHosted) {
-    const key = decodeURIComponent(parsed.pathname.replace(/^\//, ''));
+    const key = tryDecodeURIComponent(parsed.pathname.replace(/^\//, ''));
     if (!key) return null;
     return `s3://${virtualHosted[1]}/${key}`;
   }
   if (pathStyle) {
-    const path = decodeURIComponent(parsed.pathname.replace(/^\//, ''));
+    const path = tryDecodeURIComponent(parsed.pathname.replace(/^\//, ''));
+    if (path === null) return null;
     const slashIdx = path.indexOf('/');
     if (slashIdx === -1 || slashIdx === path.length - 1) return null;
     return `s3://${path}`;
@@ -144,14 +155,15 @@ function rewriteS3Url(parsed: URL): string | null {
 function rewriteGcsUrl(parsed: URL): string | null {
   const host = parsed.hostname;
   if (host === 'storage.googleapis.com' || host === 'storage.cloud.google.com') {
-    const path = decodeURIComponent(parsed.pathname.replace(/^\//, ''));
+    const path = tryDecodeURIComponent(parsed.pathname.replace(/^\//, ''));
+    if (path === null) return null;
     const slashIdx = path.indexOf('/');
     if (slashIdx === -1 || slashIdx === path.length - 1) return null;
     return `gs://${path}`;
   }
   const virtualHosted = host.match(/^(.+)\.storage\.googleapis\.com$/);
   if (virtualHosted) {
-    const key = decodeURIComponent(parsed.pathname.replace(/^\//, ''));
+    const key = tryDecodeURIComponent(parsed.pathname.replace(/^\//, ''));
     if (!key) return null;
     return `gs://${virtualHosted[1]}/${key}`;
   }
@@ -169,14 +181,15 @@ function rewriteDropboxPreviewUrl(parsed: URL): string | null {
   //   /preview/<path>?...            → dropbox:///<path>
   //   /home/<folder>?preview=<file>  → dropbox:///<folder>/<file>
   if (parsed.pathname.startsWith('/preview/')) {
-    const path = decodeURIComponent(parsed.pathname.slice('/preview'.length));
-    if (path.length <= 1) return null;
+    const path = tryDecodeURIComponent(parsed.pathname.slice('/preview'.length));
+    if (path === null || path.length <= 1) return null;
     return `dropbox://${path}`;
   }
   if (parsed.pathname === '/home' || parsed.pathname.startsWith('/home/')) {
     const file = parsed.searchParams.get('preview');
     if (!file) return null;
-    const folder = decodeURIComponent(parsed.pathname.slice('/home'.length));
+    const folder = tryDecodeURIComponent(parsed.pathname.slice('/home'.length));
+    if (folder === null) return null;
     return `dropbox://${folder}/${file}`;
   }
   return null;

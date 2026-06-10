@@ -172,6 +172,17 @@ describe('normalizeVideoUrl rewrites', () => {
       'dropbox:///test with spaces/runyourway.mp4',
       'dropbox',
     ],
+    // Grain share links → grain://recording/<id> (token segment dropped)
+    [
+      'https://grain.com/share/recording/7109135c-36fa-4ac3-99c9-911ceeb59344/XpCfdKVKG7zVYHSW16KeVyh7EDUSGt9ELYGMntdl',
+      'grain://recording/7109135c-36fa-4ac3-99c9-911ceeb59344',
+      'grain',
+    ],
+    [
+      'https://grain.com/share/recording/7109135c-36fa-4ac3-99c9-911ceeb59344',
+      'grain://recording/7109135c-36fa-4ac3-99c9-911ceeb59344',
+      'grain',
+    ],
     // Loom variants → canonical share URL
     [
       'https://loom.com/share/0281766fa2d04bb788eaf19e65135184',
@@ -205,6 +216,8 @@ describe('normalizeVideoUrl pass-throughs', () => {
     'https://example.com/video.mp4',
     // dropbox /home without a preview file has nothing to rewrite to
     'https://www.dropbox.com/home/test%20with%20spaces',
+    // grain non-share pages are not recording references
+    'https://grain.com/app/meetings',
     // malformed percent-encoding must pass through, not throw URIError
     'https://my-bucket.s3.amazonaws.com/bad%zzkey.mp4',
     'https://storage.googleapis.com/my-bucket/bad%zzkey.mp4',

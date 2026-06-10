@@ -70,6 +70,7 @@ The sync methods normalize URLs client-side (see the `normalizeVideoUrl` utility
 - `https://<bucket>.s3.<region>.amazonaws.com/<key>` (and path-style) → `s3://<bucket>/<key>`
 - `https://storage.googleapis.com/<bucket>/<key>` → `gs://<bucket>/<key>`
 - `https://www.dropbox.com/preview/<path>` and `/home/<folder>?preview=<file>` → `dropbox:///<path>` (these carry the real file path, unlike `scl/fi` share links)
+- `https://grain.com/share/recording/<id>/<token>` → `grain://recording/<id>` (works when the recording is accessible to the connected Grain workspace; the token itself grants web-only access)
 
 URLs that cannot map to any connector type — generic http(s) video URLs, YouTube, TikTok, Loom, and `www.dropbox.com` share links — are rejected client-side with guidance: they cannot be synced through a connector. Use them with general ingestion methods instead (`collections.addMediaByUrl()`, `describe.createDescribe()`, ...); see [Other Sources](./other-sources.md).
 

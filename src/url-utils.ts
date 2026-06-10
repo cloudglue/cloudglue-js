@@ -196,6 +196,20 @@ function rewriteDropboxPreviewUrl(parsed: URL): string | null {
   return null;
 }
 
+function rewriteGrainShareUrl(parsed: URL): string | null {
+  if (parsed.hostname !== 'grain.com' && parsed.hostname !== 'www.grain.com')
+    return null;
+  // Share links embed the recording id: grain.com/share/recording/<id>/<token>.
+  // The token only grants anonymous web access; the API resolves the id via
+  // the connected workspace, so this works when the recording is accessible
+  // to the connected Grain account.
+  const match = parsed.pathname.match(
+    /^\/share\/recording\/([a-zA-Z0-9_-]+)/,
+  );
+  if (match) return `grain://recording/${match[1]}`;
+  return null;
+}
+
 function rewriteLoomUrl(url: string, parsed: URL): string | null {
   // Already in the exact form the API accepts — leave untouched
   if (LOOM_SHARE_URL_REGEX.test(url)) return null;
@@ -251,6 +265,8 @@ function collectWarnings(url: string, warnings: string[]): void {
  *   → `gs://<bucket>/<key>`
  * - Dropbox preview links (`dropbox.com/preview/<path>`,
  *   `dropbox.com/home/<folder>?preview=<file>`) → `dropbox:///<path>`
+ * - Grain share links (`grain.com/share/recording/<id>/<token>`)
+ *   → `grain://recording/<id>`
  * - Loom links missing `www.` or using `/embed/` → canonical
  *   `https://www.loom.com/share/<id>`
  *
@@ -267,6 +283,7 @@ export function normalizeVideoUrl(url: string): NormalizedVideoUrl {
       rewriteS3Url(parsed) ??
       rewriteGcsUrl(parsed) ??
       rewriteDropboxPreviewUrl(parsed) ??
+      rewriteGrainShareUrl(parsed) ??
       rewriteLoomUrl(url, parsed);
     if (rewrittenUrl) result = rewrittenUrl;
   }

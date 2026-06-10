@@ -41,6 +41,8 @@ describe('classifyVideoUrl', () => {
     ['https://zoom.us/rec/share/abcdef', 'http'],
     // loom without www / http scheme falls through to http
     ['https://loom.com/share/0281766fa2d04bb788eaf19e65135184', 'http'],
+    // hostname must actually be dl.dropboxusercontent.com, not a substring elsewhere
+    ['https://evil.com/dl.dropboxusercontent.com/video.mp4', 'http'],
     ['not a url', null],
     ['ftp://example.com/video.mp4', null],
   ];

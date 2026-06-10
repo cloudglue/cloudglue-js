@@ -80,7 +80,12 @@ function tryParseUrl(url: string): URL | null {
 export function classifyVideoUrl(url: string): VideoUrlSource | null {
   if (YOUTUBE_VIDEO_REGEX.test(url)) return 'youtube';
   if (url.startsWith('s3://')) return 's3';
-  if (url.startsWith('dropbox://') || url.includes('dl.dropboxusercontent.com'))
+  // The server matches dl.dropboxusercontent.com as a substring; match on the
+  // hostname instead so unrelated URLs embedding that string classify as http
+  if (
+    url.startsWith('dropbox://') ||
+    tryParseUrl(url)?.hostname === 'dl.dropboxusercontent.com'
+  )
     return 'dropbox';
   if (url.startsWith('cloudglue://files')) return 'video';
   if (

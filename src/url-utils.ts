@@ -158,6 +158,30 @@ function rewriteGcsUrl(parsed: URL): string | null {
   return null;
 }
 
+function rewriteDropboxPreviewUrl(parsed: URL): string | null {
+  if (
+    parsed.hostname !== 'www.dropbox.com' &&
+    parsed.hostname !== 'dropbox.com'
+  )
+    return null;
+  // Unlike scl/fi share links, preview links carry the real file path, so
+  // they can be rewritten to the dropbox:// URI form that listFiles emits:
+  //   /preview/<path>?...            → dropbox:///<path>
+  //   /home/<folder>?preview=<file>  → dropbox:///<folder>/<file>
+  if (parsed.pathname.startsWith('/preview/')) {
+    const path = decodeURIComponent(parsed.pathname.slice('/preview'.length));
+    if (path.length <= 1) return null;
+    return `dropbox://${path}`;
+  }
+  if (parsed.pathname === '/home' || parsed.pathname.startsWith('/home/')) {
+    const file = parsed.searchParams.get('preview');
+    if (!file) return null;
+    const folder = decodeURIComponent(parsed.pathname.slice('/home'.length));
+    return `dropbox://${folder}/${file}`;
+  }
+  return null;
+}
+
 function rewriteLoomUrl(url: string, parsed: URL): string | null {
   // Already in the exact form the API accepts — leave untouched
   if (LOOM_SHARE_URL_REGEX.test(url)) return null;
@@ -211,6 +235,8 @@ function collectWarnings(url: string, warnings: string[]): void {
  * - S3 object URLs (virtual-hosted or path style) → `s3://<bucket>/<key>`
  * - GCS object URLs (`storage.googleapis.com`, `storage.cloud.google.com`)
  *   → `gs://<bucket>/<key>`
+ * - Dropbox preview links (`dropbox.com/preview/<path>`,
+ *   `dropbox.com/home/<folder>?preview=<file>`) → `dropbox:///<path>`
  * - Loom links missing `www.` or using `/embed/` → canonical
  *   `https://www.loom.com/share/<id>`
  *
@@ -226,6 +252,7 @@ export function normalizeVideoUrl(url: string): NormalizedVideoUrl {
       rewriteGoogleDriveUrl(parsed) ??
       rewriteS3Url(parsed) ??
       rewriteGcsUrl(parsed) ??
+      rewriteDropboxPreviewUrl(parsed) ??
       rewriteLoomUrl(url, parsed);
     if (rewrittenUrl) result = rewrittenUrl;
   }

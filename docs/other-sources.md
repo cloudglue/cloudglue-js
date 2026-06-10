@@ -49,4 +49,4 @@ const result = normalizeVideoUrl('https://drive.google.com/file/d/1a2bC3dE4f/vie
 // }
 ```
 
-`normalizeVideoUrl` rewrites Google Drive share links, S3/GCS https object URLs, and non-canonical Loom links; everything else passes through unchanged. `warnings` flags URL forms with known limitations (e.g. Dropbox share links, Zoom `/rec/` links). The data connector sync methods apply this normalization automatically.
+`normalizeVideoUrl` rewrites Google Drive share links, S3/GCS https object URLs, Dropbox preview links (`/preview/<path>`, `/home/<folder>?preview=<file>` — these carry the real file path), and non-canonical Loom links; everything else passes through unchanged. `warnings` flags URL forms with known limitations (e.g. Dropbox share links, Zoom `/rec/` links). The data connector sync methods apply this normalization automatically.

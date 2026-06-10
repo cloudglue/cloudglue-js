@@ -131,6 +131,27 @@ describe('normalizeVideoUrl rewrites', () => {
       'gs://my-bucket/folder/video.mp4',
       'gcs',
     ],
+    // Dropbox preview links → dropbox:/// URI (same form listFiles emits)
+    [
+      'https://www.dropbox.com/preview/test%20with%20spaces/runyourway.mp4?context=content_suggestions&role=personal',
+      'dropbox:///test with spaces/runyourway.mp4',
+      'dropbox',
+    ],
+    [
+      'https://www.dropbox.com/preview/root-video.mp4',
+      'dropbox:///root-video.mp4',
+      'dropbox',
+    ],
+    [
+      'https://www.dropbox.com/home/test%20with%20spaces?preview=runyourway.mp4',
+      'dropbox:///test with spaces/runyourway.mp4',
+      'dropbox',
+    ],
+    [
+      'https://www.dropbox.com/home?preview=video.mp4',
+      'dropbox:///video.mp4',
+      'dropbox',
+    ],
     // Loom variants → canonical share URL
     [
       'https://loom.com/share/0281766fa2d04bb788eaf19e65135184',
@@ -162,6 +183,8 @@ describe('normalizeVideoUrl pass-throughs', () => {
     'https://www.loom.com/share/0281766fa2d04bb788eaf19e65135184?sid=x',
     'https://us02web.zoom.us/j/123456789',
     'https://example.com/video.mp4',
+    // dropbox /home without a preview file has nothing to rewrite to
+    'https://www.dropbox.com/home/test%20with%20spaces',
     // dropbox URIs pass through verbatim — never rewritten client-side
     'dropbox:///test/video.mp4',
     'dropbox://test/video.mp4',

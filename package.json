@@ -12,6 +12,7 @@
     "clean": "rimraf dist",
     "generate": "node generate.js",
     "build": "tsc && node scripts/build.js",
+    "test": "tsx --test test/*.test.ts",
     "watch": "tsc --watch",
     "prepare": "npm run build",
     "prepublishOnly": "npm run build",

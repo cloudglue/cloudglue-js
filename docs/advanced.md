@@ -60,7 +60,7 @@ const result = await client.segments.createSegmentJob({
   criteria: 'shot',
   shot_config: {
     detector: 'adaptive',              // 'adaptive' or 'content'
-    min_duration_seconds: 2,           // 1-600
+    min_duration_seconds: 2,           // 0.6-600
     max_duration_seconds: 30,          // 1-600
     fill_gaps: true,
   },

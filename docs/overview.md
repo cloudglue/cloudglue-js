@@ -36,7 +36,7 @@ The SDK also exports standalone URL helpers (`classifyVideoUrl`, `normalizeVideo
 
 | Namespace | Purpose | Key Methods |
 |-----------|---------|-------------|
-| `client.files` | Upload & manage video files | `uploadFile`, `listFiles`, `getFile`, `deleteFile`, `waitForReady` |
+| `client.files` | Upload & manage video files | `uploadFile`, `syncFromUrl`, `listFiles`, `getFile`, `deleteFile`, `waitForReady` |
 | `client.collections` | Organize videos into groups | `createCollection`, `addMedia`, `listVideos`, `waitForReady` |
 | `client.describe` | Multimodal video descriptions | `createDescribe`, `getDescribe`, `waitForReady` |
 | `client.extract` | Structured data extraction | `createExtract`, `getExtract`, `waitForReady` |

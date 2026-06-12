@@ -8,6 +8,7 @@ import {
   WaitForReadyOptions,
 } from '../types';
 import { CloudglueError } from '../error';
+import { isDropboxFileShareLink, normalizeVideoUrl } from '../url-utils';
 
 import type { AxiosResponse } from 'axios';
 
@@ -19,6 +20,47 @@ type UploadFileParams = {
    */
   enable_segment_thumbnails?: boolean;
 };
+
+type SyncFromUrlParams = {
+  /** Key-value metadata to attach to the created file */
+  metadata?: Record<string, any>;
+  /**
+   * Whether to generate per-segment thumbnails for the file. Defaults to
+   * true server-side, matching file upload.
+   */
+  enable_segment_thumbnails?: boolean;
+};
+
+/**
+ * URL sources `POST /files/sync` resolves through a data connector instead of
+ * fetching anonymously. `dropbox` is absent because it splits by URL form:
+ * https file share links are accepted here (when public), while `dropbox://`
+ * URIs and `dl.dropboxusercontent.com` URLs are connector-only — see the
+ * dropbox-specific check in the guard.
+ */
+const CONNECTOR_ONLY_SOURCES = new Set([
+  's3',
+  'gcs',
+  'google-drive',
+  'zoom',
+  'gong',
+  'recall',
+  'grain',
+]);
+
+const isHttpUrl = (url: string) => /^https?:\/\//i.test(url);
+
+function isDriveUcLink(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return (
+      parsed.hostname === 'drive.google.com' &&
+      /^\/uc\/?$/.test(parsed.pathname)
+    );
+  } catch {
+    return false;
+  }
+}
 
 export class EnhancedFilesApi {
   constructor(private readonly api: typeof FilesApi) {}
@@ -78,6 +120,80 @@ export class EnhancedFilesApi {
         'Content-Type': 'multipart/form-data',
       },
     });
+  }
+
+  /**
+   * Materialize a publicly accessible URL into a Cloudglue file without a
+   * data connector or a collection. Accepts direct http(s) video/audio file
+   * URLs (e.g. `.mp4`), public Dropbox share links, TikTok video URLs, and
+   * Loom share URLs. Idempotent: syncing the same URL returns the existing
+   * file. The returned file may still be processing — chain
+   * `files.waitForReady(file.id)` to wait for it.
+   *
+   * Non-canonical Loom links are rewritten client-side to the form the API
+   * accepts. URLs the API cannot ingest here are rejected before the request
+   * is sent: YouTube URLs (collection-only — use
+   * `collections.addMediaByUrl()`) and connector-native URLs (`s3://`,
+   * `gs://`, `gdrive://`, Zoom/Grain links, ... — use
+   * `dataConnectors.syncFile()`/`syncUrl()`).
+   *
+   * @param url - Publicly accessible URL to sync
+   * @param params - Optional metadata and thumbnail settings
+   * @returns The resulting Cloudglue file
+   * @throws {CloudglueError} If the URL is not ingestible by this endpoint
+   */
+  async syncFromUrl(url: string, params: SyncFromUrlParams = {}) {
+    const normalized = normalizeVideoUrl(url);
+
+    if (!normalized.source) {
+      throw new CloudglueError(`'${url}' is not a valid http(s) URL.`, 400);
+    }
+    if (normalized.source === 'youtube') {
+      throw new CloudglueError(
+        `YouTube URLs cannot be synced into a standalone file. Add the video to a collection with collections.addMediaByUrl() instead.`,
+        400,
+      );
+    }
+    if (normalized.source === 'video') {
+      throw new CloudglueError(
+        `'${url}' already references a Cloudglue file — use files.getFile() with its file ID instead.`,
+        400,
+      );
+    }
+
+    // Google Drive `uc?id=` links rewrite to gdrive:// for connector sync,
+    // but the server keeps them on the anonymous http path here — send the
+    // original URL and skip the connector checks.
+    const driveUc = isDriveUcLink(url);
+    if (!driveUc) {
+      if (
+        !isHttpUrl(normalized.url) ||
+        CONNECTOR_ONLY_SOURCES.has(normalized.source) ||
+        (normalized.source === 'dropbox' &&
+          !isDropboxFileShareLink(normalized.url))
+      ) {
+        throw new CloudglueError(
+          `URL '${url}' resolves through a data connector ('${normalized.source}') and cannot be synced anonymously. Use dataConnectors.syncFile(connectorId, url) or dataConnectors.syncUrl(url) instead.` +
+            (normalized.warnings.length
+              ? '\n' + normalized.warnings.join('\n')
+              : ''),
+          400,
+        );
+      }
+    }
+
+    const body: {
+      url: string;
+      metadata?: Record<string, any>;
+      enable_segment_thumbnails?: boolean;
+    } = { url: driveUc ? url : normalized.url };
+    if (params.metadata !== undefined) {
+      body.metadata = params.metadata;
+    }
+    if (params.enable_segment_thumbnails !== undefined) {
+      body.enable_segment_thumbnails = params.enable_segment_thumbnails;
+    }
+    return this.api.syncFileFromUrl(body);
   }
 
   async getFile(fileId: string) {

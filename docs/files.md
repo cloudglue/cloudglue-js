@@ -17,6 +17,31 @@ const file = await client.files.waitForReady(uploaded.data.id);
 
 **Note:** File uploads use `multipart/form-data` via axios directly (not Zodios). The `file` parameter must be a `globalThis.File` object.
 
+## Sync from URL
+
+Materialize a publicly accessible URL into a Cloudglue file without a data connector or a collection. Idempotent: syncing the same URL returns the existing file.
+
+```typescript
+const file = await client.files.syncFromUrl('https://example.com/video.mp4', {
+  metadata: { project: 'demo' },           // optional key-value metadata
+  enable_segment_thumbnails: true,          // optional, defaults to true (matching upload)
+});
+
+const ready = await client.files.waitForReady(file.id);
+```
+
+Accepted URL forms:
+
+- Direct http(s) video/audio file URLs (e.g. `.mp4`)
+- Public Dropbox share links (`dropbox.com/scl/fi/...`, `/s/...`)
+- TikTok video URLs (consumes scrape credits — 402 if the balance is insufficient)
+- Loom share URLs (non-canonical forms are rewritten client-side)
+
+Not accepted — the SDK rejects these client-side with guidance:
+
+- YouTube URLs: collection-only, use `collections.addMediaByUrl()`
+- Connector-native URLs (`s3://`, `gs://`, `gdrive://`, `dropbox://`, Zoom/Gong/Recall/Grain links, Drive share links): use `dataConnectors.syncFile()`/`syncUrl()` — see [Data Connectors](./data-connectors.md)
+
 ## List Files
 
 ```typescript

@@ -278,6 +278,14 @@ const FileUpload = z
   })
   .strict()
   .passthrough();
+const syncFileFromUrl_Body = z
+  .object({
+    url: z.string(),
+    metadata: z.object({}).partial().strict().passthrough().optional(),
+    enable_segment_thumbnails: z.boolean().optional(),
+  })
+  .strict()
+  .passthrough();
 const FileDelete = z
   .object({ id: z.string(), object: z.literal('file') })
   .strict()
@@ -308,6 +316,7 @@ export const schemas = {
   FileSegment,
   FileSegmentListResponse,
   FileUpload,
+  syncFileFromUrl_Body,
   FileDelete,
   FileUpdate,
   createFileSegmentation_Body,
@@ -411,6 +420,58 @@ const endpoints = makeApi([
     ],
     response: FileList,
     errors: [
+      {
+        status: 500,
+        description: `An unexpected error occurred on the server`,
+        schema: z.object({ error: z.string() }).strict().passthrough(),
+      },
+    ],
+  },
+  {
+    method: 'post',
+    path: '/files/sync',
+    alias: 'syncFileFromUrl',
+    description: `Materialize a publicly accessible URL into a Cloudglue file without a data connector or a collection. Accepts direct http(s) video/audio file URLs (e.g. &#x60;.mp4&#x60;), public Dropbox share links, TikTok video URLs, and Loom share URLs. Idempotent: syncing the same URL returns the existing file. YouTube URLs are not supported here — add them to a collection via the add-media endpoint instead. Connector-native URIs (e.g. &#x60;s3://&#x60;, &#x60;gs://&#x60;, &#x60;gdrive://&#x60;, Zoom/Gong/Recall/Grain links) require the matching data connector — use POST /data-connectors/{id}/sync.`,
+    requestFormat: 'json',
+    parameters: [
+      {
+        name: 'body',
+        type: 'Body',
+        schema: syncFileFromUrl_Body,
+      },
+    ],
+    response: CloudglueFile,
+    errors: [
+      {
+        status: 400,
+        description: `Bad request (e.g. an unsupported URL such as YouTube or a connector-native URI, a page link from an unsupported host, a file exceeding size or duration limits, or a URL that does not serve a media file)`,
+        schema: z.object({ error: z.string() }).strict().passthrough(),
+      },
+      {
+        status: 402,
+        description: `Insufficient credit balance (TikTok URLs consume scrape credits)`,
+        schema: z.object({ error: z.string() }).strict().passthrough(),
+      },
+      {
+        status: 403,
+        description: `The source file is not accessible (e.g. a login-gated, expired, or restricted share link)`,
+        schema: z.object({ error: z.string() }).strict().passthrough(),
+      },
+      {
+        status: 404,
+        description: `The URL was not found or not accessible`,
+        schema: z.object({ error: z.string() }).strict().passthrough(),
+      },
+      {
+        status: 415,
+        description: `The URL does not serve a supported video or audio content type`,
+        schema: z.object({ error: z.string() }).strict().passthrough(),
+      },
+      {
+        status: 429,
+        description: `Resource limits exceeded (monthly upload limit, total duration, file size, or total files)`,
+        schema: z.object({ error: z.string() }).strict().passthrough(),
+      },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,

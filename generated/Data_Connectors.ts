@@ -241,7 +241,7 @@ const endpoints = makeApi([
     method: 'post',
     path: '/data-connectors/:id/sync',
     alias: 'syncDataConnectorFile',
-    description: `Materialize a connector URI (e.g. &#x60;grain://recording/&lt;id&gt;&#x60;) into a Cloudglue file without starting a downstream job. Idempotent: syncing the same URI returns the existing file. For Grain, the file&#x27;s &#x60;source_metadata&#x60; is populated from the recording.`,
+    description: `Materialize a connector URI (e.g. &#x60;grain://recording/&lt;id&gt;&#x60;) into a Cloudglue file without starting a downstream job. Idempotent: syncing the same URI returns the existing file. For Grain, the file&#x27;s &#x60;source_metadata&#x60; is populated from the recording. Plain http(s), TikTok, and Loom URLs are not connector-syncable; ingest those via POST /files/sync instead. YouTube URLs can only be added to a collection via the add-media endpoint.`,
     requestFormat: 'json',
     parameters: [
       {
@@ -259,12 +259,22 @@ const endpoints = makeApi([
     errors: [
       {
         status: 400,
-        description: `Bad request (e.g. URL source does not match the connector type)`,
+        description: `Bad request (e.g. URL source does not match the connector type, or the link points to a folder)`,
+        schema: z.object({ error: z.string() }).strict().passthrough(),
+      },
+      {
+        status: 403,
+        description: `The source file is not accessible (e.g. a login-gated, expired, or restricted Dropbox share link)`,
         schema: z.object({ error: z.string() }).strict().passthrough(),
       },
       {
         status: 404,
-        description: `Data connector not found`,
+        description: `Data connector not found, or the referenced file/recording was not found at the source`,
+        schema: z.object({ error: z.string() }).strict().passthrough(),
+      },
+      {
+        status: 429,
+        description: `The external service rate-limited the request (e.g. Dropbox or Zoom); retry shortly`,
         schema: z.object({ error: z.string() }).strict().passthrough(),
       },
       {

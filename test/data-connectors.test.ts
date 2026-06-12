@@ -4,7 +4,9 @@ import assert from 'node:assert/strict';
 import { EnhancedDataConnectorsApi } from '../src/api/data-connectors.api';
 import { CloudglueError } from '../src/error';
 
-function makeApi(connectors: Array<{ id: string; type: string; created_at: number }>) {
+function makeApi(
+  connectors: Array<{ id: string; type: string; created_at: number }>,
+) {
   const calls: Array<{ url: string; connectorId: string }> = [];
   const api = {
     listDataConnectors: async () => ({ object: 'list', data: connectors }),
@@ -41,7 +43,9 @@ describe('dataConnectors.syncUrl', () => {
     ]);
     const client = new EnhancedDataConnectorsApi(api);
 
-    await client.syncUrl('https://drive.google.com/file/d/abc123/view?usp=sharing');
+    await client.syncUrl(
+      'https://drive.google.com/file/d/abc123/view?usp=sharing',
+    );
 
     assert.deepEqual(calls, [
       { url: 'gdrive://file/abc123', connectorId: 'gdrive_1' },
@@ -57,7 +61,8 @@ describe('dataConnectors.syncUrl', () => {
     await assert.rejects(
       client.syncUrl('s3://bucket/key.mp4'),
       (err: unknown) =>
-        err instanceof CloudglueError && /No 's3' data connector/.test(err.message),
+        err instanceof CloudglueError &&
+        /No 's3' data connector/.test(err.message),
     );
   });
 
@@ -69,17 +74,54 @@ describe('dataConnectors.syncUrl', () => {
 
     for (const url of [
       'https://example.com/video.mp4',
-      'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-      'https://www.dropbox.com/scl/fi/abc/video.mp4?dl=0',
+      'https://www.tiktok.com/@user/video/7123456789012345678',
+      'https://www.dropbox.com/scl/fo/abc/folder?dl=0',
     ]) {
       await assert.rejects(
         client.syncUrl(url),
         (err: unknown) =>
           err instanceof CloudglueError &&
-          /cannot be synced through a data connector/.test(err.message),
+          /cannot be synced through a data connector/.test(err.message) &&
+          /files\.syncFromUrl/.test(err.message),
       );
     }
     assert.equal(calls.length, 0);
+  });
+
+  it('points YouTube URLs at collections.addMediaByUrl', async () => {
+    const { api, calls } = makeApi([]);
+    const client = new EnhancedDataConnectorsApi(api);
+
+    await assert.rejects(
+      client.syncUrl('https://www.youtube.com/watch?v=dQw4w9WgXcQ'),
+      (err: unknown) =>
+        err instanceof CloudglueError && /addMediaByUrl/.test(err.message),
+    );
+    assert.equal(calls.length, 0);
+  });
+
+  it('routes dropbox file share links to a dropbox connector verbatim', async () => {
+    const { api, calls } = makeApi([
+      { id: 'dropbox_1', type: 'dropbox', created_at: 500 },
+    ]);
+    const client = new EnhancedDataConnectorsApi(api);
+
+    const url = 'https://www.dropbox.com/scl/fi/abc/video.mp4?rlkey=x&dl=0';
+    await client.syncUrl(url);
+
+    assert.deepEqual(calls, [{ url, connectorId: 'dropbox_1' }]);
+  });
+
+  it('routes zoom rec/share links to a zoom connector verbatim', async () => {
+    const { api, calls } = makeApi([
+      { id: 'zoom_1', type: 'zoom', created_at: 500 },
+    ]);
+    const client = new EnhancedDataConnectorsApi(api);
+
+    const url = 'https://us02web.zoom.us/rec/share/abcdef';
+    await client.syncUrl(url);
+
+    assert.deepEqual(calls, [{ url, connectorId: 'zoom_1' }]);
   });
 });
 

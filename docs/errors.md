@@ -30,6 +30,20 @@ try {
 | 429 | Rate limit exceeded | Back off and retry. Check your plan's rate limits. |
 | 500 | Server error | Retry with exponential backoff. |
 
+## URL Ingestion & Sync Errors
+
+On URL ingestion endpoints (`files.syncFromUrl()`, `dataConnectors.syncFile()`/`syncUrl()`, `collections.addMediaByUrl()`, ...):
+
+| Status | Cause | Fix |
+|--------|-------|-----|
+| 400 | Folder link (Dropbox `/scl/fo/...`, Drive folder), unsupported video-page host (`vimeo.com`, `1drv.ms`, `onedrive.live.com`, `box.com`), or URL/connector type mismatch | Share a single file; for unsupported hosts, use a direct-download URL shape (e.g. `app.box.com/shared/static/...`, `player.vimeo.com/progressive_redirect/...`). |
+| 402 | Insufficient credit balance (TikTok URLs consume scrape credits) | Top up credits or remove TikTok URLs. |
+| 403 | Source file not accessible (login-gated, expired, or restricted share link) | Make the link public, or sync via a data connector's OAuth (`dataConnectors.syncFile()`). |
+| 404 | File/recording not found at the source (e.g. a stale Zoom `rec/share` token) | For Zoom, use the recording-detail link (`zoom.us/recording/detail?meeting_id=<uuid>`). |
+| 415 | URL does not serve a supported video/audio content type | Point at the media file itself, not an HTML page. |
+| 429 | External service rate limit (Dropbox, Zoom) or plan resource limits (upload count, duration, file size) | Retry shortly; check plan limits. |
+| 502 | Upstream/network failure fetching the source | Retry with backoff. |
+
 ## Polling Timeouts
 
 `waitForReady()` methods throw `CloudglueError` when max attempts are reached:

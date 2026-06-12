@@ -56,11 +56,13 @@ Each connector type accepts URIs in the form emitted by `listFiles()`:
 | `s3` | `s3://<bucket>/<key>` |
 | `gcs` | `gs://<bucket>/<key>` |
 | `google-drive` | `gdrive://file/<fileId>` |
-| `dropbox` | `dropbox://<path>` |
-| `zoom` | `zoom://uuid/<meetingUuid>`, `zoom://id/<meetingId>`, or `https://*.zoom.us/{j\|s\|recording/detail}/...` links |
+| `dropbox` | `dropbox://<path>`, or `https://www.dropbox.com/{scl/fi\|s}/...` file share links |
+| `zoom` | `zoom://uuid/<meetingUuid>`, `zoom://id/<meetingId>`, or `https://*.zoom.us/{j\|s\|recording/detail\|rec/share}/...` links |
 | `grain` | `grain://recording/<recordingId>` |
 | `gong` | `gong://call/<callId>` |
 | `recall` | `recall://recording/<recordingId>` |
+
+`dropbox://` path parsing is tolerant: any leading-slash count and %-encoding spellings of the same path resolve — and dedupe — to the same file.
 
 ### Share links the SDK rewrites for you
 
@@ -69,10 +71,15 @@ The sync methods normalize URLs client-side (see the `normalizeVideoUrl` utility
 - `https://drive.google.com/file/d/<id>/view`, `/open?id=<id>`, `/uc?id=<id>` → `gdrive://file/<id>`
 - `https://<bucket>.s3.<region>.amazonaws.com/<key>` (and path-style) → `s3://<bucket>/<key>`
 - `https://storage.googleapis.com/<bucket>/<key>` → `gs://<bucket>/<key>`
-- `https://www.dropbox.com/preview/<path>` and `/home/<folder>?preview=<file>` → `dropbox:///<path>` (these carry the real file path, unlike `scl/fi` share links)
+- `https://www.dropbox.com/preview/<path>` and `/home/<folder>?preview=<file>` → `dropbox:///<path>` (these carry the real file path)
 - `https://grain.com/share/recording/<id>/<token>` → `grain://recording/<id>` (works when the recording is accessible to the connected Grain workspace; the token itself grants web-only access)
 
-URLs that cannot map to any connector type — generic http(s) video URLs, YouTube, TikTok, Loom, and `www.dropbox.com` share links — are rejected client-side with guidance: they cannot be synced through a connector. Use them with general ingestion methods instead (`collections.addMediaByUrl()`, `describe.createDescribe()`, ...); see [Other Sources](./other-sources.md).
+These share links pass through as-is and are resolved server-side via the connector's OAuth:
+
+- Dropbox file share links (`https://www.dropbox.com/scl/fi/...`, `/s/...`) — works for login-gated files. Folder share links (`/scl/fo/...`) are rejected with 400.
+- Zoom `https://*.zoom.us/rec/share/<token>` links — **best-effort**: Zoom often mints a new share token each time a link is copied from the portal, so fresh links may 404. The reliable form is the recording-detail link (`zoom.us/recording/detail?meeting_id=<uuid>`), which works for any recording age. `rec/play` links are rejected.
+
+URLs that cannot map to any connector type — generic http(s) video URLs, YouTube, TikTok, Loom — are rejected client-side with guidance: they cannot be synced through a connector. Ingest them without a connector via `files.syncFromUrl()` (YouTube: `collections.addMediaByUrl()` only), or use them directly with general ingestion methods (`collections.addMediaByUrl()`, `describe.createDescribe()`, ...); see [Other Sources](./other-sources.md).
 
 ## Get Source Metadata
 

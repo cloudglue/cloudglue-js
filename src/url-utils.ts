@@ -43,7 +43,9 @@ export interface NormalizedVideoUrl {
 const YOUTUBE_VIDEO_REGEX =
   /^https?:\/\/(?:www\.)?(?:youtube\.com\/(?:watch\?(?:[^&]*&)*v=|embed\/|v\/|shorts\/|live\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
 const ZOOM_HTTPS_REGEX =
-  /^https:\/\/([a-z0-9-]+\.)?zoom\.us\/(j\/|s\/|recording\/detail)/i;
+  /^https:\/\/([a-z0-9-]+\.)?zoom\.us\/(j\/|s\/|recording\/detail|rec\/share\/)/i;
+const DROPBOX_FILE_SHARE_REGEX =
+  /^https?:\/\/(?:www\.)?dropbox\.com\/(?:scl\/fi\/|s\/)/i;
 const TIKTOK_URL_REGEX =
   /^https?:\/\/(?:(?:www\.)?tiktok\.com\/(?:t\/|@[^/]+\/video\/)|(?:vm|vt)\.tiktok\.com\/)/i;
 const LOOM_SHARE_URL_REGEX =
@@ -58,12 +60,24 @@ export const CONNECTOR_SYNC_URI_GRAMMAR: Record<string, string> = {
   s3: 's3://<bucket>/<key>',
   gcs: 'gs://<bucket>/<key>',
   'google-drive': 'gdrive://file/<fileId>',
-  dropbox: 'dropbox://<path>',
-  zoom: 'zoom://uuid/<meetingUuid>, zoom://id/<meetingId>, or https://*.zoom.us/{j|s|recording/detail}/... links',
+  dropbox:
+    'dropbox://<path>, or https://www.dropbox.com/{scl/fi|s}/... file share links',
+  zoom: 'zoom://uuid/<meetingUuid>, zoom://id/<meetingId>, or https://*.zoom.us/{j|s|recording/detail|rec/share}/... links',
   grain: 'grain://recording/<recordingId>',
   gong: 'gong://call/<callId>',
   recall: 'recall://recording/<recordingId>',
 };
+
+/**
+ * True for https Dropbox *file share* links (`dropbox.com/scl/fi/...`,
+ * `/s/...`) — the only `dropbox`-classified URL form that general ingestion
+ * endpoints accept without a connector (when the link is public). Other
+ * dropbox forms (`dropbox://` URIs, `dl.dropboxusercontent.com` URLs)
+ * resolve only through a Dropbox data connector.
+ */
+export function isDropboxFileShareLink(url: string): boolean {
+  return DROPBOX_FILE_SHARE_REGEX.test(url);
+}
 
 function tryParseUrl(url: string): URL | null {
   try {
@@ -91,9 +105,12 @@ export function classifyVideoUrl(url: string): VideoUrlSource | null {
   if (YOUTUBE_VIDEO_REGEX.test(url)) return 'youtube';
   if (url.startsWith('s3://')) return 's3';
   // The server matches dl.dropboxusercontent.com as a substring; match on the
-  // hostname instead so unrelated URLs embedding that string classify as http
+  // hostname instead so unrelated URLs embedding that string classify as http.
+  // File share links (/scl/fi/, /s/) resolve through a Dropbox connector's
+  // OAuth; folder share links (/scl/fo/) stay http and fail server-side.
   if (
     url.startsWith('dropbox://') ||
+    DROPBOX_FILE_SHARE_REGEX.test(url) ||
     tryParseUrl(url)?.hostname === 'dl.dropboxusercontent.com'
   )
     return 'dropbox';
@@ -154,7 +171,10 @@ function rewriteS3Url(parsed: URL): string | null {
 
 function rewriteGcsUrl(parsed: URL): string | null {
   const host = parsed.hostname;
-  if (host === 'storage.googleapis.com' || host === 'storage.cloud.google.com') {
+  if (
+    host === 'storage.googleapis.com' ||
+    host === 'storage.cloud.google.com'
+  ) {
     const path = tryDecodeURIComponent(parsed.pathname.replace(/^\//, ''));
     if (path === null) return null;
     const slashIdx = path.indexOf('/');
@@ -181,7 +201,9 @@ function rewriteDropboxPreviewUrl(parsed: URL): string | null {
   //   /preview/<path>?...            → dropbox:///<path>
   //   /home/<folder>?preview=<file>  → dropbox:///<folder>/<file>
   if (parsed.pathname.startsWith('/preview/')) {
-    const path = tryDecodeURIComponent(parsed.pathname.slice('/preview'.length));
+    const path = tryDecodeURIComponent(
+      parsed.pathname.slice('/preview'.length),
+    );
     if (path === null || path.length <= 1) return null;
     return `dropbox://${path}`;
   }
@@ -203,9 +225,7 @@ function rewriteGrainShareUrl(parsed: URL): string | null {
   // The token only grants anonymous web access; the API resolves the id via
   // the connected workspace, so this works when the recording is accessible
   // to the connected Grain account.
-  const match = parsed.pathname.match(
-    /^\/share\/recording\/([a-zA-Z0-9_-]+)/,
-  );
+  const match = parsed.pathname.match(/^\/share\/recording\/([a-zA-Z0-9_-]+)/);
   if (match) return `grain://recording/${match[1]}`;
   return null;
 }
@@ -232,7 +252,12 @@ function collectWarnings(url: string, warnings: string[]): void {
       parsed.pathname.startsWith('/s/')
     ) {
       warnings.push(
-        'Dropbox share links are treated as generic HTTP downloads: they work with general ingestion methods (e.g. collections.addMediaByUrl) only when the link is publicly accessible, and cannot be used with dataConnectors.syncFile(). To sync via a Dropbox connector, use the dropbox:// URI returned by dataConnectors.listFiles().',
+        'Dropbox file share links sync through a Dropbox data connector via OAuth (dataConnectors.syncFile()/syncUrl()), including login-gated links. Without a connector they work with general ingestion methods (e.g. files.syncFromUrl, collections.addMediaByUrl) only when the link is publicly accessible.',
+      );
+    }
+    if (parsed.pathname.startsWith('/scl/fo/')) {
+      warnings.push(
+        'Dropbox folder share links (/scl/fo/...) are not supported. Share a single file, or use the dropbox:// file URIs returned by dataConnectors.listFiles().',
       );
     }
   }
@@ -248,9 +273,15 @@ function collectWarnings(url: string, warnings: string[]): void {
     (host === 'zoom.us' || host.endsWith('.zoom.us')) &&
     parsed.pathname.startsWith('/rec/')
   ) {
-    warnings.push(
-      'Zoom recording share links (zoom.us/rec/...) are not supported. Use a zoom://uuid/<meetingUuid> URI from dataConnectors.listFiles(), or a https://*.zoom.us/{j|s|recording/detail} link.',
-    );
+    if (parsed.pathname.startsWith('/rec/share/')) {
+      warnings.push(
+        'Zoom /rec/share/ links are resolved best-effort: Zoom often mints a new share token each time a link is copied from the portal, so the link may not resolve (404). The reliable form is the recording-detail link (https://*.zoom.us/recording/detail?meeting_id=<uuid>), which works for any recording age.',
+      );
+    } else {
+      warnings.push(
+        'Zoom recording links of this form (e.g. zoom.us/rec/play/...) are not supported. Use a zoom://uuid/<meetingUuid> URI from dataConnectors.listFiles(), or a https://*.zoom.us/{j|s|recording/detail|rec/share} link.',
+      );
+    }
   }
 }
 
@@ -271,7 +302,8 @@ function collectWarnings(url: string, warnings: string[]): void {
  *   `https://www.loom.com/share/<id>`
  *
  * Everything else passes through unchanged. `warnings` flags URL forms with
- * known limitations (e.g. Dropbox share links, Zoom `/rec/` links).
+ * known limitations (e.g. Dropbox folder links, Zoom `/rec/play/` links,
+ * best-effort Zoom `/rec/share/` tokens).
  */
 export function normalizeVideoUrl(url: string): NormalizedVideoUrl {
   const warnings: string[] = [];

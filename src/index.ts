@@ -17,6 +17,11 @@ export type * from './types';
 export * from './enums';
 
 /**
+ * Error class wrapping API errors with response metadata
+ */
+export * from './error';
+
+/**
  * URL classification and normalization utilities mirroring the API's
  * server-side URL handling
  */

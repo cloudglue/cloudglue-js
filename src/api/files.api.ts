@@ -8,7 +8,7 @@ import {
   WaitForReadyOptions,
 } from '../types';
 import { CloudglueError } from '../error';
-import { normalizeVideoUrl } from '../url-utils';
+import { isDropboxFileShareLink, normalizeVideoUrl } from '../url-utils';
 
 import type { AxiosResponse } from 'axios';
 
@@ -33,9 +33,10 @@ type SyncFromUrlParams = {
 
 /**
  * URL sources `POST /files/sync` resolves through a data connector instead of
- * fetching anonymously. `dropbox` is absent: https Dropbox share links are
- * accepted here (when public), while `dropbox://` URIs are caught by the
- * connector-URI check.
+ * fetching anonymously. `dropbox` is absent because it splits by URL form:
+ * https file share links are accepted here (when public), while `dropbox://`
+ * URIs and `dl.dropboxusercontent.com` URLs are connector-only — see the
+ * dropbox-specific check in the guard.
  */
 const CONNECTOR_ONLY_SOURCES = new Set([
   's3',
@@ -167,7 +168,9 @@ export class EnhancedFilesApi {
     if (!driveUc) {
       if (
         !isHttpUrl(normalized.url) ||
-        CONNECTOR_ONLY_SOURCES.has(normalized.source)
+        CONNECTOR_ONLY_SOURCES.has(normalized.source) ||
+        (normalized.source === 'dropbox' &&
+          !isDropboxFileShareLink(normalized.url))
       ) {
         throw new CloudglueError(
           `URL '${url}' resolves through a data connector ('${normalized.source}') and cannot be synced anonymously. Use dataConnectors.syncFile(connectorId, url) or dataConnectors.syncUrl(url) instead.` +

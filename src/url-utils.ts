@@ -68,6 +68,17 @@ export const CONNECTOR_SYNC_URI_GRAMMAR: Record<string, string> = {
   recall: 'recall://recording/<recordingId>',
 };
 
+/**
+ * True for https Dropbox *file share* links (`dropbox.com/scl/fi/...`,
+ * `/s/...`) — the only `dropbox`-classified URL form that general ingestion
+ * endpoints accept without a connector (when the link is public). Other
+ * dropbox forms (`dropbox://` URIs, `dl.dropboxusercontent.com` URLs)
+ * resolve only through a Dropbox data connector.
+ */
+export function isDropboxFileShareLink(url: string): boolean {
+  return DROPBOX_FILE_SHARE_REGEX.test(url);
+}
+
 function tryParseUrl(url: string): URL | null {
   try {
     return new URL(url);

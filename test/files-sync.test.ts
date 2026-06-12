@@ -114,6 +114,8 @@ describe('files.syncFromUrl', () => {
       'https://drive.google.com/file/d/1a2bC3dE4f/view',
       'https://grain.com/share/recording/abc-123/token',
       'https://www.dropbox.com/preview/folder/video.mp4',
+      // dropbox CDN URLs are connector-only, unlike dropbox.com share links
+      'https://dl.dropboxusercontent.com/1/view/abc/test/video.mp4',
     ]) {
       await assert.rejects(
         client.syncFromUrl(url),

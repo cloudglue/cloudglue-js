@@ -33,12 +33,17 @@ describe('classifyVideoUrl', () => {
     ['grain://recording/abc-123', 'grain'],
     ['https://example.com/video.mp4', 'http'],
     ['http://example.com/video.mp4', 'http'],
-    // share links the server treats as generic http
+    // dropbox file share links resolve via a connector's OAuth (API 0.7.5)
     [
       'https://www.dropbox.com/scl/fi/r85h2r4d9s13la63r5pzf/video.mp4?rlkey=x&dl=0',
-      'http',
+      'dropbox',
     ],
-    ['https://zoom.us/rec/share/abcdef', 'http'],
+    ['https://www.dropbox.com/s/abc123/video.mp4?dl=0', 'dropbox'],
+    // ...but folder share links stay http and fail server-side
+    ['https://www.dropbox.com/scl/fo/abc123/folder?rlkey=x&dl=0', 'http'],
+    // zoom rec/share links are connector-syncable (best-effort); rec/play is not
+    ['https://zoom.us/rec/share/abcdef', 'zoom'],
+    ['https://us02web.zoom.us/rec/play/abcdef', 'http'],
     // loom without www / http scheme falls through to http
     ['https://loom.com/share/0281766fa2d04bb788eaf19e65135184', 'http'],
     // hostname must actually be dl.dropboxusercontent.com, not a substring elsewhere
@@ -243,20 +248,31 @@ describe('normalizeVideoUrl pass-throughs', () => {
 });
 
 describe('normalizeVideoUrl warnings', () => {
-  it('warns on www.dropbox.com share links (scl/fi form)', () => {
+  it('notes the public-only anonymous path on dropbox file share links (scl/fi form)', () => {
     const result = normalizeVideoUrl(
       'https://www.dropbox.com/scl/fi/r85h2r4d9s13la63r5pzf/video.mp4?rlkey=x&dl=0',
     );
-    assert.equal(result.source, 'http');
+    assert.equal(result.source, 'dropbox');
     assert.equal(result.warnings.length, 1);
     assert.match(result.warnings[0], /syncFile/);
+    assert.match(result.warnings[0], /publicly accessible/);
   });
 
-  it('warns on legacy /s/ dropbox share links', () => {
+  it('notes the public-only anonymous path on legacy /s/ dropbox share links', () => {
     const result = normalizeVideoUrl(
       'https://www.dropbox.com/s/abc123/video.mp4?dl=0',
     );
+    assert.equal(result.source, 'dropbox');
     assert.equal(result.warnings.length, 1);
+  });
+
+  it('warns on dropbox folder share links (scl/fo form)', () => {
+    const result = normalizeVideoUrl(
+      'https://www.dropbox.com/scl/fo/abc123/folder?rlkey=x&dl=0',
+    );
+    assert.equal(result.source, 'http');
+    assert.equal(result.warnings.length, 1);
+    assert.match(result.warnings[0], /folder/i);
   });
 
   it('warns on non-/1/view dl.dropboxusercontent.com URLs', () => {
@@ -275,11 +291,20 @@ describe('normalizeVideoUrl warnings', () => {
     assert.equal(result.warnings.length, 0);
   });
 
-  it('warns on zoom.us/rec/ recording links', () => {
+  it('notes best-effort resolution on zoom.us/rec/share links', () => {
     const result = normalizeVideoUrl('https://us02web.zoom.us/rec/share/abc');
+    assert.equal(result.source, 'zoom');
+    assert.equal(result.warnings.length, 1);
+    assert.match(result.warnings[0], /best-effort/i);
+    assert.match(result.warnings[0], /recording\/detail/);
+  });
+
+  it('warns on unsupported zoom.us/rec/play links', () => {
+    const result = normalizeVideoUrl('https://us02web.zoom.us/rec/play/abc');
     assert.equal(result.source, 'http');
     assert.equal(result.warnings.length, 1);
-    assert.match(result.warnings[0], /zoom/i);
+    assert.match(result.warnings[0], /not supported/i);
+    assert.match(result.warnings[0], /recording\/detail/);
   });
 
   it('produces no warnings for clean URLs', () => {
@@ -294,7 +319,16 @@ describe('CONNECTOR_SYNC_URI_GRAMMAR', () => {
   it('covers all connector types', () => {
     assert.deepEqual(
       Object.keys(CONNECTOR_SYNC_URI_GRAMMAR).sort(),
-      ['dropbox', 'gcs', 'gong', 'google-drive', 'grain', 'recall', 's3', 'zoom'].sort(),
+      [
+        'dropbox',
+        'gcs',
+        'gong',
+        'google-drive',
+        'grain',
+        'recall',
+        's3',
+        'zoom',
+      ].sort(),
     );
   });
 });

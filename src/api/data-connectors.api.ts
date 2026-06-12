@@ -50,7 +50,10 @@ export class EnhancedDataConnectorsApi {
    * @param params - Optional filtering and pagination parameters
    * @returns Paginated list of files in the data source
    */
-  async listFiles(connectorId: string, params: ListDataConnectorFilesParams = {}) {
+  async listFiles(
+    connectorId: string,
+    params: ListDataConnectorFilesParams = {},
+  ) {
     return this.api.listDataConnectorFiles({
       params: { id: connectorId },
       queries: params,
@@ -80,8 +83,13 @@ export class EnhancedDataConnectorsApi {
    * is populated from the recording.
    *
    * Known https share links are rewritten client-side into connector URIs
-   * (e.g. `drive.google.com/file/d/<id>` → `gdrive://file/<id>`). URLs that
-   * cannot map to any connector type are rejected before the request is sent.
+   * (e.g. `drive.google.com/file/d/<id>` → `gdrive://file/<id>`), and some
+   * pass through for server-side resolution via the connector's OAuth:
+   * Dropbox file share links (`dropbox.com/scl/fi/...`, `/s/...` — works for
+   * login-gated files) and Zoom `rec/share` links (best-effort: Zoom often
+   * mints a new share token per copy; `zoom.us/recording/detail?meeting_id=`
+   * links are the reliable form). URLs that cannot map to any connector type
+   * are rejected before the request is sent.
    *
    * @param connectorId - The ID of the data connector
    * @param url - Connector URI to sync (must match the connector's type)
@@ -137,11 +145,17 @@ export class EnhancedDataConnectorsApi {
       const grammar = Object.entries(CONNECTOR_SYNC_URI_GRAMMAR)
         .map(([type, form]) => `  ${type}: ${form}`)
         .join('\n');
+      const hint =
+        normalized.source === 'youtube'
+          ? 'YouTube URLs can only be added to a collection — use collections.addMediaByUrl().'
+          : 'Publicly accessible URLs (direct media URLs, public Dropbox share links, TikTok, Loom) can be synced into a file without a connector via files.syncFromUrl().';
       throw new CloudglueError(
         `URL '${url}' cannot be synced through a data connector` +
           (normalized.source ? ` (classified as '${normalized.source}')` : '') +
           '. Use the URI returned by dataConnectors.listFiles(), or one of these forms per connector type:\n' +
           grammar +
+          '\n' +
+          hint +
           (normalized.warnings.length
             ? '\n' + normalized.warnings.join('\n')
             : ''),

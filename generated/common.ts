@@ -459,7 +459,7 @@ export const SegmentationUniformConfig = z
 export const SegmentationShotDetectorConfig = z
   .object({
     threshold: z.number().nullish(),
-    min_seconds: z.number().gte(1).lte(600).nullish(),
+    min_seconds: z.number().gte(0.6).lte(600).nullish(),
     max_seconds: z.number().gte(1).lte(600).nullish(),
     detector: z.enum(['adaptive', 'content']),
     fill_gaps: z.boolean().optional(),

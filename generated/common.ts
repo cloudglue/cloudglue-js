@@ -253,6 +253,10 @@ export type Describe = {
         enable_visual_scene_description: boolean;
         enable_scene_text: boolean;
         enable_audio_description: boolean;
+        participants: Array<{
+          name: string;
+          scope?: string | undefined;
+        }>;
       }>
     | undefined;
   use_in_default_index?: boolean | undefined;
@@ -878,6 +882,14 @@ export const Describe = z
         enable_visual_scene_description: z.boolean(),
         enable_scene_text: z.boolean(),
         enable_audio_description: z.boolean(),
+        participants: z
+          .array(
+            z
+              .object({ name: z.string(), scope: z.string().optional() })
+              .strict()
+              .passthrough()
+          )
+          .max(50),
       })
       .partial()
       .strict()

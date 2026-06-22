@@ -21,6 +21,15 @@ export class EnhancedDescribeApi {
       include_chapters?: boolean;
       include_shots?: boolean;
       use_in_default_index?: boolean;
+      /**
+       * Known participants on the recording. When provided, speaker naming is
+       * constrained to these people: transcript speaker labels will only use one
+       * of these names (or a generic "Speaker N"), never an invented name.
+       * Intended for uploaded files, which (unlike data-connector files such as
+       * Grain) carry no participant metadata; for connector files this is
+       * populated automatically and need not be supplied.
+       */
+      participants?: Array<{ name: string; scope?: string }>;
     } = {},
   ) {
     return this.api.createDescribe({

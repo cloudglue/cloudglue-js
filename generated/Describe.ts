@@ -27,6 +27,12 @@ type NewDescribe = {
   include_chapters?: boolean | undefined;
   include_shots?: boolean | undefined;
   use_in_default_index?: boolean | undefined;
+  participants?:
+    | Array<{
+        name: string;
+        scope?: string | undefined;
+      }>
+    | undefined;
 } & FileSegmentationConfig;
 
 const NewDescribe: z.ZodType<NewDescribe> = z
@@ -41,6 +47,15 @@ const NewDescribe: z.ZodType<NewDescribe> = z
     include_chapters: z.boolean().optional(),
     include_shots: z.boolean().optional(),
     use_in_default_index: z.boolean().optional(),
+    participants: z
+      .array(
+        z
+          .object({ name: z.string(), scope: z.string().optional() })
+          .strict()
+          .passthrough()
+      )
+      .max(50)
+      .optional(),
   })
   .strict()
   .passthrough()

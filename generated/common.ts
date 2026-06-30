@@ -113,7 +113,7 @@ export type File = {
   filename?: string | undefined;
   uri: string;
   metadata?: ({} | null) | undefined;
-  media_type?: ('video' | 'audio') | undefined;
+  media_type?: ('video' | 'audio' | 'image') | undefined;
   media_info?:
     | Partial<{
         duration_seconds: number | null;
@@ -641,7 +641,7 @@ export const File = z
     filename: z.string().optional(),
     uri: z.string(),
     metadata: z.object({}).partial().strict().passthrough().nullish(),
-    media_type: z.enum(['video', 'audio']).optional(),
+    media_type: z.enum(['video', 'audio', 'image']).optional(),
     media_info: z
       .object({
         duration_seconds: z.number().nullable(),

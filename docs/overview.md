@@ -5,13 +5,13 @@ Cloudglue turns video into LLM-ready data. This SDK (`@cloudglue/cloudglue-js`) 
 ## Mental Model
 
 ```text
-Files (upload video/audio, video URL, data connector URI)
+Files (upload video/audio/image, media URL, data connector URI)
   → Processing (describe, extract, face detection)
     → Collections (group processed files)
       → Querying (chat, search, deep search, responses API)
 ```
 
-1. **Upload** a video file, provide a URL, or provide a data connector URI
+1. **Upload** a video, audio, or image file, provide a URL, or provide a data connector URI
 2. **Process** it with describe (multimodal descriptions) or extract (structured data)
 3. **Organize** files into collections
 4. **Query** collections via chat, search, deep search, or the Responses API
@@ -36,7 +36,7 @@ The SDK also exports standalone URL helpers (`classifyVideoUrl`, `normalizeVideo
 
 | Namespace | Purpose | Key Methods |
 |-----------|---------|-------------|
-| `client.files` | Upload & manage video files | `uploadFile`, `syncFromUrl`, `listFiles`, `getFile`, `deleteFile`, `waitForReady` |
+| `client.files` | Upload & manage video, audio & image files | `uploadFile`, `syncFromUrl`, `listFiles`, `getFile`, `deleteFile`, `waitForReady` |
 | `client.collections` | Organize videos into groups | `createCollection`, `addMedia`, `listVideos`, `waitForReady` |
 | `client.describe` | Multimodal video descriptions | `createDescribe`, `getDescribe`, `waitForReady` |
 | `client.extract` | Structured data extraction | `createExtract`, `getExtract`, `waitForReady` |

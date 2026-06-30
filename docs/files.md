@@ -1,12 +1,12 @@
 # Files API
 
-Manage video and audio files in Cloudglue.
+Manage video, audio, and image files in Cloudglue.
 
 ## Upload a File
 
 ```typescript
 const uploaded = await client.files.uploadFile({
-  file: myFile,                        // globalThis.File object
+  file: myFile,                        // globalThis.File object (video, audio, or image)
   metadata: { project: 'demo' },      // optional key-value metadata
   enable_segment_thumbnails: true,     // optional: generate thumbnails per segment
 });
@@ -16,6 +16,12 @@ const file = await client.files.waitForReady(uploaded.data.id);
 ```
 
 **Note:** File uploads use `multipart/form-data` via axios directly (not Zodios). The `file` parameter must be a `globalThis.File` object.
+
+### Image files
+
+Images (JPEG/PNG/WebP, …) upload through the same `uploadFile`/`syncFromUrl`/`waitForReady` flow as video and audio. On the returned file, `media_type === 'image'` and `media_info` carries `width`/`height` (with `duration_seconds` ≈ 0 and `has_audio: false`).
+
+Images are processed **at the file level only** — they are not segmented. As a result they have no segments, no per-segment thumbnails, and `enable_segment_thumbnails` is ignored. Describe and extract still work on images: pass the file's `cloudglue://files/<id>` URI (or a direct public image URL) to `describe.createDescribe()` / `extract.createExtract()`. Visual modalities (`visual_scene_description`, `scene_text`, `summary`, `title`) are populated; speech/audio modalities come back empty.
 
 ## Sync from URL
 
@@ -32,10 +38,12 @@ const ready = await client.files.waitForReady(file.id);
 
 Accepted URL forms:
 
-- Direct http(s) video/audio file URLs (e.g. `.mp4`)
+- Direct http(s) video, audio, or image file URLs (e.g. `.mp4`, `.jpg`/`.png`/`.webp`)
 - Public Dropbox share links (`dropbox.com/scl/fi/...`, `/s/...`)
 - TikTok video URLs (consumes scrape credits — 402 if the balance is insufficient)
 - Loom share URLs (non-canonical forms are rewritten client-side)
+
+The host must serve the bytes to an anonymous request. Image URLs gated behind a browser User-Agent (e.g. some Wikimedia links) are rejected server-side as `Unsupported file type`.
 
 Not accepted — the SDK rejects these client-side with guidance:
 

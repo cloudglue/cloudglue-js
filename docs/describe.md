@@ -4,6 +4,8 @@ Generate rich multimodal descriptions of video content including speech transcri
 
 **Note:** The `transcribe` API is deprecated. Use `describe` instead.
 
+**Images:** `createDescribe` also accepts images — pass an uploaded image's `cloudglue://files/<id>` URI or a direct public image URL. Images are described at the file level (no segmentation), so omit `segmentation_config`/`include_shots`/`include_chapters`; the visual modalities (`visual_scene_description`, `scene_text`, `summary`, `title`) are populated and speech/audio come back empty. Image describe jobs often complete synchronously, so the create response may already be `completed` — `waitForReady` still works either way.
+
 ## Create a Describe Job
 
 ```typescript

@@ -13,10 +13,17 @@ import { isDropboxFileShareLink, normalizeVideoUrl } from '../url-utils';
 import type { AxiosResponse } from 'axios';
 
 type UploadFileParams = {
+  /**
+   * The file to upload. Accepts video, audio, and image files
+   * (e.g. JPEG/PNG/WebP). Images are processed at the file level only — they
+   * are not segmented, so they have no segments, segment thumbnails, or
+   * per-segment describe/extract outputs.
+   */
   file: globalThis.File;
   metadata?: Record<string, any>;
   /**
    * If enabled, the file will be segmented and thumbnails will be generated for each segment for the default segmentation config.
+   * Ignored for images, which are not segmented.
    */
   enable_segment_thumbnails?: boolean;
 };
@@ -124,10 +131,13 @@ export class EnhancedFilesApi {
 
   /**
    * Materialize a publicly accessible URL into a Cloudglue file without a
-   * data connector or a collection. Accepts direct http(s) video/audio file
-   * URLs (e.g. `.mp4`), public Dropbox share links, TikTok video URLs, and
-   * Loom share URLs. Idempotent: syncing the same URL returns the existing
-   * file. The returned file may still be processing — chain
+   * data connector or a collection. Accepts direct http(s) video, audio, or
+   * image file URLs (e.g. `.mp4`, `.jpg`/`.png`/`.webp`), public Dropbox share
+   * links, TikTok video URLs, and Loom share URLs. The host must serve the
+   * bytes to an anonymous request — links gated behind a browser User-Agent
+   * (e.g. some Wikimedia URLs) are rejected server-side as "Unsupported file
+   * type". Idempotent: syncing the same URL returns the existing file. The
+   * returned file may still be processing — chain
    * `files.waitForReady(file.id)` to wait for it.
    *
    * Non-canonical Loom links are rewritten client-side to the form the API

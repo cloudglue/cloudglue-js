@@ -328,12 +328,12 @@ const endpoints = makeApi([
     method: 'post',
     path: '/files',
     alias: 'uploadFile',
-    description: `Upload a video file that can be used with Cloudglue services`,
+    description: `Upload a video, audio, or image file that can be used with Cloudglue services`,
     requestFormat: 'form-data',
     parameters: [
       {
         name: 'body',
-        description: `Upload a video file`,
+        description: `Upload a video, audio, or image file`,
         type: 'Body',
         schema: FileUpload,
       },

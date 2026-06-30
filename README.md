@@ -110,16 +110,10 @@ This will:
 
 ### Releasing
 
-Publishing to npm is automated via GitHub Actions using OIDC trusted publishing.
-Push a version tag and the workflow builds, publishes, and creates a GitHub
-Release with the build artifacts attached:
-
-```bash
-npm version patch     # bumps package.json and creates the git tag
-git push --follow-tags
-```
-
-See [RELEASING.md](RELEASING.md) for the full process and one-time npm setup.
+Publishing to npm is automated: pushing a `v*.*.*` tag triggers a GitHub Actions
+workflow that builds, publishes via OIDC trusted publishing, and creates a GitHub
+Release with the build artifacts attached. See **[RELEASING.md](RELEASING.md)** for
+the exact commands, the one-time npm Trusted Publisher setup, and troubleshooting.
 
 ## Contact
 

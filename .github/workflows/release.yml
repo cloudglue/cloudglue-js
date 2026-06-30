@@ -41,7 +41,10 @@ jobs:
           # no token is present. Crucially, do not pass `env: NODE_AUTH_TOKEN` to this step.
 
       - name: Upgrade npm to a trusted-publishing-capable version
-        run: npm install --global npm@latest # OIDC trusted publishing needs npm >= 11.5.1
+        # OIDC trusted publishing needs npm >= 11.5.1. Pin to the 11 major (resolves to the
+        # latest 11.x) rather than @latest so a future npm major can't silently change
+        # publish/OIDC behavior on the one path that only runs at release time.
+        run: npm install --global npm@11
 
       - name: Verify the tag matches package.json version
         run: |
@@ -67,7 +70,9 @@ jobs:
       - name: Package dist build artifacts
         run: |
           NAME="cloudglue-cloudglue-js-${GITHUB_REF_NAME}"
-          # The npm-publishable tarball — exactly what gets published to the registry.
+          # A fresh pack of the built package, attached to the Release for convenience. It
+          # has the same contents as the published package, but is a separate pack run from
+          # the registry upload below, so don't rely on it being byte-identical to npm's.
           npm pack
           # Convenience archives of the compiled output for the GitHub Release.
           tar -czf "${NAME}-dist.tar.gz" dist docs README.md LICENSE.md package.json
@@ -83,16 +88,37 @@ jobs:
         run: |
           NAME="$(node -p "require('./package.json').name")"
           VERSION="$(node -p "require('./package.json').version")"
+
+          # Prereleases (e.g. v1.0.0-rc.1 — the v*.*.* trigger still matches them) must NOT
+          # land on the `latest` dist-tag, or a plain `npm install` would hand every user the
+          # unstable build. Route any semver prerelease (the version contains a hyphen) to the
+          # `next` tag; stable versions go to `latest`.
+          DIST_TAG="latest"
+          case "$VERSION" in
+            *-*) DIST_TAG="next" ;;
+          esac
+
           # Re-run safety, scoped narrowly: only SKIP publishing when this exact version is
-          # already on the registry — that is the partial-release case (publish succeeded but
-          # a later step failed), where re-running must not get stuck on a version conflict.
-          # In every other case we publish and let ANY failure (auth/OIDC/network/etc.) fail
-          # the job. We never swallow a publish error, so a GitHub Release is only created for
-          # a build that is genuinely on npm.
-          if [ -n "$(npm view "${NAME}@${VERSION}" version 2> /dev/null || true)" ]; then
+          # already on the registry — the partial-release case (publish succeeded but a later
+          # step failed), where re-running must not get stuck on a version conflict. We tell
+          # "definitely not published" (npm view returns E404) apart from "registry query
+          # failed" (network/5xx): only E404 is treated as safe-to-publish. A query failure
+          # is NOT assumed to mean absent, so a transient blip can't make a re-run try to
+          # publish over an existing version. Otherwise we publish and let any failure fail
+          # the job — a GitHub Release is only ever created for a build that is genuinely on npm.
+          ERRLOG="$RUNNER_TEMP/npm-view.err"
+          set +e
+          EXISTING="$(npm view "${NAME}@${VERSION}" version 2> "$ERRLOG")"
+          VIEW_CODE=$?
+          set -e
+          if [ "$VIEW_CODE" -eq 0 ] && [ -n "$EXISTING" ]; then
             echo "::notice::${NAME}@${VERSION} is already on npm; skipping publish (re-run after a partial release)."
+          elif grep -q "E404" "$ERRLOG"; then
+            npm publish --access public --tag "$DIST_TAG"
           else
-            npm publish --access public
+            echo "::error::Could not determine whether ${NAME}@${VERSION} is published; the npm registry query failed:"
+            cat "$ERRLOG"
+            exit 1
           fi
 
       - name: Create GitHub Release with build artifacts

@@ -39,6 +39,14 @@ npm version patch     # or: minor / major / 0.8.0
 git push --follow-tags
 ```
 
+For a prerelease, use a version with a hyphen — it publishes to the `next`
+dist-tag instead of `latest`:
+
+```bash
+npm version prerelease --preid rc   # e.g. 0.8.0-rc.0
+git push --follow-tags
+```
+
 Pushing the `v*.*.*` tag triggers the workflow, which:
 
 1. Checks out the repo (the committed `generated/` clients mean the `spec/`
@@ -53,9 +61,16 @@ Pushing the `v*.*.*` tag triggers the workflow, which:
    > explicitly before publishing.
 5. Packages artifacts: the publishable `npm pack` tarball plus convenience
    `*-dist.tar.gz` and `*-dist.zip` archives of the compiled output.
-6. Publishes to npm via OIDC (provenance is attached automatically).
+6. Publishes to npm via OIDC (provenance is attached automatically). Stable
+   versions go to the `latest` dist-tag; **prereleases** (a version with a
+   hyphen, e.g. `0.8.0-rc.1`) are published to the `next` tag instead, so they
+   never become the default `npm install`.
 7. Creates a GitHub Release for the tag with auto-generated notes and all three
    artifacts attached.
+
+> CI installs with `npm ci` against `package-lock.json`. If you change
+> dependencies, keep `package-lock.json` in sync (run `npm install` and commit
+> it) — a stale lockfile makes the release job fail at `npm ci`.
 
 ## Manual / fallback publish
 

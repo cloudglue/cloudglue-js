@@ -1,0 +1,87 @@
+name: Release & Publish
+
+# Publishes to npm (via OIDC trusted publishing) and creates a GitHub Release
+# with the built dist artifacts attached. Triggered by pushing a version tag.
+#
+#   npm version patch   # bumps package.json + creates the git tag
+#   git push --follow-tags
+#
+# One-time setup is required on npmjs.com — see RELEASING.md.
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+# Never run two releases for the same ref at once.
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write # create the GitHub Release and upload build assets
+  id-token: write # mint the OIDC token for npm trusted publishing
+
+jobs:
+  release:
+    name: Build, publish to npm, and create GitHub Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        # generated/ is committed, so the spec/ submodule is not needed to build.
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22' # resolves to >= 22.14.0, required for trusted publishing
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Upgrade npm to a trusted-publishing-capable version
+        run: npm install --global npm@latest # OIDC trusted publishing needs npm >= 11.5.1
+
+      - name: Verify the tag matches package.json version
+        run: |
+          PKG_VERSION="$(node -p "require('./package.json').version")"
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          echo "package.json: $PKG_VERSION | tag: $TAG_VERSION"
+          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
+            echo "::error::Tag '$GITHUB_REF_NAME' does not match package.json version '$PKG_VERSION'. Bump package.json or fix the tag."
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build dist
+        run: npm run build
+        # .npmrc sets ignore-scripts=true, so prepublishOnly/prepare won't auto-build —
+        # we build explicitly here before packaging and publishing.
+
+      - name: Test
+        run: npm test
+
+      - name: Package dist build artifacts
+        run: |
+          NAME="cloudglue-cloudglue-js-${GITHUB_REF_NAME}"
+          # The npm-publishable tarball — exactly what gets published to the registry.
+          npm pack
+          # Convenience archives of the compiled output for the GitHub Release.
+          tar -czf "${NAME}-dist.tar.gz" dist docs README.md LICENSE.md package.json
+          zip -qr "${NAME}-dist.zip" dist docs README.md LICENSE.md package.json
+          ls -lh *.tgz "${NAME}-dist.tar.gz" "${NAME}-dist.zip"
+
+      - name: Publish to npm via OIDC trusted publishing
+        run: npm publish --access public
+        # No NODE_AUTH_TOKEN required: with a Trusted Publisher configured on npmjs.com,
+        # npm exchanges the GitHub OIDC token automatically and attaches provenance.
+
+      - name: Create GitHub Release with build artifacts
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: |
+            *.tgz
+            *-dist.tar.gz
+            *-dist.zip

@@ -79,12 +79,15 @@ npm publish --access public   # requires npm login / 2FA
   `setup-node` is fine on its own and is the npm-documented setup.
 - **Version mismatch failure** — the pushed tag (`vX.Y.Z`) must equal
   `package.json` `version`. Use `npm version` so they stay in sync.
-- **Release created but npm publish skipped** — publish runs *before* the GitHub
-  Release step, so if a release appears, the publish succeeded. Check the
-  workflow logs for the publish step output.
-- **Re-running after a partial failure is safe** — if `npm publish` succeeded but
-  a later step failed, just re-run the workflow for the same tag. The publish step
-  detects the version is already on npm and continues, and the GitHub Release step
-  updates the existing release rather than failing. No need to bump the version.
+- **Did the publish actually happen?** — the publish step runs *before* the GitHub
+  Release step and never swallows a publish error: a real failure (auth/OIDC/network)
+  fails the job and no release is created. The only non-fatal case is when the exact
+  version is *already* on npm, where it is skipped on purpose (see below). So if a
+  release appears, the version is genuinely on npm.
+- **Re-running after a partial failure is safe** — if `npm publish` succeeded but a
+  later step failed, just re-run the workflow for the same tag. The publish step sees
+  the version is already on npm and **skips** publishing (it does not try to publish
+  over it), and the GitHub Release step updates the existing release rather than
+  failing. No need to bump the version.
 - **Hardening (optional)** — for a sensitive publish workflow you may want to pin
   the actions to commit SHAs instead of `@v4`/`@v2`.

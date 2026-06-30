@@ -100,9 +100,14 @@ npm publish --access public   # requires npm login / 2FA
   version is *already* on npm, where it is skipped on purpose (see below). So if a
   release appears, the version is genuinely on npm.
 - **Re-running after a partial failure is safe** — if `npm publish` succeeded but a
-  later step failed, just re-run the workflow for the same tag. The publish step sees
-  the version is already on npm and **skips** publishing (it does not try to publish
-  over it), and the GitHub Release step updates the existing release rather than
-  failing. No need to bump the version.
+  later step failed, just re-run the workflow for the **same tag on the same commit**.
+  The publish step sees the version is already on npm and **skips** publishing (it does
+  not try to publish over it), and the GitHub Release step updates the existing release
+  rather than failing. No need to bump the version.
+  > Caveat: this assumes the tag still points at the originally published commit. **Never
+  > move a published tag to a different commit while keeping the same version** — the
+  > publish would be skipped (npm keeps the old tarball) while the GitHub Release re-uploads
+  > artifacts built from the new commit, silently desyncing the two. To ship new code,
+  > always bump the version (`npm version`) and push a new tag.
 - **Hardening (optional)** — for a sensitive publish workflow you may want to pin
   the actions to commit SHAs instead of `@v4`/`@v2`.

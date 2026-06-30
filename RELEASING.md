@@ -82,5 +82,9 @@ npm publish --access public   # requires npm login / 2FA
 - **Release created but npm publish skipped** — publish runs *before* the GitHub
   Release step, so if a release appears, the publish succeeded. Check the
   workflow logs for the publish step output.
+- **Re-running after a partial failure is safe** — if `npm publish` succeeded but
+  a later step failed, just re-run the workflow for the same tag. The publish step
+  detects the version is already on npm and continues, and the GitHub Release step
+  updates the existing release rather than failing. No need to bump the version.
 - **Hardening (optional)** — for a sensitive publish workflow you may want to pin
   the actions to commit SHAs instead of `@v4`/`@v2`.

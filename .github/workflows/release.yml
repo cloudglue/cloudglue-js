@@ -75,12 +75,30 @@ jobs:
           ls -lh *.tgz "${NAME}-dist.tar.gz" "${NAME}-dist.zip"
 
       - name: Publish to npm via OIDC trusted publishing
-        run: npm publish --access public
         # Do NOT add an `env: NODE_AUTH_TOKEN: ...` block here. With a Trusted Publisher
         # configured on npmjs.com, npm exchanges the GitHub OIDC token automatically and
         # attaches provenance. Setting NODE_AUTH_TOKEN to ANY value (even an empty string,
         # e.g. from a missing secret) makes npm use token auth instead of OIDC and the
         # publish fails. Leaving it unset is required, not just optional.
+        run: |
+          set +e
+          npm publish --access public
+          code=$?
+          set -e
+          if [ "$code" -ne 0 ]; then
+            # A re-run after a partial release (publish succeeded but a later step failed)
+            # would otherwise be stuck forever: publish errors on the existing version and
+            # the GitHub Release never gets created. If this exact version is already on the
+            # registry, treat publish as done and continue so the Release step can finish.
+            NAME="$(node -p "require('./package.json').name")"
+            VERSION="$(node -p "require('./package.json').version")"
+            if npm view "${NAME}@${VERSION}" version > /dev/null 2>&1; then
+              echo "::notice::${NAME}@${VERSION} is already on npm; continuing (re-run after a partial release)."
+            else
+              echo "::error::npm publish failed (exit ${code}) and ${NAME}@${VERSION} is not on npm."
+              exit "$code"
+            fi
+          fi
 
       - name: Create GitHub Release with build artifacts
         uses: softprops/action-gh-release@v2

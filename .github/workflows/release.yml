@@ -131,6 +131,10 @@ jobs:
         with:
           generate_release_notes: true
           fail_on_unmatched_files: true
+          # Mark prerelease tags (e.g. v1.0.0-rc.1) as a GitHub prerelease so they don't
+          # become the repo's "Latest" release — consistent with routing them to npm's
+          # `next` dist-tag in the publish step. The tag carries the version (verified above).
+          prerelease: ${{ contains(github.ref_name, '-') }}
           files: |
             *.tgz
             *-dist.tar.gz

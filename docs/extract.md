@@ -2,6 +2,8 @@
 
 Extract structured data from videos using custom prompts and schemas.
 
+**Images:** `createExtract` also accepts images — pass an uploaded image's `cloudglue://files/<id>` URI or a direct public image URL. Images aren't segmented, so use whole-file extraction (`enable_video_level_entities: true`, `enable_segment_level_entities: false`); `segment_entities` comes back empty.
+
 ## Create an Extract Job
 
 ```typescript

@@ -56,9 +56,9 @@ Pushing the `v*.*.*` tag triggers the workflow, which:
 3. Verifies the tag matches `package.json` `version` (fails fast on a mismatch).
 4. Builds (`npm run build`) and runs tests (`npm test`).
 
-   > Note: `.npmrc` sets `ignore-scripts=true`, so `prepublishOnly`/`prepare`
-   > do **not** run automatically during `npm publish` — the workflow builds
-   > explicitly before publishing.
+   > Note: the workflow builds explicitly before packaging/publishing rather than
+   > relying on npm's `prepare`/`prepublishOnly` lifecycle scripts, whose behavior
+   > depends on the repo's `.npmrc` `ignore-scripts` setting and the npm version.
 5. Packages artifacts: the publishable `npm pack` tarball plus convenience
    `*-dist.tar.gz` and `*-dist.zip` archives of the compiled output.
 6. Publishes to npm via OIDC (provenance is attached automatically). Stable

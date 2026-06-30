@@ -66,8 +66,9 @@ jobs:
 
       - name: Build dist
         run: npm run build
-        # .npmrc sets ignore-scripts=true, so prepublishOnly/prepare won't auto-build —
-        # we build explicitly here before packaging and publishing.
+        # Build explicitly so dist/ is fresh before packaging and publishing — don't rely on
+        # npm's prepare/prepublishOnly lifecycle scripts, whose behavior here depends on the
+        # repo's .npmrc ignore-scripts setting and varies by npm version.
 
       - name: Test
         run: npm test

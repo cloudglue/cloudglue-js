@@ -105,20 +105,25 @@ jobs:
 
           # Re-run safety, scoped narrowly: only SKIP publishing when this exact version is
           # already on the registry — the partial-release case (publish succeeded but a later
-          # step failed), where re-running must not get stuck on a version conflict. We tell
-          # "definitely not published" (npm view returns E404) apart from "registry query
-          # failed" (network/5xx): only E404 is treated as safe-to-publish. A query failure
-          # is NOT assumed to mean absent, so a transient blip can't make a re-run try to
-          # publish over an existing version. Otherwise we publish and let any failure fail
-          # the job — a GitHub Release is only ever created for a build that is genuinely on npm.
+          # step failed), where re-running must not get stuck on a version conflict. Ask npm
+          # for the full published version list and test membership, rather than parsing a
+          # per-version 404 string, so the normal-release decision never depends on npm's
+          # error wording. exit 0 = authoritative answer; a never-published package returns
+          # E404 (publish the first version); any other failure (network/5xx) is fatal, so a
+          # transient blip can neither skip a real release nor publish over an existing one.
           ERRLOG="$RUNNER_TEMP/npm-view.err"
           set +e
-          EXISTING="$(npm view "${NAME}@${VERSION}" version 2> "$ERRLOG")"
+          VERSIONS_JSON="$(npm view "${NAME}" versions --json 2> "$ERRLOG")"
           VIEW_CODE=$?
           set -e
-          if [ "$VIEW_CODE" -eq 0 ] && [ -n "$EXISTING" ]; then
-            echo "::notice::${NAME}@${VERSION} is already on npm; skipping publish (re-run after a partial release)."
+          if [ "$VIEW_CODE" -eq 0 ]; then
+            if node -e 'const [v,j]=process.argv.slice(1);let a;try{a=JSON.parse(j)}catch{a=[]};if(!Array.isArray(a))a=[a];process.exit(a.includes(v)?0:1)' "$VERSION" "$VERSIONS_JSON"; then
+              echo "::notice::${NAME}@${VERSION} is already on npm; skipping publish (re-run after a partial release)."
+            else
+              npm publish --access public --tag "$DIST_TAG"
+            fi
           elif grep -q "E404" "$ERRLOG"; then
+            # The package has never been published before — publish the first version.
             npm publish --access public --tag "$DIST_TAG"
           else
             echo "::error::Could not determine whether ${NAME}@${VERSION} is published; the npm registry query failed:"

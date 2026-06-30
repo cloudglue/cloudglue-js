@@ -29,6 +29,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # No step does an authenticated `git push`, so don't leave the repo-write token
+          # in git config where later build/test/publish steps could reach it. The Release
+          # step authenticates via GITHUB_TOKEN in the environment, not git credentials.
+          persist-credentials: false
         # generated/ is committed, so the spec/ submodule is not needed to build.
 
       - name: Set up Node.js

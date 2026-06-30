@@ -72,6 +72,11 @@ npm publish --access public   # requires npm login / 2FA
 - **`npm error need auth` / OIDC not used** — the Trusted Publisher on npmjs.com
   doesn't match `cloudglue/cloudglue-js` + `release.yml` exactly, or the runner's
   npm is older than 11.5.1. The workflow upgrades npm; double-check the npm config.
+- **Publish uses token auth instead of OIDC** — never set `NODE_AUTH_TOKEN` for the
+  publish step (no `env:` block, no `${{ secrets.* }}` that could be empty). Any
+  value — including an empty string from a missing secret — disables OIDC and forces
+  token auth. The workflow intentionally leaves it unset; `registry-url` on
+  `setup-node` is fine on its own and is the npm-documented setup.
 - **Version mismatch failure** — the pushed tag (`vX.Y.Z`) must equal
   `package.json` `version`. Use `npm version` so they stay in sync.
 - **Release created but npm publish skipped** — publish runs *before* the GitHub

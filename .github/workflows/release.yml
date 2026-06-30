@@ -36,6 +36,9 @@ jobs:
         with:
           node-version: '22' # resolves to >= 22.14.0, required for trusted publishing
           registry-url: 'https://registry.npmjs.org'
+          # registry-url is the npm-documented OIDC setup. It does NOT break OIDC as long
+          # as NODE_AUTH_TOKEN is never set (see the publish step) — npm prefers OIDC when
+          # no token is present. Crucially, do not pass `env: NODE_AUTH_TOKEN` to this step.
 
       - name: Upgrade npm to a trusted-publishing-capable version
         run: npm install --global npm@latest # OIDC trusted publishing needs npm >= 11.5.1
@@ -73,8 +76,11 @@ jobs:
 
       - name: Publish to npm via OIDC trusted publishing
         run: npm publish --access public
-        # No NODE_AUTH_TOKEN required: with a Trusted Publisher configured on npmjs.com,
-        # npm exchanges the GitHub OIDC token automatically and attaches provenance.
+        # Do NOT add an `env: NODE_AUTH_TOKEN: ...` block here. With a Trusted Publisher
+        # configured on npmjs.com, npm exchanges the GitHub OIDC token automatically and
+        # attaches provenance. Setting NODE_AUTH_TOKEN to ANY value (even an empty string,
+        # e.g. from a missing secret) makes npm use token auth instead of OIDC and the
+        # publish fails. Leaving it unset is required, not just optional.
 
       - name: Create GitHub Release with build artifacts
         uses: softprops/action-gh-release@v2

@@ -108,6 +108,13 @@ This will:
 1. Clean the previous build
 2. Compile TypeScript files
 
+### Releasing
+
+Publishing to npm is automated: pushing a `v*.*.*` tag triggers a GitHub Actions
+workflow that builds, publishes via OIDC trusted publishing, and creates a GitHub
+Release with the build artifacts attached. See **[RELEASING.md](RELEASING.md)** for
+the exact commands, the one-time npm Trusted Publisher setup, and troubleshooting.
+
 ## Contact
 
 * [Open an Issue](https://github.com/cloudglue/cloudglue-js/issues/new)

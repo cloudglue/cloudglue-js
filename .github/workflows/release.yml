@@ -1,0 +1,147 @@
+name: Release & Publish
+
+# Publishes to npm (via OIDC trusted publishing) and creates a GitHub Release
+# with the built dist artifacts attached. Triggered by pushing a version tag.
+#
+#   npm version patch   # bumps package.json + creates the git tag
+#   git push --follow-tags
+#
+# One-time setup is required on npmjs.com — see RELEASING.md.
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+# Never run two releases for the same ref at once.
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write # create the GitHub Release and upload build assets
+  id-token: write # mint the OIDC token for npm trusted publishing
+
+jobs:
+  release:
+    name: Build, publish to npm, and create GitHub Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # No step does an authenticated `git push`, so don't leave the repo-write token
+          # in git config where later build/test/publish steps could reach it. The Release
+          # step authenticates via GITHUB_TOKEN in the environment, not git credentials.
+          persist-credentials: false
+        # generated/ is committed, so the spec/ submodule is not needed to build.
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22' # resolves to >= 22.14.0, required for trusted publishing
+          registry-url: 'https://registry.npmjs.org'
+          # registry-url is the npm-documented OIDC setup. It does NOT break OIDC as long
+          # as NODE_AUTH_TOKEN is never set (see the publish step) — npm prefers OIDC when
+          # no token is present. Crucially, do not pass `env: NODE_AUTH_TOKEN` to this step.
+
+      - name: Upgrade npm to a trusted-publishing-capable version
+        # OIDC trusted publishing needs npm >= 11.5.1. Pin to the 11 major (resolves to the
+        # latest 11.x) rather than @latest so a future npm major can't silently change
+        # publish/OIDC behavior on the one path that only runs at release time.
+        run: npm install --global npm@11
+
+      - name: Verify the tag matches package.json version
+        run: |
+          PKG_VERSION="$(node -p "require('./package.json').version")"
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          echo "package.json: $PKG_VERSION | tag: $TAG_VERSION"
+          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
+            echo "::error::Tag '$GITHUB_REF_NAME' does not match package.json version '$PKG_VERSION'. Bump package.json or fix the tag."
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build dist
+        run: npm run build
+        # Build explicitly so dist/ is fresh before packaging and publishing — don't rely on
+        # npm's prepare/prepublishOnly lifecycle scripts, whose behavior here depends on the
+        # repo's .npmrc ignore-scripts setting and varies by npm version.
+
+      - name: Test
+        run: npm test
+
+      - name: Package dist build artifacts
+        run: |
+          NAME="cloudglue-cloudglue-js-${GITHUB_REF_NAME}"
+          # A fresh pack of the built package, attached to the Release for convenience. It
+          # has the same contents as the published package, but is a separate pack run from
+          # the registry upload below, so don't rely on it being byte-identical to npm's.
+          npm pack
+          # Convenience archives of the compiled output for the GitHub Release.
+          tar -czf "${NAME}-dist.tar.gz" dist docs README.md LICENSE.md package.json
+          zip -qr "${NAME}-dist.zip" dist docs README.md LICENSE.md package.json
+          ls -lh *.tgz "${NAME}-dist.tar.gz" "${NAME}-dist.zip"
+
+      - name: Publish to npm via OIDC trusted publishing
+        # Do NOT add an `env: NODE_AUTH_TOKEN: ...` block here. With a Trusted Publisher
+        # configured on npmjs.com, npm exchanges the GitHub OIDC token automatically and
+        # attaches provenance. Setting NODE_AUTH_TOKEN to ANY value (even an empty string,
+        # e.g. from a missing secret) makes npm use token auth instead of OIDC and the
+        # publish fails. Leaving it unset is required, not just optional.
+        run: |
+          NAME="$(node -p "require('./package.json').name")"
+          VERSION="$(node -p "require('./package.json').version")"
+
+          # Prereleases (e.g. v1.0.0-rc.1 — the v*.*.* trigger still matches them) must NOT
+          # land on the `latest` dist-tag, or a plain `npm install` would hand every user the
+          # unstable build. Route any semver prerelease (the version contains a hyphen) to the
+          # `next` tag; stable versions go to `latest`.
+          DIST_TAG="latest"
+          case "$VERSION" in
+            *-*) DIST_TAG="next" ;;
+          esac
+
+          # Re-run safety, scoped narrowly: only SKIP publishing when this exact version is
+          # already on the registry — the partial-release case (publish succeeded but a later
+          # step failed), where re-running must not get stuck on a version conflict. Ask npm
+          # for the full published version list and test membership, rather than parsing a
+          # per-version 404 string, so the normal-release decision never depends on npm's
+          # error wording. exit 0 = authoritative answer; a never-published package returns
+          # E404 (publish the first version); any other failure (network/5xx) is fatal, so a
+          # transient blip can neither skip a real release nor publish over an existing one.
+          ERRLOG="$RUNNER_TEMP/npm-view.err"
+          set +e
+          VERSIONS_JSON="$(npm view "${NAME}" versions --json 2> "$ERRLOG")"
+          VIEW_CODE=$?
+          set -e
+          if [ "$VIEW_CODE" -eq 0 ]; then
+            if node -e 'const [v,j]=process.argv.slice(1);let a;try{a=JSON.parse(j)}catch{a=[]};if(!Array.isArray(a))a=[a];process.exit(a.includes(v)?0:1)' "$VERSION" "$VERSIONS_JSON"; then
+              echo "::notice::${NAME}@${VERSION} is already on npm; skipping publish (re-run after a partial release)."
+            else
+              npm publish --access public --tag "$DIST_TAG"
+            fi
+          elif grep -q "E404" "$ERRLOG"; then
+            # The package has never been published before — publish the first version.
+            npm publish --access public --tag "$DIST_TAG"
+          else
+            echo "::error::Could not determine whether ${NAME}@${VERSION} is published; the npm registry query failed:"
+            cat "$ERRLOG"
+            exit 1
+          fi
+
+      - name: Create GitHub Release with build artifacts
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          # Mark prerelease tags (e.g. v1.0.0-rc.1) as a GitHub prerelease so they don't
+          # become the repo's "Latest" release — consistent with routing them to npm's
+          # `next` dist-tag in the publish step. The tag carries the version (verified above).
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          files: |
+            *.tgz
+            *-dist.tar.gz
+            *-dist.zip

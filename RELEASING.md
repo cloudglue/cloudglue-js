@@ -79,7 +79,14 @@ If you ever need to publish from your machine (e.g. the workflow is unavailable)
 ```bash
 npm ci
 npm run build
-npm publish --access public   # requires npm login / 2FA
+npm publish --access public              # stable release; requires npm login / 2FA
+```
+
+For a **prerelease**, match the automated workflow and publish to the `next`
+dist-tag so it does not become the default `npm install`:
+
+```bash
+npm publish --access public --tag next   # e.g. version 0.8.0-rc.0
 ```
 
 ## Troubleshooting

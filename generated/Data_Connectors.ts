@@ -4,6 +4,11 @@ import { z } from 'zod';
 import { File } from './common';
 import { SourceMetadata } from './common';
 import { GrainSourceMetadata } from './common';
+import { ZoomSourceMetadata } from './common';
+import { RecallSourceMetadata } from './common';
+import { GoogleDriveSourceMetadata } from './common';
+import { DropboxSourceMetadata } from './common';
+import { GongSourceMetadata } from './common';
 
 type DataConnectorList = {
   object: 'list';
@@ -149,7 +154,7 @@ const endpoints = makeApi([
     method: 'get',
     path: '/data-connectors/:id/files',
     alias: 'listDataConnectorFiles',
-    description: `Browse files available in a connected data source. Returns URIs compatible with Cloudglue&#x27;s file import system. Supports pagination and provider-specific filtering.`,
+    description: `Browse files available in a connected data source. Returns URIs compatible with Cloudglue&#x27;s file import system, and per-file provider metadata (see the &#x60;metadata&#x60; field) so you can inspect participants, hosts, durations, and AI summaries before importing. Supports pagination and filtering: &#x60;from&#x60;/&#x60;to&#x60; and &#x60;title_search&#x60; are shared filters honored by every connector that can (see each parameter&#x27;s support matrix); parameters a connector can&#x27;t honor are silently ignored. When filters are applied, a page may contain fewer than &#x60;limit&#x60; items — even zero — while &#x60;has_more&#x60; is still true: continue paginating until &#x60;next_page_token&#x60; is null rather than stopping at the first short or empty page.`,
     requestFormat: 'json',
     parameters: [
       {
@@ -241,7 +246,7 @@ const endpoints = makeApi([
     method: 'post',
     path: '/data-connectors/:id/sync',
     alias: 'syncDataConnectorFile',
-    description: `Materialize a connector URI (e.g. &#x60;grain://recording/&lt;id&gt;&#x60;) into a Cloudglue file without starting a downstream job. Idempotent: syncing the same URI returns the existing file. For Grain, the file&#x27;s &#x60;source_metadata&#x60; is populated from the recording. Plain http(s), TikTok, and Loom URLs are not connector-syncable; ingest those via POST /files/sync instead. YouTube URLs can only be added to a collection via the add-media endpoint.`,
+    description: `Materialize a connector URI (e.g. &#x60;grain://recording/&lt;id&gt;&#x60;) into a Cloudglue file without starting a downstream job. Idempotent: syncing the same URI returns the existing file. For Grain, Zoom, Recall, Google Drive, Dropbox, and Gong the file&#x27;s &#x60;source_metadata&#x60; is populated from the provider (see the SourceMetadata schema). Plain http(s), TikTok, and Loom URLs are not connector-syncable; ingest those via POST /files/sync instead. YouTube URLs can only be added to a collection via the add-media endpoint.`,
     requestFormat: 'json',
     parameters: [
       {
@@ -293,7 +298,7 @@ const endpoints = makeApi([
     method: 'get',
     path: '/data-connectors/:id/source-metadata',
     alias: 'getDataConnectorSourceMetadata',
-    description: `Fetch source metadata for a connector URI directly from the upstream source, without creating a Cloudglue file. Currently supported for Grain; other connector types return 501.`,
+    description: `Fetch source metadata for a connector URI directly from the upstream source, without creating a Cloudglue file. Supported for Grain, Zoom, Recall, Google Drive, Dropbox, and Gong; S3/GCS return 501 (plain object stores have no richer metadata). Returns 502 when the upstream provider&#x27;s response can&#x27;t be validated.`,
     requestFormat: 'json',
     parameters: [
       {

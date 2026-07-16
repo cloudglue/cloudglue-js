@@ -133,7 +133,6 @@ type NewCollection = {
           enable_frame_thumbnails: boolean;
         }>;
       }>
-    | null
     | undefined;
 };
 type DefaultSegmentationConfig = {

@@ -158,24 +158,49 @@ for (const file of generatedFiles) {
     fs.writeFileSync(filePath, fileContent);
 }
 
-for (const file of generatedFiles) {
-    const filePath = path.join(generatedDir, file);
-    let fileContent = fs.readFileSync(filePath, 'utf8');
+// The generator emits .nullish()/.nullable() on the Zod side but omits
+// `| null` from the corresponding TypeScript type declarations, so we add it.
+// Detection and widening are SCOPED to matching `const <Name>` (Zod schema)
+// and `type <Name>` (TS type) declaration pairs: collecting bare field names
+// per file and widening every same-named field leaks nullability across
+// unrelated types (e.g. RecallSourceMetadata.created_at, nullable, would
+// widen File.created_at, which is never null).
+const tsc = require('typescript');
 
-    // Find all Zod schemas that use .nullish() or .nullable()
+// Top-level statement spans for a generated file: type aliases and consts
+function topLevelDecls(fileContent, fileName) {
+    const sourceFile = tsc.createSourceFile(fileName, fileContent, tsc.ScriptTarget.Latest, false);
+    const types = [];
+    const consts = [];
+    for (const stmt of sourceFile.statements) {
+        if (tsc.isTypeAliasDeclaration(stmt)) {
+            types.push({ name: stmt.name.text, start: stmt.getStart(sourceFile), end: stmt.end });
+        } else if (tsc.isVariableStatement(stmt)) {
+            const decl = stmt.declarationList.declarations[0];
+            if (decl && tsc.isIdentifier(decl.name)) {
+                consts.push({ name: decl.name.text, start: stmt.getStart(sourceFile), end: stmt.end });
+            }
+        }
+    }
+    return { types, consts };
+}
+
+// Find top-level fields of a single Zod schema declaration whose chain ends
+// in .nullish() or .nullable()
+function collectNullishFields(constText) {
     // Pattern: field_name: SomeType.nullish() or SomeType.nullable()
     const nullishPattern = /(\w+):\s*([A-Z]\w+)\.(?:nullish|nullable)\(\)/g;
     const nullishFields = new Set();
     let match;
-    
-    while ((match = nullishPattern.exec(fileContent)) !== null) {
+
+    while ((match = nullishPattern.exec(constText)) !== null) {
         nullishFields.add(match[1]); // field name
     }
-    
+
     // Also find standalone .nullish()/.nullable() calls like z.string().nullish() or multi-line z.object().nullish()
     // Strategy: find all .nullish()/.nullable() and look backwards to find the field name
     const nullishCallPattern = /\.(?:nullish|nullable)\(\)/g;
-    while ((match = nullishCallPattern.exec(fileContent)) !== null) {
+    while ((match = nullishCallPattern.exec(constText)) !== null) {
         const nullishIndex = match.index;
         // Look backwards from .nullish()/.nullable() to find the field name
         // We're looking for: field_name: z... or field_name: SomeType...
@@ -183,13 +208,13 @@ for (const file of generatedFiles) {
         // mid-line — otherwise the `^` anchor in the regexes below could match a
         // truncated line fragment as a line-start field and pick a false owner.
         const rawStart = Math.max(0, nullishIndex - 1000);
-        const windowStart = rawStart === 0 ? 0 : fileContent.lastIndexOf('\n', rawStart) + 1;
-        const beforeNullish = fileContent.substring(windowStart, nullishIndex);
+        const windowStart = rawStart === 0 ? 0 : constText.lastIndexOf('\n', rawStart) + 1;
+        const beforeNullish = constText.substring(windowStart, nullishIndex);
         // Get the indent level of the .nullish() line
-        const lineStart = fileContent.lastIndexOf('\n', nullishIndex - 1) + 1;
-        const lineBeforeNullish = fileContent.substring(lineStart, nullishIndex);
+        const lineStart = constText.lastIndexOf('\n', nullishIndex - 1) + 1;
+        const lineBeforeNullish = constText.substring(lineStart, nullishIndex);
         const nullishIndent = (lineBeforeNullish.match(/^(\s*)/) || ['', ''])[1].length;
-        
+
         // Find field definitions before .nullish()
         // Pattern matches: field_name: z (with newline and whitespace before a dot, or directly z.)
         // Handles both z\n      .object() and z.object() styles
@@ -201,7 +226,7 @@ for (const file of generatedFiles) {
         // which would otherwise be mistaken for the nullish field.
         const singleLineMatches = [...beforeNullish.matchAll(/(?:^|\n)(\s*)(\w+)\s*:\s*z\./g)];
         fieldMatches.push(...singleLineMatches);
-        
+
         if (fieldMatches.length > 0) {
             // Find the field at the object property level (same or less indent than .nullish())
             // Sort by index (most recent first) and find the one with indent <= nullishIndent
@@ -215,18 +240,19 @@ for (const file of generatedFiles) {
             }
         }
     }
-    
-    if (nullishFields.size === 0) continue;
-    
-    // Now fix the TypeScript type definitions for these fields
-    // We need to change: field_name?: Type | undefined
-    // to: field_name?: (Type | null) | undefined
-    // This also handles multi-line union types like:
-    // field_name?:
-    //   | Type1
-    //   | Type2
-    //   | undefined;
-    // And fields inside Partial<{...}> like: field_name: Type;
+    return nullishFields;
+}
+
+// Fix the TypeScript type declaration text for the given nullish fields.
+// We need to change: field_name?: Type | undefined
+// to: field_name?: (Type | null) | undefined
+// This also handles multi-line union types like:
+// field_name?:
+//   | Type1
+//   | Type2
+//   | undefined;
+// And fields inside Partial<{...}> like: field_name: Type;
+function widenNullishFields(fileContent, nullishFields) {
     for (const fieldName of nullishFields) {
         // First, try to match single-line patterns: fieldName?: Type | undefined
         const singleLinePattern = new RegExp(
@@ -341,21 +367,14 @@ for (const file of generatedFiles) {
         
         fileContent = newLines.join('\n');
     }
-    
-    fs.writeFileSync(filePath, fileContent);
+    return fileContent;
 }
 
-// Fix nullable object/Partial fields inside Partial<{...}> types
-// The generator produces `metadata: {};` but the Zod schema has `.nullable()`
-// so the type should be `metadata: {} | null;`
-for (const file of generatedFiles) {
-    const filePath = path.join(generatedDir, file);
-    let fileContent = fs.readFileSync(filePath, 'utf8');
-
-    // Find all fields with .nullable() in Zod schemas using multi-line search
-    // This handles both single-line and multi-line z.object(...).nullable() patterns
+// Find top-level fields of a single Zod schema declaration with .nullable()
+// (multi-line aware), for the object/Partial fixes below
+function collectNullableObjFields(constText) {
     const nullableObjFields = new Set();
-    const lines = fileContent.split('\n');
+    const lines = constText.split('\n');
     for (let i = 0; i < lines.length; i++) {
         if (lines[i].includes('.nullable()')) {
             // The owning field is indented at most as much as its `.nullable()`
@@ -382,8 +401,13 @@ for (const file of generatedFiles) {
         }
     }
 
-    if (nullableObjFields.size === 0) continue;
+    return nullableObjFields;
+}
 
+// Fix nullable object/Partial fields inside Partial<{...}> type declaration text
+// The generator produces `metadata: {};` but the Zod schema has `.nullable()`
+// so the type should be `metadata: {} | null;`
+function widenNullableObjFields(fileContent, nullableObjFields) {
     for (const fieldName of nullableObjFields) {
         // Fix `field: {};` -> `field: {} | null;` inside Partial<{...}>
         fileContent = fileContent.replace(
@@ -442,6 +466,37 @@ for (const file of generatedFiles) {
             }
         }
         fileContent = newLines.join('\n');
+    }
+    return fileContent;
+}
+
+// Apply the nullish/nullable type fixes per matching const/type declaration pair
+for (const file of generatedFiles) {
+    const filePath = path.join(generatedDir, file);
+    let fileContent = fs.readFileSync(filePath, 'utf8');
+
+    const { types, consts } = topLevelDecls(fileContent, file);
+    const nullishBySchema = new Map();
+    const nullableObjBySchema = new Map();
+    for (const c of consts) {
+        const constText = fileContent.slice(c.start, c.end);
+        const nullish = collectNullishFields(constText);
+        if (nullish.size > 0) nullishBySchema.set(c.name, nullish);
+        const nullableObj = collectNullableObjFields(constText);
+        if (nullableObj.size > 0) nullableObjBySchema.set(c.name, nullableObj);
+    }
+
+    // Rewrite matching type declarations from last to first so earlier
+    // spans stay valid as the content changes length
+    const typesByEnd = [...types].sort((a, b) => b.start - a.start);
+    for (const t of typesByEnd) {
+        const nullish = nullishBySchema.get(t.name);
+        const nullableObj = nullableObjBySchema.get(t.name);
+        if (!nullish && !nullableObj) continue;
+        let typeText = fileContent.slice(t.start, t.end);
+        if (nullish) typeText = widenNullishFields(typeText, nullish);
+        if (nullableObj) typeText = widenNullableObjFields(typeText, nullableObj);
+        fileContent = fileContent.slice(0, t.start) + typeText + fileContent.slice(t.end);
     }
 
     fs.writeFileSync(filePath, fileContent);

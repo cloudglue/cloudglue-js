@@ -109,7 +109,7 @@ export type File = {
   id: string;
   status: 'pending' | 'processing' | 'completed' | 'failed' | 'not_applicable';
   bytes?: (number | null) | undefined;
-  created_at?: (number | null) | undefined;
+  created_at?: number | undefined;
   filename?: string | undefined;
   uri: string;
   metadata?: ({} | null) | undefined;
@@ -125,7 +125,6 @@ export type File = {
         format: string | null;
         has_audio: boolean | null;
       }>
-    | null
     | undefined;
   video_info?:
     | Partial<{
@@ -136,7 +135,7 @@ export type File = {
         has_audio: boolean | null;
       }>
     | undefined;
-  thumbnail_url?: (string | null) | undefined;
+  thumbnail_url?: string | undefined;
   source?:
     | (
         | 'video'
@@ -409,9 +408,9 @@ export type Describe = {
   job_id: string;
   status: 'pending' | 'processing' | 'completed' | 'failed' | 'not_applicable';
   url?: string | undefined;
-  duration_seconds?: (number | null) | undefined;
-  thumbnail_url?: (string | null) | undefined;
-  created_at?: (number | null) | undefined;
+  duration_seconds?: number | undefined;
+  thumbnail_url?: string | undefined;
+  created_at?: number | undefined;
   describe_config?:
     | Partial<{
         enable_summary: boolean;
@@ -421,7 +420,7 @@ export type Describe = {
         enable_audio_description: boolean;
         participants: Array<{
           name: string;
-          scope?: (string | null) | undefined;
+          scope?: string | undefined;
         }>;
       }>
     | undefined;
@@ -488,7 +487,7 @@ export type Segmentation = {
               id: string;
               start_time: number;
               end_time: number;
-              thumbnail_url?: (string | null) | undefined;
+              thumbnail_url?: string | undefined;
             }>
           | undefined;
         shots?: Array<Shot> | undefined;
@@ -538,7 +537,7 @@ export type FrameExtraction = {
           | Array<{
               id: string;
               timestamp: number;
-              thumbnail_url?: (string | null) | undefined;
+              thumbnail_url?: string | undefined;
             }>
           | undefined;
         total: number;

@@ -69,7 +69,7 @@ type DeepSearchUsage = Partial<{
 type DeepSearchKBCollections = {
   source: 'collections';
   collections: Array<string>;
-  filter?: (SearchFilter | null) | undefined;
+  filter?: SearchFilter | undefined;
 };
 type DeepSearchKBFiles = {
   source: 'files';

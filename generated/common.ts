@@ -135,7 +135,7 @@ export type File = {
         has_audio: boolean | null;
       }>
     | undefined;
-  thumbnail_url?: (string | null) | undefined;
+  thumbnail_url?: string | undefined;
   source?:
     | (
         | 'video'
@@ -156,33 +156,46 @@ export type File = {
     | undefined;
   source_metadata?: (SourceMetadata | null) | undefined;
 };
-export type SourceMetadata = GrainSourceMetadata;
+export type SourceMetadata =
+  | GrainSourceMetadata
+  | ZoomSourceMetadata
+  | RecallSourceMetadata
+  | GoogleDriveSourceMetadata
+  | DropboxSourceMetadata
+  | GongSourceMetadata;
 export type GrainSourceMetadata = {
   source_type: 'grain';
   grain_recording_id: string;
-  title: string;
-  start_datetime: string;
-  end_datetime: string;
-  duration_ms: number;
-  media_type: 'audio' | 'transcript' | 'video';
-  upstream_source:
-    | 'aircall'
-    | 'local_capture'
-    | 'meet'
-    | 'teams'
-    | 'upload'
-    | 'webex'
-    | 'zoom'
-    | 'other';
-  grain_url: string;
+  title?: (string | null) | undefined;
+  start_datetime?: (string | null) | undefined;
+  end_datetime?: (string | null) | undefined;
+  duration_ms?: (number | null) | undefined;
+  media_type?: ('audio' | 'transcript' | 'video' | null) | undefined;
+  upstream_source?:
+    | (
+        | 'aircall'
+        | 'local_capture'
+        | 'meet'
+        | 'teams'
+        | 'upload'
+        | 'webex'
+        | 'zoom'
+        | 'other'
+        | null
+      )
+    | null
+    | undefined;
+  grain_url?: (string | null) | undefined;
   thumbnail_url?: (string | null) | undefined;
-  tags: Array<string>;
-  teams: Array<
-    Partial<{
-      id: string;
-      name: string;
-    }>
-  >;
+  tags?: (Array<string> | null) | undefined;
+  teams?:
+    | (Array<
+        Partial<{
+          id: string;
+          name: string;
+        }>
+      > | null)
+    | undefined;
   meeting_type?:
     | Partial<{
         id: string;
@@ -239,12 +252,164 @@ export type GrainSourceMetadata = {
     | null
     | undefined;
 };
+export type ZoomSourceMetadata = {
+  source_type: 'zoom';
+  zoom_meeting_uuid: string;
+  zoom_meeting_id?: (number | null) | undefined;
+  topic?: (string | null) | undefined;
+  start_time?: (string | null) | undefined;
+  host_id?: (string | null) | undefined;
+  host_email?: (string | null) | undefined;
+  account_id?: (string | null) | undefined;
+  timezone?: (string | null) | undefined;
+  duration_minutes?: (number | null) | undefined;
+  total_size?: (number | null) | undefined;
+  recording_count?: (number | null) | undefined;
+  meeting_type?: (number | null) | undefined;
+  recording_files?:
+    | (Array<
+        Partial<{
+          id: string | null;
+          recording_type: string | null;
+          file_type: string | null;
+          file_extension: string | null;
+          file_size: number | null;
+          recording_start: string | null;
+          recording_end: string | null;
+          status: string | null;
+        }>
+      > | null)
+    | undefined;
+};
+export type RecallSourceMetadata = {
+  source_type: 'recall';
+  recall_recording_id: string;
+  created_at?: (string | null) | undefined;
+  started_at?: (string | null) | undefined;
+  completed_at?: (string | null) | undefined;
+  expires_at?: (string | null) | undefined;
+  status_code?: (string | null) | undefined;
+  meeting_title?: (string | null) | undefined;
+  meeting_platform?: (string | null) | undefined;
+  has_transcript?: (boolean | null) | undefined;
+  has_audio?: (boolean | null) | undefined;
+  has_participant_events?: (boolean | null) | undefined;
+  bot_id?: (string | null) | undefined;
+  recall_metadata?: ({} | null) | undefined;
+};
+export type GoogleDriveSourceMetadata = {
+  source_type: 'google-drive';
+  gdrive_file_id: string;
+  name?: (string | null) | undefined;
+  mime_type?: (string | null) | undefined;
+  size_bytes?: (number | null) | undefined;
+  created_time?: (string | null) | undefined;
+  modified_time?: (string | null) | undefined;
+  web_view_link?: (string | null) | undefined;
+  owners?:
+    | (Array<
+        Partial<{
+          display_name: string | null;
+          email_address: string | null;
+        }>
+      > | null)
+    | undefined;
+  last_modifying_user?:
+    | Partial<{
+        display_name: string | null;
+        email_address: string | null;
+      }>
+    | null
+    | undefined;
+  parents?: (Array<string> | null) | undefined;
+  shared?: (boolean | null) | undefined;
+  file_extension?: (string | null) | undefined;
+  md5_checksum?: (string | null) | undefined;
+  video_media_metadata?:
+    | Partial<{
+        duration_millis: number | null;
+        width: number | null;
+        height: number | null;
+      }>
+    | null
+    | undefined;
+};
+export type DropboxSourceMetadata = {
+  source_type: 'dropbox';
+  dropbox_id: string;
+  name?: (string | null) | undefined;
+  path_lower?: (string | null) | undefined;
+  path_display?: (string | null) | undefined;
+  size_bytes?: (number | null) | undefined;
+  client_modified?: (string | null) | undefined;
+  server_modified?: (string | null) | undefined;
+  rev?: (string | null) | undefined;
+  content_hash?: (string | null) | undefined;
+  is_downloadable?: (boolean | null) | undefined;
+  media_info?:
+    | Partial<{
+        duration_ms: number | null;
+        width: number | null;
+        height: number | null;
+      }>
+    | null
+    | undefined;
+};
+export type GongSourceMetadata = {
+  source_type: 'gong';
+  gong_call_id: string;
+  title?: (string | null) | undefined;
+  started?: (string | null) | undefined;
+  scheduled?: (string | null) | undefined;
+  duration?: (number | null) | undefined;
+  gong_url?: (string | null) | undefined;
+  meeting_url?: (string | null) | undefined;
+  is_private?: (boolean | null) | undefined;
+  purpose?: (string | null) | undefined;
+  primary_user_id?: (string | null) | undefined;
+  direction?: (string | null) | undefined;
+  system?: (string | null) | undefined;
+  scope?: (string | null) | undefined;
+  language?: (string | null) | undefined;
+  workspace_id?: (string | null) | undefined;
+  call_media_type?: (string | null) | undefined;
+  parties?:
+    | (Array<
+        Partial<{
+          id: string | null;
+          name: string | null;
+          email: string | null;
+          affiliation: string | null;
+          speaker_id: string | null;
+          user_id: string | null;
+        }>
+      > | null)
+    | undefined;
+  topics?:
+    | (Array<
+        Partial<{
+          name: string | null;
+          duration: number | null;
+        }>
+      > | null)
+    | undefined;
+  trackers?:
+    | (Array<
+        Partial<{
+          name: string | null;
+          count: number | null;
+        }>
+      > | null)
+    | undefined;
+  brief?: (string | null) | undefined;
+  key_points?: (Array<string> | null) | undefined;
+};
 export type Describe = {
   job_id: string;
   status: 'pending' | 'processing' | 'completed' | 'failed' | 'not_applicable';
   url?: string | undefined;
-  duration_seconds?: (number | null) | undefined;
-  thumbnail_url?: (string | null) | undefined;
+  duration_seconds?: number | undefined;
+  thumbnail_url?: string | undefined;
   created_at?: number | undefined;
   describe_config?:
     | Partial<{
@@ -322,7 +487,7 @@ export type Segmentation = {
               id: string;
               start_time: number;
               end_time: number;
-              thumbnail_url?: (string | null) | undefined;
+              thumbnail_url?: string | undefined;
             }>
           | undefined;
         shots?: Array<Shot> | undefined;
@@ -372,7 +537,7 @@ export type FrameExtraction = {
           | Array<{
               id: string;
               timestamp: number;
-              thumbnail_url?: (string | null) | undefined;
+              thumbnail_url?: string | undefined;
             }>
           | undefined;
         total: number;
@@ -525,31 +690,35 @@ export const GrainSourceMetadata = z
   .object({
     source_type: z.literal('grain'),
     grain_recording_id: z.string(),
-    title: z.string(),
-    start_datetime: z.string().datetime({ offset: true }),
-    end_datetime: z.string().datetime({ offset: true }),
-    duration_ms: z.number().int(),
-    media_type: z.enum(['audio', 'transcript', 'video']),
-    upstream_source: z.enum([
-      'aircall',
-      'local_capture',
-      'meet',
-      'teams',
-      'upload',
-      'webex',
-      'zoom',
-      'other',
-    ]),
-    grain_url: z.string(),
+    title: z.string().nullish(),
+    start_datetime: z.string().datetime({ offset: true }).nullish(),
+    end_datetime: z.string().datetime({ offset: true }).nullish(),
+    duration_ms: z.number().int().nullish(),
+    media_type: z.enum(['audio', 'transcript', 'video']).nullish(),
+    upstream_source: z
+      .enum([
+        'aircall',
+        'local_capture',
+        'meet',
+        'teams',
+        'upload',
+        'webex',
+        'zoom',
+        'other',
+      ])
+      .nullish(),
+    grain_url: z.string().nullish(),
     thumbnail_url: z.string().nullish(),
-    tags: z.array(z.string()),
-    teams: z.array(
-      z
-        .object({ id: z.string(), name: z.string() })
-        .partial()
-        .strict()
-        .passthrough()
-    ),
+    tags: z.array(z.string()).nullish(),
+    teams: z
+      .array(
+        z
+          .object({ id: z.string(), name: z.string() })
+          .partial()
+          .strict()
+          .passthrough()
+      )
+      .nullish(),
     meeting_type: z
       .object({ id: z.string(), name: z.string(), scope: z.string() })
       .partial()
@@ -625,7 +794,204 @@ export const GrainSourceMetadata = z
   })
   .strict()
   .passthrough();
-export const SourceMetadata = GrainSourceMetadata;
+export const ZoomSourceMetadata = z
+  .object({
+    source_type: z.literal('zoom'),
+    zoom_meeting_uuid: z.string(),
+    zoom_meeting_id: z.number().int().nullish(),
+    topic: z.string().nullish(),
+    start_time: z.string().datetime({ offset: true }).nullish(),
+    host_id: z.string().nullish(),
+    host_email: z.string().nullish(),
+    account_id: z.string().nullish(),
+    timezone: z.string().nullish(),
+    duration_minutes: z.number().nullish(),
+    total_size: z.number().nullish(),
+    recording_count: z.number().nullish(),
+    meeting_type: z.number().nullish(),
+    recording_files: z
+      .array(
+        z
+          .object({
+            id: z.string().nullable(),
+            recording_type: z.string().nullable(),
+            file_type: z.string().nullable(),
+            file_extension: z.string().nullable(),
+            file_size: z.number().nullable(),
+            recording_start: z.string().nullable(),
+            recording_end: z.string().nullable(),
+            status: z.string().nullable(),
+          })
+          .partial()
+          .strict()
+          .passthrough()
+      )
+      .nullish(),
+  })
+  .strict()
+  .passthrough();
+export const RecallSourceMetadata = z
+  .object({
+    source_type: z.literal('recall'),
+    recall_recording_id: z.string(),
+    created_at: z.string().nullish(),
+    started_at: z.string().nullish(),
+    completed_at: z.string().nullish(),
+    expires_at: z.string().nullish(),
+    status_code: z.string().nullish(),
+    meeting_title: z.string().nullish(),
+    meeting_platform: z.string().nullish(),
+    has_transcript: z.boolean().nullish(),
+    has_audio: z.boolean().nullish(),
+    has_participant_events: z.boolean().nullish(),
+    bot_id: z.string().nullish(),
+    recall_metadata: z.object({}).partial().strict().passthrough().nullish(),
+  })
+  .strict()
+  .passthrough();
+export const GoogleDriveSourceMetadata = z
+  .object({
+    source_type: z.literal('google-drive'),
+    gdrive_file_id: z.string(),
+    name: z.string().nullish(),
+    mime_type: z.string().nullish(),
+    size_bytes: z.number().nullish(),
+    created_time: z.string().nullish(),
+    modified_time: z.string().nullish(),
+    web_view_link: z.string().nullish(),
+    owners: z
+      .array(
+        z
+          .object({
+            display_name: z.string().nullable(),
+            email_address: z.string().nullable(),
+          })
+          .partial()
+          .strict()
+          .passthrough()
+      )
+      .nullish(),
+    last_modifying_user: z
+      .object({
+        display_name: z.string().nullable(),
+        email_address: z.string().nullable(),
+      })
+      .partial()
+      .strict()
+      .passthrough()
+      .nullish(),
+    parents: z.array(z.string()).nullish(),
+    shared: z.boolean().nullish(),
+    file_extension: z.string().nullish(),
+    md5_checksum: z.string().nullish(),
+    video_media_metadata: z
+      .object({
+        duration_millis: z.number().nullable(),
+        width: z.number().nullable(),
+        height: z.number().nullable(),
+      })
+      .partial()
+      .strict()
+      .passthrough()
+      .nullish(),
+  })
+  .strict()
+  .passthrough();
+export const DropboxSourceMetadata = z
+  .object({
+    source_type: z.literal('dropbox'),
+    dropbox_id: z.string(),
+    name: z.string().nullish(),
+    path_lower: z.string().nullish(),
+    path_display: z.string().nullish(),
+    size_bytes: z.number().nullish(),
+    client_modified: z.string().nullish(),
+    server_modified: z.string().nullish(),
+    rev: z.string().nullish(),
+    content_hash: z.string().nullish(),
+    is_downloadable: z.boolean().nullish(),
+    media_info: z
+      .object({
+        duration_ms: z.number().nullable(),
+        width: z.number().nullable(),
+        height: z.number().nullable(),
+      })
+      .partial()
+      .strict()
+      .passthrough()
+      .nullish(),
+  })
+  .strict()
+  .passthrough();
+export const GongSourceMetadata = z
+  .object({
+    source_type: z.literal('gong'),
+    gong_call_id: z.string(),
+    title: z.string().nullish(),
+    started: z.string().nullish(),
+    scheduled: z.string().nullish(),
+    duration: z.number().nullish(),
+    gong_url: z.string().nullish(),
+    meeting_url: z.string().nullish(),
+    is_private: z.boolean().nullish(),
+    purpose: z.string().nullish(),
+    primary_user_id: z.string().nullish(),
+    direction: z.string().nullish(),
+    system: z.string().nullish(),
+    scope: z.string().nullish(),
+    language: z.string().nullish(),
+    workspace_id: z.string().nullish(),
+    call_media_type: z.string().nullish(),
+    parties: z
+      .array(
+        z
+          .object({
+            id: z.string().nullable(),
+            name: z.string().nullable(),
+            email: z.string().nullable(),
+            affiliation: z.string().nullable(),
+            speaker_id: z.string().nullable(),
+            user_id: z.string().nullable(),
+          })
+          .partial()
+          .strict()
+          .passthrough()
+      )
+      .nullish(),
+    topics: z
+      .array(
+        z
+          .object({
+            name: z.string().nullable(),
+            duration: z.number().nullable(),
+          })
+          .partial()
+          .strict()
+          .passthrough()
+      )
+      .nullish(),
+    trackers: z
+      .array(
+        z
+          .object({ name: z.string().nullable(), count: z.number().nullable() })
+          .partial()
+          .strict()
+          .passthrough()
+      )
+      .nullish(),
+    brief: z.string().nullish(),
+    key_points: z.array(z.string()).nullish(),
+  })
+  .strict()
+  .passthrough();
+export const SourceMetadata = z.discriminatedUnion('source_type', [
+  GrainSourceMetadata,
+  ZoomSourceMetadata,
+  RecallSourceMetadata,
+  GoogleDriveSourceMetadata,
+  DropboxSourceMetadata,
+  GongSourceMetadata,
+]);
 export const File = z
   .object({
     id: z.string(),

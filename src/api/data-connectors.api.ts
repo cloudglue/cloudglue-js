@@ -12,21 +12,32 @@ const CONNECTOR_SOURCES = new Set(Object.keys(CONNECTOR_SYNC_URI_GRAMMAR));
 export interface ListDataConnectorFilesParams {
   /** Maximum number of files to return (1-100) */
   limit?: number;
-  /** Pagination token for fetching the next page */
+  /**
+   * Pagination token for fetching the next page. Tokens are only valid with
+   * the same filter parameters they were issued under.
+   */
   page_token?: string;
-  /** Filter by date range start (ISO 8601) */
+  /**
+   * Start date filter (YYYY-MM-DD, inclusive UTC day bound). Supported by
+   * Grain, Zoom, Recall, Google Drive, Dropbox, and Gong (Zoom and Gong
+   * default to a 6-month lookback when omitted); ignored for S3/GCS.
+   */
   from?: string;
-  /** Filter by date range end (ISO 8601) */
+  /** End date filter (YYYY-MM-DD). Same per-connector support as `from`. */
   to?: string;
-  /** Filter by folder ID (Google Drive, Dropbox) */
+  /** Filter by folder ID (Google Drive) */
   folder_id?: string;
-  /** Filter by path */
+  /** Folder path to list contents of, default root (Dropbox) */
   path?: string;
-  /** Filter by bucket name (S3, GCS) */
+  /** Filter by bucket name — required for S3 and GCS */
   bucket?: string;
   /** Filter by key prefix (S3, GCS) */
   prefix?: string;
-  /** Filter by title (Grain) */
+  /**
+   * Case-insensitive title filter. Supported by Grain, Zoom, Google Drive,
+   * Dropbox, and Gong; ignored for Recall (no title available when listing)
+   * and S3/GCS.
+   */
   title_search?: string;
   /** Filter by team (Grain) */
   team?: string;
@@ -43,8 +54,15 @@ export class EnhancedDataConnectorsApi {
 
   /**
    * Browse files available in a connected data source.
-   * Returns URIs compatible with Cloudglue's file import system.
-   * Supports pagination and provider-specific filtering.
+   * Returns URIs compatible with Cloudglue's file import system, plus
+   * per-file provider metadata (the `metadata` field) so you can inspect
+   * participants, hosts, durations, and AI summaries before importing.
+   *
+   * Supports pagination and filtering; parameters a connector can't honor
+   * are silently ignored. When filters are applied, a page may contain fewer
+   * than `limit` items — even zero — while `has_more` is still true: keep
+   * paginating until `next_page_token` is null rather than stopping at the
+   * first short or empty page.
    *
    * @param connectorId - The ID of the data connector
    * @param params - Optional filtering and pagination parameters
@@ -62,8 +80,10 @@ export class EnhancedDataConnectorsApi {
 
   /**
    * Fetch source metadata for a connector URI directly from the upstream
-   * source, without creating a Cloudglue file. Currently supported for Grain;
-   * other connector types return 501.
+   * source, without creating a Cloudglue file. Supported for Grain, Zoom,
+   * Recall, Google Drive, Dropbox, and Gong; S3/GCS return 501 (plain object
+   * stores have no richer metadata). Returns 502 when the upstream provider's
+   * response can't be validated.
    *
    * @param connectorId - The ID of the data connector
    * @param url - Connector URI to look up (must match the connector's type)
@@ -79,8 +99,9 @@ export class EnhancedDataConnectorsApi {
   /**
    * Materialize a connector URI (e.g. `grain://recording/<id>`) into a
    * Cloudglue file without starting a downstream job. Idempotent: syncing the
-   * same URI returns the existing file. For Grain, the file's `source_metadata`
-   * is populated from the recording.
+   * same URI returns the existing file. For Grain, Zoom, Recall, Google
+   * Drive, Dropbox, and Gong the file's `source_metadata` is populated from
+   * the provider.
    *
    * Known https share links are rewritten client-side into connector URIs
    * (e.g. `drive.google.com/file/d/<id>` → `gdrive://file/<id>`), and some

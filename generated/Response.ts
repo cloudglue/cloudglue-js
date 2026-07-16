@@ -18,7 +18,7 @@ type Response = Partial<{
 type CreateResponseRequest = {
   model: string;
   input: string | Array<ResponseInputMessage>;
-  instructions?: (string | null) | undefined;
+  instructions?: string | undefined;
   temperature?: number | undefined;
   knowledge_base?: ResponseKnowledgeBase | undefined;
   include?: Array<'cloudglue_citations.media_descriptions'> | undefined;

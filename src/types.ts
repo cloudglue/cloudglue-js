@@ -442,6 +442,29 @@ export type DataConnectorFileList = z.infer<
   typeof dataConnectorsSchemas.DataConnectorFileList
 >;
 
+/**
+ * Provider-populated source metadata attached to files synced through a data
+ * connector (`file.source_metadata`) and returned by
+ * `dataConnectors.getSourceMetadata()`. Discriminated union on `source_type`
+ * covering all six metadata-bearing connectors.
+ */
+export type {
+  SourceMetadata,
+  GrainSourceMetadata,
+  ZoomSourceMetadata,
+  RecallSourceMetadata,
+  GoogleDriveSourceMetadata,
+  DropboxSourceMetadata,
+  GongSourceMetadata,
+} from '../generated/common';
+
+/**
+ * Response envelope for dataConnectors.getSourceMetadata()
+ */
+export type SourceMetadataResponse = z.infer<
+  typeof dataConnectorsSchemas.SourceMetadataResponse
+>;
+
 // Response API types
 import { schemas as responseSchemas } from '../generated/Response';
 

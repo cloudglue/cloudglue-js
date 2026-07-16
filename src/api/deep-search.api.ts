@@ -6,7 +6,7 @@ import { CloudglueError } from '../error';
 type DeepSearchStatus = 'in_progress' | 'completed' | 'failed' | 'cancelled';
 
 export type DeepSearchKnowledgeBase =
-  | { source: 'collections'; collections: string[]; filter?: SearchFilter | null }
+  | { source: 'collections'; collections: string[]; filter?: SearchFilter }
   | { source: 'files'; files: string[] }
   | { source: 'default' };
 

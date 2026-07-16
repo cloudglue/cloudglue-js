@@ -204,12 +204,10 @@ function collectNullishFields(constText) {
         const nullishIndex = match.index;
         // Look backwards from .nullish()/.nullable() to find the field name
         // We're looking for: field_name: z... or field_name: SomeType...
-        // Align the 1000-char window to a line boundary so it never begins
-        // mid-line — otherwise the `^` anchor in the regexes below could match a
-        // truncated line fragment as a line-start field and pick a false owner.
-        const rawStart = Math.max(0, nullishIndex - 1000);
-        const windowStart = rawStart === 0 ? 0 : constText.lastIndexOf('\n', rawStart) + 1;
-        const beforeNullish = constText.substring(windowStart, nullishIndex);
+        // Search the whole text before the call: constText is a single schema
+        // declaration, so this is bounded and can't miss the owning field the
+        // way a fixed-size window could on a large inline schema.
+        const beforeNullish = constText.substring(0, nullishIndex);
         // Get the indent level of the .nullish() line
         const lineStart = constText.lastIndexOf('\n', nullishIndex - 1) + 1;
         const lineBeforeNullish = constText.substring(lineStart, nullishIndex);
@@ -382,8 +380,10 @@ function collectNullableObjFields(constText) {
             // `assignee` object) are indented MORE. Skip those deeper matches so
             // we attribute `.nullable()` to the real field, not a nested one.
             const nullableIndent = (lines[i].match(/^(\s*)/) || ['', ''])[1].length;
-            // Walk backwards to find the field name
-            for (let j = i; j >= Math.max(0, i - 20); j--) {
+            // Walk backwards to find the field name. constText is a single
+            // schema declaration, so walking to its start is bounded and can't
+            // miss the owning field of a large inline object.
+            for (let j = i; j >= 0; j--) {
                 const indent = (lines[j].match(/^(\s*)/) || ['', ''])[1].length;
                 if (indent > nullableIndent) continue;
                 const fieldMatch = lines[j].match(/^\s+(\w+):\s*(?:z\b|z\s*$)/);

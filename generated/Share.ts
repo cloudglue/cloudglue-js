@@ -9,6 +9,7 @@ type ShareableAsset = {
   description?: string | undefined;
   metadata?: {} | undefined;
   visibility?: ('public' | 'private') | undefined;
+  link_preview: 'none' | 'full';
   preview_url?: string | undefined;
   media_download_url?: string | undefined;
   media_download_expires_at?: (number | null) | undefined;
@@ -36,6 +37,7 @@ const ShareableAsset: z.ZodType<ShareableAsset> = z
     description: z.string().optional(),
     metadata: z.object({}).partial().strict().passthrough().optional(),
     visibility: z.enum(['public', 'private']).optional(),
+    link_preview: z.enum(['none', 'full']),
     preview_url: z.string().optional(),
     media_download_url: z.string().optional(),
     media_download_expires_at: z.number().nullish(),
@@ -66,6 +68,7 @@ const CreateShareableAssetRequest = z
     description: z.string().optional(),
     metadata: z.object({}).partial().strict().passthrough().optional(),
     visibility: z.enum(['public', 'private']).optional(),
+    link_preview: z.enum(['none', 'full']).optional(),
   })
   .strict()
   .passthrough();
@@ -74,6 +77,7 @@ const UpdateShareableAssetRequest = z
     title: z.string(),
     description: z.string(),
     metadata: z.object({}).partial().strict().passthrough(),
+    link_preview: z.enum(['none', 'full']),
   })
   .partial()
   .strict()

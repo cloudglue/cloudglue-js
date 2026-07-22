@@ -446,7 +446,7 @@ export type DataConnectorFileList = z.infer<
  * Provider-populated source metadata attached to files synced through a data
  * connector (`file.source_metadata`) and returned by
  * `dataConnectors.getSourceMetadata()`. Discriminated union on `source_type`
- * covering all six metadata-bearing connectors.
+ * covering all seven metadata-bearing connectors.
  */
 export type {
   SourceMetadata,
@@ -456,6 +456,7 @@ export type {
   GoogleDriveSourceMetadata,
   DropboxSourceMetadata,
   GongSourceMetadata,
+  IconikSourceMetadata,
 } from '../generated/common';
 
 /**

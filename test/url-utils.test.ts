@@ -31,6 +31,7 @@ describe('classifyVideoUrl', () => {
     ['gong://call/123456', 'gong'],
     ['recall://recording/abc-123', 'recall'],
     ['grain://recording/abc-123', 'grain'],
+    ['iconik://asset/abc-123', 'iconik'],
     ['https://example.com/video.mp4', 'http'],
     ['http://example.com/video.mp4', 'http'],
     // dropbox file share links resolve via a connector's OAuth (API 0.7.5)
@@ -325,6 +326,7 @@ describe('CONNECTOR_SYNC_URI_GRAMMAR', () => {
         'gong',
         'google-drive',
         'grain',
+        'iconik',
         'recall',
         's3',
         'zoom',

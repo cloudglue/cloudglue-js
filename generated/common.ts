@@ -20,6 +20,7 @@ export type SearchFilter = Partial<{
         path: 'bytes' | 'filename' | 'uri' | 'created_at' | 'id';
       }>
   >;
+  source_metadata: Array<SearchFilterCriteria>;
 }>;
 export type SearchFilterCriteria = {
   path: string;
@@ -151,6 +152,7 @@ export type File = {
         | 'gcs'
         | 'grain'
         | 'loom'
+        | 'iconik'
       )
     | null
     | undefined;
@@ -162,7 +164,8 @@ export type SourceMetadata =
   | RecallSourceMetadata
   | GoogleDriveSourceMetadata
   | DropboxSourceMetadata
-  | GongSourceMetadata;
+  | GongSourceMetadata
+  | IconikSourceMetadata;
 export type GrainSourceMetadata = {
   source_type: 'grain';
   grain_recording_id: string;
@@ -404,6 +407,20 @@ export type GongSourceMetadata = {
   brief?: (string | null) | undefined;
   key_points?: (Array<string> | null) | undefined;
 };
+export type IconikSourceMetadata = {
+  source_type: 'iconik';
+  iconik_asset_id: string;
+  title?: (string | null) | undefined;
+  media_type?: (string | null) | undefined;
+  date_created?: (string | null) | undefined;
+  date_modified?: (string | null) | undefined;
+  duration_ms?: (number | null) | undefined;
+  ingested_rendition?: ('proxy' | 'original' | null) | undefined;
+  iconik_url?: (string | null) | undefined;
+  external_id?: (string | null) | undefined;
+  created_by_user?: (string | null) | undefined;
+  iconik_metadata?: ({} | null) | undefined;
+};
 export type Describe = {
   job_id: string;
   status: 'pending' | 'processing' | 'completed' | 'failed' | 'not_applicable';
@@ -461,6 +478,7 @@ export type Describe = {
     | undefined;
   total_chapters?: number | undefined;
   total_shots?: number | undefined;
+  file?: File | undefined;
 };
 export type DescribeList = {
   object: 'list';
@@ -984,15 +1002,33 @@ export const GongSourceMetadata = z
   })
   .strict()
   .passthrough();
-export const SourceMetadata = z.discriminatedUnion('source_type', [
+export const IconikSourceMetadata = z
+  .object({
+    source_type: z.literal('iconik'),
+    iconik_asset_id: z.string(),
+    title: z.string().nullish(),
+    media_type: z.string().nullish(),
+    date_created: z.string().nullish(),
+    date_modified: z.string().nullish(),
+    duration_ms: z.number().nullish(),
+    ingested_rendition: z.enum(['proxy', 'original']).nullish(),
+    iconik_url: z.string().nullish(),
+    external_id: z.string().nullish(),
+    created_by_user: z.string().nullish(),
+    iconik_metadata: z.object({}).partial().strict().passthrough().nullish(),
+  })
+  .strict()
+  .passthrough();
+export const SourceMetadata: z.ZodType<SourceMetadata> = z.discriminatedUnion('source_type', [
   GrainSourceMetadata,
   ZoomSourceMetadata,
   RecallSourceMetadata,
   GoogleDriveSourceMetadata,
   DropboxSourceMetadata,
   GongSourceMetadata,
+  IconikSourceMetadata,
 ]);
-export const File = z
+export const File: z.ZodType<File> = z
   .object({
     id: z.string(),
     status: z.enum([
@@ -1051,6 +1087,7 @@ export const File = z
         'gcs',
         'grain',
         'loom',
+        'iconik',
       ])
       .optional(),
     source_metadata: SourceMetadata.nullish(),
@@ -1223,11 +1260,12 @@ export const SearchFilter = z
           .passthrough()
       )
     ),
+    source_metadata: z.array(SearchFilterCriteria),
   })
   .partial()
   .strict()
   .passthrough();
-export const Describe = z
+export const Describe: z.ZodType<Describe> = z
   .object({
     job_id: z.string(),
     status: z.enum([
@@ -1315,10 +1353,11 @@ export const Describe = z
       .optional(),
     total_chapters: z.number().int().gte(0).optional(),
     total_shots: z.number().int().gte(0).optional(),
+    file: File.optional(),
   })
   .strict()
   .passthrough();
-export const DescribeList = z
+export const DescribeList: z.ZodType<DescribeList> = z
   .object({
     object: z.literal('list'),
     data: z.array(Describe),

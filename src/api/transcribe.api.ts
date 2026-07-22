@@ -37,11 +37,16 @@ export class EnhancedTranscribeApi {
     jobId: string,
     options: {
       response_format?: 'json' | 'markdown';
+      /** Include the file's `metadata` and `source_metadata` on the `file` object */
+      include_metadata?: boolean;
     } = {},
   ) {
     return this.api.getTranscribe({
       params: { job_id: jobId },
-      queries: { response_format: options.response_format },
+      queries: {
+        response_format: options.response_format,
+        include_metadata: options.include_metadata,
+      },
     });
   }
 
@@ -62,6 +67,8 @@ export class EnhancedTranscribeApi {
       created_after?: string;
       url?: string;
       response_format?: 'json' | 'markdown';
+      /** Include each file's `metadata` and `source_metadata` on the `file` object */
+      include_metadata?: boolean;
     } = {},
   ) {
     return this.api.listTranscribes({ queries: params });

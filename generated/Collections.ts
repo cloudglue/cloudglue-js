@@ -16,6 +16,7 @@ import { RecallSourceMetadata } from './common';
 import { GoogleDriveSourceMetadata } from './common';
 import { DropboxSourceMetadata } from './common';
 import { GongSourceMetadata } from './common';
+import { IconikSourceMetadata } from './common';
 import { DescribeOutput } from './common';
 import { DescribeOutputPart } from './common';
 import { SpeechOutputPart } from './common';
@@ -31,7 +32,8 @@ type Collection = {
     | 'media-descriptions'
     | 'entities'
     | 'rich-transcripts'
-    | 'face-analysis';
+    | 'face-analysis'
+    | 'metadata';
   extract_config?:
     | Partial<{
         prompt: string;
@@ -86,7 +88,8 @@ type NewCollection = {
     | 'media-descriptions'
     | 'entities'
     | 'rich-transcripts'
-    | 'face-analysis';
+    | 'face-analysis'
+    | 'metadata';
   name: string;
   description?: (string | null) | undefined;
   describe_config?:
@@ -196,6 +199,7 @@ type RichTranscript = {
         }>
       >
     | undefined;
+  file?: File | undefined;
 } & DescribeOutput;
 type CollectionRichTranscriptsList = {
   object: 'list';
@@ -216,6 +220,7 @@ type CollectionRichTranscriptsList = {
       >;
     }> &
       DescribeOutput;
+    file?: File | undefined;
   }>;
   total: number;
   limit: number;
@@ -242,6 +247,7 @@ type CollectionMediaDescriptionsList = {
       >;
     }> &
       DescribeOutput;
+    file?: File | undefined;
   }>;
   total: number;
   limit: number;
@@ -283,6 +289,7 @@ type MediaDescription = {
     | undefined;
   total_chapters?: number | undefined;
   total_shots?: number | undefined;
+  file?: File | undefined;
 } & DescribeOutput;
 type AddCollectionFile = (
   | {
@@ -295,6 +302,7 @@ type AddCollectionFile = (
   FileSegmentationConfig &
   Partial<{
     thumbnails_config: ThumbnailsConfig;
+    metadata: {};
   }>;
 
 const Collection: z.ZodType<Collection> = z
@@ -308,6 +316,7 @@ const Collection: z.ZodType<Collection> = z
       'entities',
       'rich-transcripts',
       'face-analysis',
+      'metadata',
     ]),
     extract_config: z
       .object({
@@ -398,6 +407,7 @@ const NewCollection: z.ZodType<NewCollection> = z
       'entities',
       'rich-transcripts',
       'face-analysis',
+      'metadata',
     ]),
     name: z.string(),
     description: z.string().nullish(),
@@ -487,7 +497,10 @@ const AddCollectionFile: z.ZodType<AddCollectionFile> = z
   .and(FileSegmentationConfig)
   .and(
     z
-      .object({ thumbnails_config: ThumbnailsConfig })
+      .object({
+        thumbnails_config: ThumbnailsConfig,
+        metadata: z.object({}).partial().strict().passthrough(),
+      })
       .partial()
       .strict()
       .passthrough()
@@ -586,6 +599,7 @@ const MediaDescription: z.ZodType<MediaDescription> = z
       .optional(),
     total_chapters: z.number().int().gte(0).optional(),
     total_shots: z.number().int().gte(0).optional(),
+    file: File.optional(),
   })
   .strict()
   .passthrough()
@@ -612,6 +626,7 @@ const RichTranscript: z.ZodType<RichTranscript> = z
           .passthrough()
       )
       .optional(),
+    file: File.optional(),
   })
   .strict()
   .passthrough()
@@ -647,6 +662,7 @@ const CollectionRichTranscriptsList: z.ZodType<CollectionRichTranscriptsList> =
               .strict()
               .passthrough()
               .and(DescribeOutput),
+            file: File.optional(),
           })
           .strict()
           .passthrough()
@@ -690,6 +706,7 @@ const CollectionMediaDescriptionsList: z.ZodType<CollectionMediaDescriptionsList
               .strict()
               .passthrough()
               .and(DescribeOutput),
+            file: File.optional(),
           })
           .strict()
           .passthrough()
@@ -930,6 +947,7 @@ const endpoints = makeApi([
             'entities',
             'rich-transcripts',
             'face-analysis',
+            'metadata',
           ])
           .optional(),
       },
@@ -1300,6 +1318,11 @@ const endpoints = makeApi([
         type: 'Query',
         schema: z.boolean().optional(),
       },
+      {
+        name: 'include_metadata',
+        type: 'Query',
+        schema: z.boolean().optional(),
+      },
     ],
     response: RichTranscript,
     errors: [
@@ -1446,6 +1469,11 @@ const endpoints = makeApi([
           )
           .optional(),
       },
+      {
+        name: 'include_metadata',
+        type: 'Query',
+        schema: z.boolean().optional(),
+      },
     ],
     response: CollectionRichTranscriptsList,
     errors: [
@@ -1529,6 +1557,11 @@ const endpoints = makeApi([
             ])
           )
           .optional(),
+      },
+      {
+        name: 'include_metadata',
+        type: 'Query',
+        schema: z.boolean().optional(),
       },
     ],
     response: CollectionMediaDescriptionsList,
@@ -1616,6 +1649,11 @@ const endpoints = makeApi([
       },
       {
         name: 'include_shots',
+        type: 'Query',
+        schema: z.boolean().optional(),
+      },
+      {
+        name: 'include_metadata',
         type: 'Query',
         schema: z.boolean().optional(),
       },

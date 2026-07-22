@@ -1,7 +1,7 @@
 import { makeApi, Zodios, type ZodiosOptions } from '@zodios/core';
 import { z } from 'zod';
 import { File as CloudglueFile } from "./common";
-import { SourceMetadata, GrainSourceMetadata, ZoomSourceMetadata, RecallSourceMetadata, GoogleDriveSourceMetadata, DropboxSourceMetadata, GongSourceMetadata, Segmentation, SegmentationConfig, SegmentationUniformConfig, SegmentationShotDetectorConfig, SegmentationManualConfig, NarrativeConfig, KeyframeConfig, ThumbnailsConfig, Shot, Chapter, ThumbnailList, Thumbnail, ThumbnailType, ListVideoTagsResponse, PaginationResponse, VideoTag, FrameExtraction, FrameExtractionConfig, FrameExtractionUniformConfig, FrameExtractionThumbnailsConfig } from "./common";
+import { SourceMetadata, GrainSourceMetadata, ZoomSourceMetadata, RecallSourceMetadata, GoogleDriveSourceMetadata, DropboxSourceMetadata, GongSourceMetadata, IconikSourceMetadata, Segmentation, SegmentationConfig, SegmentationUniformConfig, SegmentationShotDetectorConfig, SegmentationManualConfig, NarrativeConfig, KeyframeConfig, ThumbnailsConfig, Shot, Chapter, ThumbnailList, Thumbnail, ThumbnailType, ListVideoTagsResponse, PaginationResponse, VideoTag, FrameExtraction, FrameExtractionConfig, FrameExtractionUniformConfig, FrameExtractionThumbnailsConfig } from "./common";
 
 type FileList = {
   object: 'list';
@@ -557,6 +557,33 @@ const endpoints = makeApi([
       {
         status: 400,
         description: `Invalid request or malformed file update parameters`,
+        schema: z.object({ error: z.string() }).strict().passthrough(),
+      },
+    ],
+  },
+  {
+    method: 'post',
+    path: '/files/:file_id/sync',
+    alias: 'syncFileSourceMetadata',
+    description: `Re-fetches the file&#x27;s source_metadata live from its data connector (google-drive, dropbox, zoom, gong, recall, grain, or iconik) and updates the stored value. If the file belongs to any metadata collections, their search documents are re-indexed with the refreshed metadata. Works for both metadata-only files and fully ingested connector files. Free — no media is downloaded or processed.`,
+    requestFormat: 'json',
+    parameters: [
+      {
+        name: 'file_id',
+        type: 'Path',
+        schema: z.string().uuid(),
+      },
+    ],
+    response: CloudglueFile,
+    errors: [
+      {
+        status: 400,
+        description: `File has no connector URI, the source does not support metadata lookup, or the account has no connector of that type`,
+        schema: z.object({ error: z.string() }).strict().passthrough(),
+      },
+      {
+        status: 404,
+        description: `File not found`,
         schema: z.object({ error: z.string() }).strict().passthrough(),
       },
     ],

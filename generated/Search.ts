@@ -44,6 +44,7 @@ type SearchModalities = Array<
   | 'ocr_lexical'
   | 'tag_semantic'
   | 'tag_lexical'
+  | 'doc_lexical'
 >;
 type FileSearchResult = {
   type: 'file';
@@ -170,6 +171,7 @@ const SearchModalities = z.array(
     'ocr_lexical',
     'tag_semantic',
     'tag_lexical',
+    'doc_lexical',
   ])
 );
 const SearchRequest: z.ZodType<SearchRequest> = z

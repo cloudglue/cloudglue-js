@@ -6,6 +6,15 @@ import { DescribeOutput } from './common';
 import { DescribeOutputPart } from './common';
 import { SpeechOutputPart } from './common';
 import { WordTimestamp } from './common';
+import { File } from './common';
+import { SourceMetadata } from './common';
+import { GrainSourceMetadata } from './common';
+import { ZoomSourceMetadata } from './common';
+import { RecallSourceMetadata } from './common';
+import { GoogleDriveSourceMetadata } from './common';
+import { DropboxSourceMetadata } from './common';
+import { GongSourceMetadata } from './common';
+import { IconikSourceMetadata } from './common';
 import { ThumbnailsConfig } from './common';
 import { FileSegmentationConfig } from './common';
 import { SegmentationConfig } from './common';
@@ -33,6 +42,7 @@ type NewDescribe = {
         scope?: string | undefined;
       }>
     | undefined;
+  include_metadata?: boolean | undefined;
 } & FileSegmentationConfig;
 
 const NewDescribe: z.ZodType<NewDescribe> = z
@@ -56,6 +66,7 @@ const NewDescribe: z.ZodType<NewDescribe> = z
       )
       .max(50)
       .optional(),
+    include_metadata: z.boolean().optional(),
   })
   .strict()
   .passthrough()
@@ -176,6 +187,11 @@ const endpoints = makeApi([
           )
           .optional(),
       },
+      {
+        name: 'include_metadata',
+        type: 'Query',
+        schema: z.boolean().optional(),
+      },
     ],
     response: DescribeList,
     errors: [
@@ -261,6 +277,11 @@ const endpoints = makeApi([
       },
       {
         name: 'include_shots',
+        type: 'Query',
+        schema: z.boolean().optional(),
+      },
+      {
+        name: 'include_metadata',
         type: 'Query',
         schema: z.boolean().optional(),
       },

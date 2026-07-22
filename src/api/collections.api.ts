@@ -28,6 +28,8 @@ type ListCollectionEntitiesParams = AddedFilterParams &
 type ListCollectionMediaDescriptionsParams = {
   response_format?: 'json' | 'markdown';
   modalities?: Modalities[];
+  /** Include each file's `metadata` and `source_metadata` on the `file` object */
+  include_metadata?: boolean;
 } & AddedFilterParams &
   OrderParams &
   PaginationParams;
@@ -37,7 +39,8 @@ type ListCollectionParams = {
     | 'entities'
     | 'rich-transcripts'
     | 'media-descriptions'
-    | 'face-analysis';
+    | 'face-analysis'
+    | 'metadata';
   order?: 'name' | 'created_at';
 } & PaginationParams;
 
@@ -203,6 +206,8 @@ export class EnhancedCollectionsApi {
       end_time_seconds?: number;
       modalities?: Modalities[];
       include_word_timestamps?: boolean;
+      /** Include the file's `metadata` and `source_metadata` on the `file` object */
+      include_metadata?: boolean;
     } = {},
   ) {
     return this.api.getTranscripts({
@@ -242,6 +247,8 @@ export class EnhancedCollectionsApi {
       include_word_timestamps?: boolean;
       include_chapters?: boolean;
       include_shots?: boolean;
+      /** Include the file's `metadata` and `source_metadata` on the `file` object */
+      include_metadata?: boolean;
     } = {},
   ) {
     return this.api.getMediaDescriptions({

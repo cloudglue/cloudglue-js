@@ -20,6 +20,15 @@ import { DescribeOutput } from './common';
 import { DescribeOutputPart } from './common';
 import { SpeechOutputPart } from './common';
 import { WordTimestamp } from './common';
+import { File } from './common';
+import { SourceMetadata } from './common';
+import { GrainSourceMetadata } from './common';
+import { ZoomSourceMetadata } from './common';
+import { RecallSourceMetadata } from './common';
+import { GoogleDriveSourceMetadata } from './common';
+import { DropboxSourceMetadata } from './common';
+import { GongSourceMetadata } from './common';
+import { IconikSourceMetadata } from './common';
 
 const endpoints = makeApi([
   {
@@ -164,6 +173,11 @@ const endpoints = makeApi([
         name: 'offset',
         type: 'Query',
         schema: z.number().int().gte(0).optional(),
+      },
+      {
+        name: 'include_metadata',
+        type: 'Query',
+        schema: z.boolean().optional(),
       },
     ],
     response: DescribeList,

@@ -26,7 +26,8 @@ export type VideoUrlSource =
   | 'gong'
   | 'recall'
   | 'gcs'
-  | 'grain';
+  | 'grain'
+  | 'iconik';
 
 export interface NormalizedVideoUrl {
   /** The URL to send to the API (rewritten when a known share-link form was recognized) */
@@ -66,6 +67,7 @@ export const CONNECTOR_SYNC_URI_GRAMMAR: Record<string, string> = {
   grain: 'grain://recording/<recordingId>',
   gong: 'gong://call/<callId>',
   recall: 'recall://recording/<recordingId>',
+  iconik: 'iconik://asset/<assetId>',
 };
 
 /**
@@ -126,6 +128,7 @@ export function classifyVideoUrl(url: string): VideoUrlSource | null {
   if (LOOM_SHARE_URL_REGEX.test(url)) return 'loom';
   if (url.startsWith('gong://call/')) return 'gong';
   if (url.startsWith('recall://recording/')) return 'recall';
+  if (url.startsWith('iconik://asset/')) return 'iconik';
   if (url.startsWith('gs://')) return 'gcs';
   if (url.startsWith('grain://recording/')) return 'grain';
   const parsed = tryParseUrl(url);

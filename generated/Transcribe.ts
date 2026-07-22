@@ -5,6 +5,15 @@ import { DescribeOutput } from './common';
 import { DescribeOutputPart } from './common';
 import { SpeechOutputPart } from './common';
 import { WordTimestamp } from './common';
+import { File } from './common';
+import { SourceMetadata } from './common';
+import { GrainSourceMetadata } from './common';
+import { ZoomSourceMetadata } from './common';
+import { RecallSourceMetadata } from './common';
+import { GoogleDriveSourceMetadata } from './common';
+import { DropboxSourceMetadata } from './common';
+import { GongSourceMetadata } from './common';
+import { IconikSourceMetadata } from './common';
 import { ThumbnailsConfig } from './common';
 import { FileSegmentationConfig } from './common';
 import { SegmentationConfig } from './common';
@@ -44,6 +53,7 @@ type Transcribe = {
         DescribeOutput)
     | undefined;
   error?: string | undefined;
+  file?: File | undefined;
 };
 type NewTranscribe = {
   url: string;
@@ -53,6 +63,7 @@ type NewTranscribe = {
   enable_scene_text?: boolean | undefined;
   enable_audio_description?: boolean | undefined;
   thumbnails_config?: ThumbnailsConfig | undefined;
+  include_metadata?: boolean | undefined;
 } & FileSegmentationConfig;
 type TranscribeList = {
   object: 'list';
@@ -108,6 +119,7 @@ const Transcribe: z.ZodType<Transcribe> = z
       .and(DescribeOutput)
       .optional(),
     error: z.string().optional(),
+    file: File.optional(),
   })
   .strict()
   .passthrough();
@@ -120,6 +132,7 @@ const NewTranscribe: z.ZodType<NewTranscribe> = z
     enable_scene_text: z.boolean().optional(),
     enable_audio_description: z.boolean().optional(),
     thumbnails_config: ThumbnailsConfig.optional(),
+    include_metadata: z.boolean().optional(),
   })
   .strict()
   .passthrough()
@@ -231,6 +244,11 @@ Note: For most use cases, you should use the &#x60;/describe&#x60; endpoint inst
         type: 'Query',
         schema: z.enum(['json', 'markdown']).optional(),
       },
+      {
+        name: 'include_metadata',
+        type: 'Query',
+        schema: z.boolean().optional(),
+      },
     ],
     response: TranscribeList,
     errors: [
@@ -262,6 +280,11 @@ Note: For most use cases, you should use the &#x60;/describe&#x60; endpoint inst
         name: 'response_format',
         type: 'Query',
         schema: z.enum(['json', 'markdown']).optional(),
+      },
+      {
+        name: 'include_metadata',
+        type: 'Query',
+        schema: z.boolean().optional(),
       },
     ],
     response: Transcribe,

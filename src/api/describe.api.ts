@@ -49,6 +49,8 @@ export class EnhancedDescribeApi {
       include_word_timestamps?: boolean;
       include_chapters?: boolean;
       include_shots?: boolean;
+      /** Include the file's `metadata` and `source_metadata` on the `file` object */
+      include_metadata?: boolean;
     } = {
       response_format: 'json',
     },
@@ -75,6 +77,8 @@ export class EnhancedDescribeApi {
       response_format?: 'json' | 'markdown';
       include_data?: boolean;
       modalities?: Modalities[];
+      /** Include each file's `metadata` and `source_metadata` on the `file` object */
+      include_metadata?: boolean;
     } = {},
   ) {
     return this.api.listDescribes({ queries: params });

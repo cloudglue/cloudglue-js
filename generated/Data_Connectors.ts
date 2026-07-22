@@ -9,6 +9,7 @@ import { RecallSourceMetadata } from './common';
 import { GoogleDriveSourceMetadata } from './common';
 import { DropboxSourceMetadata } from './common';
 import { GongSourceMetadata } from './common';
+import { IconikSourceMetadata } from './common';
 
 type DataConnectorList = {
   object: 'list';
@@ -28,7 +29,8 @@ type DataConnector = {
     | 'gong'
     | 'recall'
     | 'gcs'
-    | 'grain';
+    | 'grain'
+    | 'iconik';
   created_at: number;
   updated_at: number;
   metadata: {};
@@ -75,6 +77,7 @@ const DataConnector: z.ZodType<DataConnector> = z
       'recall',
       'gcs',
       'grain',
+      'iconik',
     ]),
     created_at: z.number().int(),
     updated_at: z.number().int(),

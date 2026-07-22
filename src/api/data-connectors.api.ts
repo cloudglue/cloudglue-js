@@ -19,8 +19,8 @@ export interface ListDataConnectorFilesParams {
   page_token?: string;
   /**
    * Start date filter (YYYY-MM-DD, inclusive UTC day bound). Supported by
-   * Grain, Zoom, Recall, Google Drive, Dropbox, and Gong (Zoom and Gong
-   * default to a 6-month lookback when omitted); ignored for S3/GCS.
+   * Grain, Zoom, Recall, Google Drive, Dropbox, Gong, and Iconik (Zoom and
+   * Gong default to a 6-month lookback when omitted); ignored for S3/GCS.
    */
   from?: string;
   /** End date filter (YYYY-MM-DD). Same per-connector support as `from`. */
@@ -35,8 +35,8 @@ export interface ListDataConnectorFilesParams {
   prefix?: string;
   /**
    * Case-insensitive title filter. Supported by Grain, Zoom, Google Drive,
-   * Dropbox, and Gong; ignored for Recall (no title available when listing)
-   * and S3/GCS.
+   * Dropbox, Gong, and Iconik (full-text title search); ignored for Recall
+   * (no title available when listing) and S3/GCS.
    */
   title_search?: string;
   /** Filter by team (Grain) */
@@ -81,9 +81,9 @@ export class EnhancedDataConnectorsApi {
   /**
    * Fetch source metadata for a connector URI directly from the upstream
    * source, without creating a Cloudglue file. Supported for Grain, Zoom,
-   * Recall, Google Drive, Dropbox, and Gong; S3/GCS return 501 (plain object
-   * stores have no richer metadata). Returns 502 when the upstream provider's
-   * response can't be validated.
+   * Recall, Google Drive, Dropbox, Gong, and Iconik; S3/GCS return 501
+   * (plain object stores have no richer metadata). Returns 502 when the
+   * upstream provider's response can't be validated.
    *
    * @param connectorId - The ID of the data connector
    * @param url - Connector URI to look up (must match the connector's type)
@@ -100,8 +100,8 @@ export class EnhancedDataConnectorsApi {
    * Materialize a connector URI (e.g. `grain://recording/<id>`) into a
    * Cloudglue file without starting a downstream job. Idempotent: syncing the
    * same URI returns the existing file. For Grain, Zoom, Recall, Google
-   * Drive, Dropbox, and Gong the file's `source_metadata` is populated from
-   * the provider.
+   * Drive, Dropbox, Gong, and Iconik the file's `source_metadata` is
+   * populated from the provider.
    *
    * Known https share links are rewritten client-side into connector URIs
    * (e.g. `drive.google.com/file/d/<id>` → `gdrive://file/<id>`), and some

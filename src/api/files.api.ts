@@ -210,6 +210,23 @@ export class EnhancedFilesApi {
     return this.api.getFile({ params: { file_id: fileId } });
   }
 
+  /**
+   * Re-fetch a connector file's `source_metadata` live from its data
+   * connector (google-drive, dropbox, zoom, gong, recall, grain, or iconik)
+   * and update the stored value. If the file belongs to any metadata
+   * collections, their search documents are re-indexed with the refreshed
+   * metadata. Works for both metadata-only and fully ingested connector
+   * files. Free — no media is downloaded or processed.
+   *
+   * @param fileId - The ID of the connector-backed file to refresh
+   * @returns The file with refreshed `source_metadata`
+   */
+  async syncSourceMetadata(fileId: string) {
+    return this.api.syncFileSourceMetadata(undefined, {
+      params: { file_id: fileId },
+    });
+  }
+
   async deleteFile(fileId: string) {
     return this.api.deleteFile(undefined, {
       params: { file_id: fileId },

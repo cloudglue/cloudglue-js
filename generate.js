@@ -520,4 +520,23 @@ for (const file of generatedFiles) {
     fs.writeFileSync(filePath, fileContent);
 }
 
+// TS7056: as of spec v0.7.11 Describe/Transcribe responses embed File, whose
+// source_metadata union spans seven connector variants — the structurally
+// inferred types of the big common.ts consts exceed what the compiler will
+// serialize into declaration files. Annotate them with their exported type
+// so downstream inference (tag-file endpoints, Zodios clients) references a
+// named type instead of re-expanding the structure.
+{
+    const bigCommonSchemas = ['SourceMetadata', 'File', 'Describe', 'DescribeList'];
+    const commonPath = path.join(generatedDir, 'common.ts');
+    let commonContent = fs.readFileSync(commonPath, 'utf8');
+    for (const name of bigCommonSchemas) {
+        commonContent = commonContent.replace(
+            new RegExp(`^export const ${name} = z`, 'm'),
+            `export const ${name}: z.ZodType<${name}> = z`
+        );
+    }
+    fs.writeFileSync(commonPath, commonContent);
+}
+
 console.log('Generation complete!'); 

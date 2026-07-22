@@ -64,6 +64,8 @@ export class EnhancedSegmentationsApi {
       response_format?: 'json' | 'markdown';
       limit?: number;
       offset?: number;
+      /** Include each file's `metadata` and `source_metadata` on the `file` object */
+      include_metadata?: boolean;
     } = {},
   ) {
     return this.api.listSegmentationDescribes({

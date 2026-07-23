@@ -41,6 +41,7 @@ type Collection = {
         enable_video_level_entities: boolean;
         enable_segment_level_entities: boolean;
         enable_transcript_mode: boolean;
+        enable_metadata_mode: boolean;
       }>
     | undefined;
   transcribe_config?:
@@ -108,6 +109,7 @@ type NewCollection = {
         enable_video_level_entities: boolean;
         enable_segment_level_entities: boolean;
         enable_transcript_mode: boolean;
+        enable_metadata_mode: boolean;
       }>
     | undefined;
   transcribe_config?:
@@ -325,6 +327,7 @@ const Collection: z.ZodType<Collection> = z
         enable_video_level_entities: z.boolean(),
         enable_segment_level_entities: z.boolean(),
         enable_transcript_mode: z.boolean(),
+        enable_metadata_mode: z.boolean(),
       })
       .partial()
       .strict()
@@ -430,6 +433,7 @@ const NewCollection: z.ZodType<NewCollection> = z
         enable_video_level_entities: z.boolean(),
         enable_segment_level_entities: z.boolean(),
         enable_transcript_mode: z.boolean(),
+        enable_metadata_mode: z.boolean(),
       })
       .partial()
       .strict()

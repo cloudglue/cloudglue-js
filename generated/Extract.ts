@@ -22,6 +22,7 @@ type Extract = {
         enable_video_level_entities: boolean;
         enable_segment_level_entities: boolean;
         enable_transcript_mode: boolean;
+        enable_metadata_mode: boolean;
       }>
     | undefined;
   segmentation_id?: string | undefined;
@@ -68,6 +69,7 @@ type NewExtract = {
   enable_video_level_entities?: boolean | undefined;
   enable_segment_level_entities?: boolean | undefined;
   enable_transcript_mode?: boolean | undefined;
+  enable_metadata_mode?: boolean | undefined;
   thumbnails_config?: ThumbnailsConfig | undefined;
   include_chapters?: boolean | undefined;
   include_shots?: boolean | undefined;
@@ -99,6 +101,7 @@ const Extract: z.ZodType<Extract> = z
         enable_video_level_entities: z.boolean(),
         enable_segment_level_entities: z.boolean(),
         enable_transcript_mode: z.boolean(),
+        enable_metadata_mode: z.boolean(),
       })
       .partial()
       .strict()
@@ -178,6 +181,7 @@ const NewExtract: z.ZodType<NewExtract> = z
     enable_video_level_entities: z.boolean().optional(),
     enable_segment_level_entities: z.boolean().optional(),
     enable_transcript_mode: z.boolean().optional(),
+    enable_metadata_mode: z.boolean().optional(),
     thumbnails_config: ThumbnailsConfig.optional(),
     include_chapters: z.boolean().optional(),
     include_shots: z.boolean().optional(),

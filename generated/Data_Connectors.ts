@@ -49,6 +49,7 @@ type DataConnectorFile = {
   mime_type: string | null;
   size_bytes: number | null;
   created_at: number | null;
+  thumbnail_url?: (string | null) | undefined;
   metadata: Partial<
     {
       folder_id: string;
@@ -104,6 +105,7 @@ const DataConnectorFile: z.ZodType<DataConnectorFile> = z
     mime_type: z.string().nullable(),
     size_bytes: z.number().int().nullable(),
     created_at: z.number().int().nullable(),
+    thumbnail_url: z.string().nullish(),
     metadata: z
       .object({ folder_id: z.string(), path: z.string(), prefix: z.string() })
       .partial()

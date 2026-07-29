@@ -11,7 +11,9 @@ type Response = Partial<{
   created_at: number;
   model: string;
   instructions: string | null;
-  output: Array<ResponseOutputMessage> | null;
+  output: Array<
+    ResponseOutputMessage | ResponseFunctionCall | ResponseQueryCall
+  > | null;
   usage: ResponseUsage;
   error: ResponseError | null;
 }>;
@@ -51,6 +53,23 @@ type ResponseAnnotation = {
   speech?: Array<string> | undefined;
   audio_description?: Array<string> | undefined;
 };
+type ResponseFunctionCall = Partial<{
+  type: 'function_call';
+  id: string;
+  call_id: string;
+  name: string;
+  arguments: string;
+}>;
+type ResponseQueryCall = Partial<{
+  type: 'cloudglue_query_call';
+  id: string;
+  status: 'completed' | 'failed';
+  sql: string;
+  row_count: number;
+  total_rows: number | null;
+  truncated: boolean;
+  error: string | null;
+}>;
 type ResponseUsage = Partial<{
   input_tokens: number;
   output_tokens: number;
@@ -235,6 +254,31 @@ const ResponseOutputMessage: z.ZodType<ResponseOutputMessage> = z
   .partial()
   .strict()
   .passthrough();
+const ResponseFunctionCall: z.ZodType<ResponseFunctionCall> = z
+  .object({
+    type: z.literal('function_call'),
+    id: z.string(),
+    call_id: z.string(),
+    name: z.string(),
+    arguments: z.string(),
+  })
+  .partial()
+  .strict()
+  .passthrough();
+const ResponseQueryCall: z.ZodType<ResponseQueryCall> = z
+  .object({
+    type: z.literal('cloudglue_query_call'),
+    id: z.string(),
+    status: z.enum(['completed', 'failed']),
+    sql: z.string(),
+    row_count: z.number().int(),
+    total_rows: z.number().int().nullable(),
+    truncated: z.boolean(),
+    error: z.string().nullable(),
+  })
+  .partial()
+  .strict()
+  .passthrough();
 const ResponseUsage: z.ZodType<ResponseUsage> = z
   .object({
     input_tokens: z.number().int(),
@@ -257,7 +301,15 @@ const Response: z.ZodType<Response> = z
     created_at: z.number().int(),
     model: z.string(),
     instructions: z.string().nullable(),
-    output: z.array(ResponseOutputMessage).nullable(),
+    output: z
+      .array(
+        z.union([
+          ResponseOutputMessage,
+          ResponseFunctionCall,
+          ResponseQueryCall,
+        ])
+      )
+      .nullable(),
     usage: ResponseUsage,
     error: ResponseError.nullable(),
   })
@@ -312,6 +364,8 @@ export const schemas = {
   ResponseAnnotation,
   ResponseOutputContent,
   ResponseOutputMessage,
+  ResponseFunctionCall,
+  ResponseQueryCall,
   ResponseUsage,
   ResponseError,
   Response,

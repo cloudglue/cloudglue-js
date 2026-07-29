@@ -29,6 +29,7 @@ import { schemas as tagsSchemas } from '../generated/Tags';
 import { schemas as shareableSchemas } from '../generated/Share';
 import { schemas as dataConnectorsSchemas } from '../generated/Data_Connectors';
 import { schemas as deepSearchSchemas } from '../generated/Deep_Search';
+import { schemas as querySchemas } from '../generated/Query';
 
 /**
  * Represents a video file in the Cloudglue system
@@ -621,3 +622,33 @@ export type {
 
 // Re-export Data Connector file browsing params
 export type { ListDataConnectorFilesParams } from './api/data-connectors.api';
+
+/**
+ * Parameters for running a SQL or natural-language query over collections
+ */
+export type RunQueryRequest = z.infer<typeof querySchemas.RunQueryRequest>;
+
+/**
+ * Represents a query run, including inline result rows or export state
+ */
+export type QueryResult = z.infer<typeof querySchemas.QueryResult>;
+
+/**
+ * Represents a query run list item (columns/rows omitted)
+ */
+export type QueryListItem = z.infer<typeof querySchemas.QueryListItem>;
+
+/**
+ * Represents a paginated list of query runs
+ */
+export type QueryListResponse = z.infer<typeof querySchemas.QueryListResponse>;
+
+/**
+ * Represents the queryable virtual schema for a set of collections
+ */
+export type QuerySchema = z.infer<typeof querySchemas.QuerySchema>;
+
+/**
+ * Represents credit usage for a query run
+ */
+export type QueryUsage = z.infer<typeof querySchemas.QueryUsage>;

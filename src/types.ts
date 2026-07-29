@@ -500,6 +500,22 @@ export type ResponseOutputMessage = z.infer<
 >;
 
 /**
+ * Represents a Response API function-call output item (type 'function_call')
+ */
+export type ResponseFunctionCall = z.infer<
+  typeof responseSchemas.ResponseFunctionCall
+>;
+
+/**
+ * Represents a Response API query-call output item
+ * (type 'cloudglue_query_call') — a SQL query the model ran against the
+ * knowledge base's entity collections, with row counts and truncation state
+ */
+export type ResponseQueryCall = z.infer<
+  typeof responseSchemas.ResponseQueryCall
+>;
+
+/**
  * Represents a citation annotation in a Response API response
  */
 export type ResponseAnnotation = z.infer<

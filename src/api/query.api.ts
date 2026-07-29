@@ -97,7 +97,10 @@ export class EnhancedQueryApi {
 
       if (['completed', 'failed', 'cancelled'].includes(run.status ?? '')) {
         if (run.status === 'failed') {
-          throw new CloudglueError(`Query run failed: ${queryId}`);
+          const detail = run.error?.message
+            ? ` — ${run.error.code ?? 'error'}: ${run.error.message}`
+            : '';
+          throw new CloudglueError(`Query run failed: ${queryId}${detail}`);
         }
         return run;
       }

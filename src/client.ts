@@ -10,6 +10,7 @@ import { createApiClient as createSegmentationsApiClient } from '../generated/Se
 import { createApiClient as createSearchApiClient } from '../generated/Search';
 import { createApiClient as createDescribeApiClient } from '../generated/Describe';
 import { createApiClient as createSegmentsApiClient } from '../generated/Segments';
+import { createApiClient as createQueryApiClient } from '../generated/Query';
 import { createApiClient as createWebhooksApiClient } from '../generated/Webhooks';
 import { createApiClient as createFramesApiClient } from '../generated/Frames';
 import { createApiClient as createFaceDetectionApiClient } from '../generated/Face_Detection';
@@ -32,6 +33,7 @@ import { EnhancedFramesApi } from './api/frame-extraction.api';
 import { EnhancedSearchApi } from './api/search.api';
 import { EnhancedSegmentationsApi } from './api/segmentations.api';
 import { EnhancedSegmentsApi } from './api/segments.api';
+import { EnhancedQueryApi } from './api/query.api';
 import { EnhancedTranscribeApi } from './api/transcribe.api';
 import { EnhancedChatApi } from './api/chat-completion.api';
 import { EnhancedCollectionsApi } from './api/collections.api';
@@ -77,6 +79,12 @@ export class Cloudglue {
    * Provides methods for extracting specific information from video content
    */
   public readonly extract: EnhancedExtractApi;
+
+  /**
+   * Query API for running read-only SQL (or natural-language) queries over
+   * the structured data extracted from collections
+   */
+  public readonly query: EnhancedQueryApi;
 
   /**
    * Segmentations API for segmenting videos into shots
@@ -188,6 +196,7 @@ export class Cloudglue {
     const chatApi = createChatApiClient(this.baseUrl, sharedConfig);
     const transcribeApi = createTranscribeApiClient(this.baseUrl, sharedConfig);
     const extractApi = createExtractApiClient(this.baseUrl, sharedConfig);
+    const queryApi = createQueryApiClient(this.baseUrl, sharedConfig);
     const segmentationsApi = createSegmentationsApiClient(
       this.baseUrl,
       sharedConfig,
@@ -221,6 +230,7 @@ export class Cloudglue {
       chatApi,
       transcribeApi,
       extractApi,
+      queryApi,
       segmentationsApi,
       searchApi,
       describeApi,
@@ -288,6 +298,7 @@ export class Cloudglue {
     this.chat = new EnhancedChatApi(chatApi);
     this.transcribe = new EnhancedTranscribeApi(transcribeApi);
     this.extract = new EnhancedExtractApi(extractApi);
+    this.query = new EnhancedQueryApi(queryApi);
     this.segmentations = new EnhancedSegmentationsApi(segmentationsApi);
     this.search = new EnhancedSearchApi(searchApi);
     this.describe = new EnhancedDescribeApi(describeApi);

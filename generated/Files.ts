@@ -565,7 +565,7 @@ const endpoints = makeApi([
     method: 'post',
     path: '/files/:file_id/sync',
     alias: 'syncFileSourceMetadata',
-    description: `Re-fetches the file&#x27;s source_metadata live from its data connector (google-drive, dropbox, zoom, gong, recall, grain, or iconik) and updates the stored value. If the file belongs to any metadata collections, their search documents are re-indexed with the refreshed metadata. Works for both metadata-only files and fully ingested connector files. Free — no media is downloaded or processed.`,
+    description: `Re-fetches the file&#x27;s source_metadata live from its data connector (google-drive, dropbox, zoom, gong, recall, grain, or iconik) and updates the stored value. If the file belongs to any metadata collections, their search documents are re-indexed with the refreshed metadata. For iconik files without a thumbnail, the asset&#x27;s poster keyframe is also copied and set as the file&#x27;s thumbnail_url. Works for both metadata-only files and fully ingested connector files. Free — no media is downloaded or processed.`,
     requestFormat: 'json',
     parameters: [
       {

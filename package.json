@@ -35,7 +35,7 @@
   "homepage": "https://github.com/cloudglue/cloudglue-js#readme",
   "dependencies": {
     "@zodios/core": "^10.0.0",
-    "axios": "^1.12.0",
+    "axios": "^1.18.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
@@ -51,13 +51,14 @@
   },
   "pnpm": {
     "overrides": {
-      "js-yaml": "^4.2.0",
-      "axios": "^1.12.0",
+      "js-yaml": "^4.3.0",
+      "axios": "^1.18.0",
       "glob": "^13.0.3",
       "ajv": "^8.18.0",
+      "fast-uri": "^3.1.5",
       "minimatch": "^10.2.3",
       "handlebars": "^4.7.9",
-      "brace-expansion": "^5.0.5",
+      "brace-expansion": "^5.0.9",
       "yaml": "^2.8.3",
       "form-data": "^4.0.6",
       "@babel/core": "^7.29.6",

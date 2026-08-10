@@ -5,7 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  js-yaml: ^4.3.0
+  js-yaml: ^4.3.1
   axios: ^1.18.0
   glob: ^13.0.3
   ajv: ^8.18.0

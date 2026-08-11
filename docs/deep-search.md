@@ -11,7 +11,9 @@ const result = await client.deepSearch.createDeepSearch({
     collections: ['col_id'],
   },
   query: 'What pricing strategies were discussed?',
-  scope: 'segment',          // 'segment' or 'file'
+  scope: 'segment',          // 'segment' or 'file'; omit for auto (the
+                             // planner picks scopes per search plan and
+                             // fuses results; responses report scope: null)
   limit: 50,                 // max results (1-500)
   exclude_weak_results: true,
   include: ['search_queries'], // include the intermediate search queries used

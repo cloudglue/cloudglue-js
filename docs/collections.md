@@ -68,6 +68,11 @@ const videos = await client.collections.listVideos(collectionId, {
 // Get/delete a specific video
 const video = await client.collections.getVideo(collectionId, fileId);
 await client.collections.deleteVideo(collectionId, fileId);
+
+// Videos in searchable collections (media-descriptions, rich-transcripts,
+// metadata, entities) also report searchable_status ('pending' |
+// 'processing' | 'completed' | 'failed') — indexing progress of the
+// file's search documents.
 ```
 
 ## Retrieve Processed Data

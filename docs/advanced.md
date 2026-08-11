@@ -158,5 +158,10 @@ const describes = await client.segmentations.listSegmentationDescribes(segmentat
 // visibility defaults to 'public' (viewable by anyone with the link);
 // pass visibility: 'private' for account-restricted, token-gated playback.
 // A file (or segment) can have at most one active share per visibility.
+// link_preview ('none' | 'full' | 'player') controls Open Graph metadata
+// for unfurl bots on private shares; 'player' lets the share play inline
+// when unfurled by the Cloudglue Slack app.
+// getShareableAsset(id, { clip_start, clip_end }) returns a stream_url
+// that plays only that window (seconds, both required together).
 // See source: src/api/shareable.api.ts
 ```

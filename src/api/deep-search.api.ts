@@ -15,7 +15,13 @@ export interface CreateDeepSearchParams {
   knowledge_base: DeepSearchKnowledgeBase;
   /** The search query */
   query: string;
-  /** Search scope - segment-level or file-level */
+  /**
+   * Search scope - segment-level or file-level. Omit for auto: the search
+   * planner picks a scope per search plan, each collection is searched at
+   * the scopes its documents support, and results from both scopes are
+   * fused (responses report `scope: null`). With an explicit scope, every
+   * collection in the knowledge base must be searchable at it.
+   */
   scope?: 'segment' | 'file';
   /** Maximum number of results to return (1-500) */
   limit?: number;

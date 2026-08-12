@@ -9,7 +9,7 @@ type ShareableAsset = {
   description?: string | undefined;
   metadata?: {} | undefined;
   visibility?: ('public' | 'private') | undefined;
-  link_preview: 'none' | 'full';
+  link_preview: 'none' | 'full' | 'player';
   preview_url?: string | undefined;
   media_download_url?: string | undefined;
   media_download_expires_at?: (number | null) | undefined;
@@ -37,7 +37,7 @@ const ShareableAsset: z.ZodType<ShareableAsset> = z
     description: z.string().optional(),
     metadata: z.object({}).partial().strict().passthrough().optional(),
     visibility: z.enum(['public', 'private']).optional(),
-    link_preview: z.enum(['none', 'full']),
+    link_preview: z.enum(['none', 'full', 'player']),
     preview_url: z.string().optional(),
     media_download_url: z.string().optional(),
     media_download_expires_at: z.number().nullish(),
@@ -68,7 +68,7 @@ const CreateShareableAssetRequest = z
     description: z.string().optional(),
     metadata: z.object({}).partial().strict().passthrough().optional(),
     visibility: z.enum(['public', 'private']).optional(),
-    link_preview: z.enum(['none', 'full']).optional(),
+    link_preview: z.enum(['none', 'full', 'player']).optional(),
   })
   .strict()
   .passthrough();
@@ -77,7 +77,7 @@ const UpdateShareableAssetRequest = z
     title: z.string(),
     description: z.string(),
     metadata: z.object({}).partial().strict().passthrough(),
-    link_preview: z.enum(['none', 'full']),
+    link_preview: z.enum(['none', 'full', 'player']),
   })
   .partial()
   .strict()
@@ -178,13 +178,23 @@ const endpoints = makeApi([
     method: 'get',
     path: '/share/:id',
     alias: 'getShareableAsset',
-    description: `Get a shareable asset`,
+    description: `Get a shareable asset. Optionally pass an instant-clip window (clip_start/clip_end) to receive a stream_url that plays only that window.`,
     requestFormat: 'json',
     parameters: [
       {
         name: 'id',
         type: 'Path',
         schema: z.string().uuid(),
+      },
+      {
+        name: 'clip_start',
+        type: 'Query',
+        schema: z.number().gte(0).optional(),
+      },
+      {
+        name: 'clip_end',
+        type: 'Query',
+        schema: z.number().gt(0).optional(),
       },
     ],
     response: ShareableAsset,

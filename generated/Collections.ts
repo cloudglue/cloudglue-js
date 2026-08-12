@@ -169,6 +169,9 @@ type CollectionFile = {
   object: 'collection_file';
   added_at: number;
   status: 'pending' | 'processing' | 'completed' | 'failed' | 'not_applicable';
+  searchable_status?:
+    | ('pending' | 'processing' | 'completed' | 'failed')
+    | undefined;
   file?: File | undefined;
   segmentation?:
     | {
@@ -522,6 +525,9 @@ const CollectionFile: z.ZodType<CollectionFile> = z
       'failed',
       'not_applicable',
     ]),
+    searchable_status: z
+      .enum(['pending', 'processing', 'completed', 'failed'])
+      .optional(),
     file: File.optional(),
     segmentation: z
       .object({

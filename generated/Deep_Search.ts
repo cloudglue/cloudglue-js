@@ -10,7 +10,7 @@ type DeepSearch = Partial<{
   status: 'in_progress' | 'completed' | 'failed' | 'cancelled';
   created_at: number;
   query: string;
-  scope: 'segment' | 'file';
+  scope: 'segment' | 'file' | null;
   text: string | null;
   results: Array<DeepSearchResult> | null;
   total: number;
@@ -91,7 +91,7 @@ type DeepSearchListItem = Partial<{
   status: 'in_progress' | 'completed' | 'failed' | 'cancelled';
   created_at: number;
   query: string;
-  scope: 'segment' | 'file';
+  scope: 'segment' | 'file' | null;
   total: number;
   usage: DeepSearchUsage;
 }>;
@@ -178,7 +178,7 @@ const DeepSearch: z.ZodType<DeepSearch> = z
     status: z.enum(['in_progress', 'completed', 'failed', 'cancelled']),
     created_at: z.number(),
     query: z.string(),
-    scope: z.enum(['segment', 'file']),
+    scope: z.enum(['segment', 'file']).nullable(),
     text: z.string().nullable(),
     results: z.array(DeepSearchResult).nullable(),
     total: z.number().int(),
@@ -202,7 +202,7 @@ const DeepSearchListItem: z.ZodType<DeepSearchListItem> = z
     status: z.enum(['in_progress', 'completed', 'failed', 'cancelled']),
     created_at: z.number(),
     query: z.string(),
-    scope: z.enum(['segment', 'file']),
+    scope: z.enum(['segment', 'file']).nullable(),
     total: z.number().int(),
     usage: DeepSearchUsage,
   })

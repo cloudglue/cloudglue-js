@@ -6,6 +6,10 @@ import { CloudglueError } from '../error';
 type DeepSearchStatus = 'in_progress' | 'completed' | 'failed' | 'cancelled';
 
 export type DeepSearchKnowledgeBase =
+  /**
+   * Collections may be of type rich-transcripts, media-descriptions,
+   * metadata, or entities.
+   */
   | { source: 'collections'; collections: string[]; filter?: SearchFilter }
   | { source: 'files'; files: string[] }
   | { source: 'default' };
@@ -16,11 +20,14 @@ export interface CreateDeepSearchParams {
   /** The search query */
   query: string;
   /**
-   * Search scope - segment-level or file-level. Omit for auto: the search
-   * planner picks a scope per search plan, each collection is searched at
-   * the scopes its documents support, and results from both scopes are
-   * fused (responses report `scope: null`). With an explicit scope, every
-   * collection in the knowledge base must be searchable at it.
+   * Search scope. `'segment'` returns individual segments, `'file'` returns
+   * file-level results — with an explicit value, every collection in the
+   * knowledge base must be searchable at that scope (metadata and file-level
+   * entities collections require `'file'`; segment-level entities
+   * collections require `'segment'`). Omit for auto: the search planner
+   * picks a scope per search plan, each collection is searched at the scope
+   * it supports, and results may mix segment and file types (the response's
+   * `scope` is null).
    */
   scope?: 'segment' | 'file';
   /** Maximum number of results to return (1-500) */

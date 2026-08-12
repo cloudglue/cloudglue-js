@@ -30,6 +30,7 @@ import { schemas as shareableSchemas } from '../generated/Share';
 import { schemas as dataConnectorsSchemas } from '../generated/Data_Connectors';
 import { schemas as deepSearchSchemas } from '../generated/Deep_Search';
 import { schemas as querySchemas } from '../generated/Query';
+import { schemas as metadataImportsSchemas } from '../generated/Metadata_Imports';
 
 /**
  * Represents a video file in the Cloudglue system
@@ -668,3 +669,60 @@ export type QuerySchema = z.infer<typeof querySchemas.QuerySchema>;
  * Represents credit usage for a query run
  */
 export type QueryUsage = z.infer<typeof querySchemas.QueryUsage>;
+
+/**
+ * Represents a bulk metadata import definition, with its latest run inline
+ */
+export type MetadataImport = z.infer<
+  typeof metadataImportsSchemas.MetadataImport
+>;
+
+/**
+ * Represents a metadata import definition with one page of its run history
+ */
+export type MetadataImportDetail = z.infer<
+  typeof metadataImportsSchemas.MetadataImportDetail
+>;
+
+/**
+ * Represents a paginated list of a collection's metadata imports
+ */
+export type MetadataImportList = z.infer<
+  typeof metadataImportsSchemas.MetadataImportList
+>;
+
+/**
+ * Represents a single run of a metadata import
+ */
+export type MetadataImportRun = z.infer<
+  typeof metadataImportsSchemas.MetadataImportRun
+>;
+
+/**
+ * Represents progress counters for a metadata import run
+ */
+export type MetadataImportRunProgress = z.infer<
+  typeof metadataImportsSchemas.MetadataImportRunProgress
+>;
+
+/**
+ * Represents one listing pass of a metadata import (date window, title
+ * search, and connector-specific narrowing)
+ */
+export type MetadataImportFilterSet = z.infer<
+  typeof metadataImportsSchemas.MetadataImportFilterSet
+>;
+
+/**
+ * Parameters for creating a metadata import definition
+ */
+export type CreateMetadataImportParams = z.infer<
+  typeof metadataImportsSchemas.CreateMetadataImportRequest
+>;
+
+/**
+ * Per-run overrides when triggering a metadata import run
+ */
+export type CreateMetadataImportRunParams = z.infer<
+  typeof metadataImportsSchemas.CreateMetadataImportRunRequest
+>;

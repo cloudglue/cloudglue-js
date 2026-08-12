@@ -20,6 +20,7 @@ import { createApiClient as createShareableApiClient } from '../generated/Share'
 import { createApiClient as createResponseApiClient } from '../generated/Response';
 import { createApiClient as createDataConnectorsApiClient } from '../generated/Data_Connectors';
 import { createApiClient as createDeepSearchApiClient } from '../generated/Deep_Search';
+import { createApiClient as createMetadataImportsApiClient } from '../generated/Metadata_Imports';
 import { ZodiosOptions } from '@zodios/core';
 import { EnhancedWebhooksApi } from './api/webhooks.api';
 import { EnhancedTagsApi } from './api/tags.api';
@@ -41,6 +42,7 @@ import { EnhancedShareableApi } from './api/shareable.api';
 import { EnhancedResponseApi } from './api/response.api';
 import { EnhancedDataConnectorsApi } from './api/data-connectors.api';
 import { EnhancedDeepSearchApi } from './api/deep-search.api';
+import { EnhancedMetadataImportsApi } from './api/metadata-imports.api';
 
 /**
  * Main Cloudglue client class that provides access to all API functionality
@@ -160,6 +162,12 @@ export class Cloudglue {
    */
   public readonly deepSearch: EnhancedDeepSearchApi;
 
+  /**
+   * Metadata Imports API for bulk-importing data-connector source metadata
+   * into metadata collections (definitions, runs, cancellation)
+   */
+  public readonly metadataImports: EnhancedMetadataImportsApi;
+
   constructor(config: CloudglueConfig = {}) {
     this.apiKey = config.apiKey || process.env.CLOUDGLUE_API_KEY || '';
     this.baseUrl = config.baseUrl || 'https://api.cloudglue.dev/v1';
@@ -223,6 +231,10 @@ export class Cloudglue {
       this.baseUrl,
       sharedConfig,
     );
+    const metadataImportsApi = createMetadataImportsApiClient(
+      this.baseUrl,
+      sharedConfig,
+    );
     // Configure base URL and axios config for all clients
     [
       filesApi,
@@ -244,6 +256,7 @@ export class Cloudglue {
       responseApi,
       dataConnectorsApi,
       deepSearchApi,
+      metadataImportsApi,
     ].forEach((client) => {
       Object.assign(client.axios.defaults, axiosConfig);
 
@@ -312,5 +325,6 @@ export class Cloudglue {
     this.responses = new EnhancedResponseApi(responseApi);
     this.dataConnectors = new EnhancedDataConnectorsApi(dataConnectorsApi);
     this.deepSearch = new EnhancedDeepSearchApi(deepSearchApi);
+    this.metadataImports = new EnhancedMetadataImportsApi(metadataImportsApi);
   }
 }

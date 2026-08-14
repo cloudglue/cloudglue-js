@@ -22,6 +22,7 @@ const job = await client.extract.createExtract(
     enable_segment_level_entities: true,   // per-segment extraction (default behavior)
     enable_video_level_entities: false,    // set true for whole-video extraction instead
     enable_transcript_mode: false,         // set true for transcript-only extraction
+    enable_metadata_mode: false,           // set true to extract from the file's metadata document
     // segmentation_config, segmentation_id, thumbnails_config also available
   }
 );
@@ -62,5 +63,10 @@ await client.extract.deleteExtract(jobId);
 
 - **Segment-level** (`enable_segment_level_entities: true`): Extracts entities per video segment. Each segment produces its own structured output. This is the default.
 - **Video-level** (`enable_video_level_entities: true`): Extracts entities for the entire video as a single output.
+- **Metadata mode** (`enable_metadata_mode: true`): Extracts entities from the file's **metadata document** (filename, file details, user metadata, connector source metadata) instead of the media content. File-level entities only, flat 1 credit per file, and works on metadata-only files (e.g. files in a `metadata` collection) — the media itself is never processed.
 
-These modes are mutually exclusive — set one to `true` and the other to `false`.
+Segment-level and video-level are mutually exclusive — set one to `true` and the other to `false`.
+
+## Query Extracted Data
+
+Once files have completed extractions, run SQL or natural-language queries over the results with the [Query API](./query.md) (`client.query`).

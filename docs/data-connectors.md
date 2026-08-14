@@ -4,7 +4,7 @@ Browse files available in connected external data sources and sync them into Clo
 
 ## Supported Connectors
 
-S3, Google Cloud Storage (GCS), Dropbox, Google Drive, Zoom, Gong, Recall, Grain
+S3, Google Cloud Storage (GCS), Dropbox, Google Drive, Zoom, Gong, Recall, Grain, Iconik
 
 ## List Connectors
 
@@ -22,17 +22,19 @@ const files = await client.dataConnectors.listFiles(connectorId, {
   from: '2025-01-01',           // YYYY-MM-DD format
   to: '2025-06-01',
   // Provider-specific filters:
-  folder_id: 'folder_123',    // Google Drive, Dropbox
-  path: '/recordings/',        // path-based sources
-  bucket: 'my-bucket',        // S3, GCS
+  folder_id: 'folder_123',    // Google Drive
+  path: '/recordings/',        // Dropbox (folder path, default root)
+  bucket: 'my-bucket',        // S3, GCS (required for these)
   prefix: 'videos/',          // S3, GCS
-  title_search: 'video-title', // Grain
+  title_search: 'video-title', // Grain, Zoom, Google Drive, Dropbox, Gong, Iconik
   team: 'team-name',           // Grain
   meeting_type: 'type-123'     // Grain
 });
 ```
 
-Each returned file has a `uri` (null for folders). These URIs are the canonical input for syncing — pass them verbatim to `syncFile()`/`syncUrl()`, or to general ingestion methods like `client.collections.addMediaByUrl()` or `client.describe.createDescribe()`.
+The `from`/`to` date filters are supported by Grain, Zoom, Recall, Google Drive, Dropbox, Gong, and Iconik (Zoom and Gong default to a 6-month lookback when omitted); they're ignored for S3/GCS. Filters a connector can't honor are silently ignored, and a filtered page may contain fewer than `limit` items (even zero) while `has_more` is still true — keep paginating until `next_page_token` is null.
+
+Each returned file has a `uri` (null for folders), per-file provider `metadata` (participants, hosts, durations, AI summaries), and an ephemeral `thumbnail_url` where the provider offers one. These URIs are the canonical input for syncing — pass them verbatim to `syncFile()`/`syncUrl()`, or to general ingestion methods like `client.collections.addMediaByUrl()` or `client.describe.createDescribe()`.
 
 ## Sync a File
 
@@ -61,6 +63,7 @@ Each connector type accepts URIs in the form emitted by `listFiles()`:
 | `grain` | `grain://recording/<recordingId>` |
 | `gong` | `gong://call/<callId>` |
 | `recall` | `recall://recording/<recordingId>` |
+| `iconik` | `iconik://asset/<assetId>` |
 
 `dropbox://` path parsing is tolerant: any leading-slash count and %-encoding spellings of the same path resolve — and dedupe — to the same file.
 
@@ -83,7 +86,7 @@ URLs that cannot map to any connector type — generic http(s) video URLs, YouTu
 
 ## Get Source Metadata
 
-Fetch metadata for a connector URI from the upstream source without creating a Cloudglue file. Currently supported for Grain; other connector types return 501.
+Fetch metadata for a connector URI from the upstream source without creating a Cloudglue file. Supported for Grain, Zoom, Recall, Google Drive, Dropbox, Gong, and Iconik; S3/GCS return 501 (plain object stores have no richer metadata).
 
 ```typescript
 const metadata = await client.dataConnectors.getSourceMetadata(
@@ -91,3 +94,5 @@ const metadata = await client.dataConnectors.getSourceMetadata(
   'grain://recording/<recordingId>',
 );
 ```
+
+Synced connector files carry the same provider metadata on their `source_metadata` field. To re-fetch it live for an existing file (and re-index any metadata collections it belongs to), use `client.files.syncSourceMetadata(fileId)` — see [Files](./files.md). To index a connector's metadata at scale without downloading media, see [Metadata Imports](./metadata-imports.md).

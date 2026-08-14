@@ -84,6 +84,14 @@ await client.files.updateFile(fileId, {
 await client.files.deleteFile(fileId);
 ```
 
+## Refresh Source Metadata
+
+For connector-backed files (google-drive, dropbox, zoom, gong, recall, grain, iconik), re-fetch `source_metadata` live from the data connector and update the stored value. If the file belongs to any metadata collections, their search documents are re-indexed with the refreshed metadata. Works for both metadata-only and fully ingested connector files; free — no media is downloaded or processed.
+
+```typescript
+const refreshed = await client.files.syncSourceMetadata(fileId);
+```
+
 ## File Segments & Segmentations
 
 ```typescript

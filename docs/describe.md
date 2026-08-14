@@ -25,9 +25,12 @@ const job = await client.describe.createDescribe(
     },
     // thumbnails_config: { ... },
     // segmentation_id: 'existing_seg_id',  // use existing segmentation
+    // participants: [{ name: 'Ada Lovelace' }, { name: 'Alan Turing' }],
   }
 );
 ```
+
+**Participants:** pass `participants` to constrain speaker naming — transcript speaker labels will only use one of the given names (or a generic "Speaker N"), never an invented name. Intended for uploaded files, which carry no participant metadata; for data-connector files (e.g. Grain) participants are populated automatically and need not be supplied.
 
 ## Wait for Completion
 
@@ -51,6 +54,7 @@ const describe = await client.describe.getDescribe(jobId, {
   include_word_timestamps: true,
   include_chapters: true,            // requires narrative segmentation on the file
   include_shots: true,               // requires shot_detector segmentation on the file
+  include_metadata: true,            // include file's `metadata` + `source_metadata` on `file`
 });
 ```
 
@@ -63,6 +67,7 @@ const describes = await client.describe.listDescribes({
   include_data: true,
   response_format: 'json',
   modalities: ['speech'],
+  include_metadata: true,   // include each file's `metadata` + `source_metadata`
   limit: 10,
 });
 

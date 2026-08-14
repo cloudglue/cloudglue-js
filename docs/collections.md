@@ -8,8 +8,9 @@ Collections group videos together for batch processing and querying (chat, searc
 |------|-------------|----------|
 | `media-descriptions` | Full multimodal (speech + visual + scene text + audio) | Chat, Search, Responses, Deep Search |
 | `rich-transcripts` | Speech-focused with visual context | Chat, Search, Deep Search |
-| `entities` | Structured extracted data | Responses API (entity-backed with nimbus-002-preview) |
+| `entities` | Structured extracted data | Query API (SQL), Search & Deep Search (file scope, `doc_lexical`), Responses API (entity-backed with nimbus-002-preview) |
 | `face-analysis` | Face detection data | Face-specific queries |
+| `metadata` | Connector source metadata + user metadata indexed into file-level search docs — no media download or processing, free to index | Search & Deep Search (file scope, `doc_lexical`), metadata-mode extraction |
 
 ## Create a Collection
 
@@ -21,8 +22,20 @@ const collection = await client.collections.createCollection({
   // default_segmentation_config: { strategy: 'shot-detector' },
   // describe_config: { enable_speech: true, enable_visual_scene_description: true },
   // default_thumbnails_config: { ... },
+  // For 'entities' collections:
+  // extract_config: { prompt, schema, enable_video_level_entities,
+  //                   enable_segment_level_entities, enable_transcript_mode,
+  //                   enable_metadata_mode },
 });
 ```
+
+Only provide the config that matches the `collection_type` — other configs are ignored.
+
+## Metadata Collections
+
+`collection_type: 'metadata'` indexes connector source metadata and user metadata into file-level search documents **without downloading or processing the media**. Indexing is free. Supported sources: google-drive, dropbox, zoom, gong, recall, grain, and iconik URLs. No processing configs are accepted.
+
+Populate one via `addMedia` with connector-synced files, or in bulk with the [Metadata Imports API](./metadata-imports.md) (`client.metadataImports`). Query with search/deep search at `file` scope (the `doc_lexical` modality matches the metadata docs), or run metadata-mode extraction over the files (see [Extract](./extract.md)). Refresh a single file's source metadata — and re-index its documents — with `client.files.syncSourceMetadata(fileId)`.
 
 ## Add Videos
 
@@ -91,6 +104,7 @@ const descriptions = await client.collections.getMediaDescriptions(collectionId,
   include_thumbnails: true,
   include_word_timestamps: true,
   include_chapters: true,            // requires narrative segmentation
+  include_metadata: true,            // include file's `metadata` + `source_metadata` on `file`
 });
 
 // Get transcripts (for 'rich-transcripts' type)
@@ -101,6 +115,7 @@ const transcripts = await client.collections.getTranscripts(collectionId, fileId
 });
 
 // List all entities/descriptions/transcripts across a collection
+// (description/transcript listings also accept include_metadata)
 const allEntities = await client.collections.listEntities(collectionId, { limit: 50 });
 const allDescriptions = await client.collections.listMediaDescriptions(collectionId, { limit: 50 });
 const allTranscripts = await client.collections.listRichTranscripts(collectionId, { limit: 50 });

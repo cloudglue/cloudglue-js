@@ -8,13 +8,15 @@ Cloudglue turns video into LLM-ready data. This SDK (`@cloudglue/cloudglue-js`) 
 Files (upload video/audio/image, media URL, data connector URI)
   → Processing (describe, extract, face detection)
     → Collections (group processed files)
-      → Querying (chat, search, deep search, responses API)
+      → Querying (chat, search, deep search, responses API, SQL query)
 ```
 
 1. **Upload** a video, audio, or image file, provide a URL, or provide a data connector URI
 2. **Process** it with describe (multimodal descriptions) or extract (structured data)
 3. **Organize** files into collections
-4. **Query** collections via chat, search, deep search, or the Responses API
+4. **Query** collections via chat, search, deep search, the Responses API, or SQL/natural-language queries over extracted data
+
+Collections of type `metadata` skip step 2: they index connector source metadata + user metadata into searchable file-level documents without downloading or processing the media — see [Collections](./collections.md) and [Metadata Imports](./metadata-imports.md).
 
 ## SDK Architecture
 
@@ -36,10 +38,11 @@ The SDK also exports standalone URL helpers (`classifyVideoUrl`, `normalizeVideo
 
 | Namespace | Purpose | Key Methods |
 |-----------|---------|-------------|
-| `client.files` | Upload & manage video, audio & image files | `uploadFile`, `syncFromUrl`, `listFiles`, `getFile`, `deleteFile`, `waitForReady` |
+| `client.files` | Upload & manage video, audio & image files | `uploadFile`, `syncFromUrl`, `syncSourceMetadata`, `listFiles`, `getFile`, `deleteFile`, `waitForReady` |
 | `client.collections` | Organize videos into groups | `createCollection`, `addMedia`, `listVideos`, `waitForReady` |
 | `client.describe` | Multimodal video descriptions | `createDescribe`, `getDescribe`, `waitForReady` |
 | `client.extract` | Structured data extraction | `createExtract`, `getExtract`, `waitForReady` |
+| `client.query` | SQL / natural-language queries over extracted data | `runQuery`, `getQuerySchema`, `listQueries`, `getQuery`, `waitForReady` |
 | `client.chat` | Chat over video collections | `createCompletion`, `getCompletion` |
 | `client.responses` | OpenAI-compatible Responses API | `createResponse`, `createStreamingResponse`, `waitForReady` |
 | `client.search` | Semantic search | `searchContent` |
@@ -50,6 +53,7 @@ The SDK also exports standalone URL helpers (`classifyVideoUrl`, `normalizeVideo
 | `client.faceDetection` | Detect faces in video | `createFaceDetection`, `waitForReady` |
 | `client.faceMatch` | Match faces across videos | `createFaceMatch`, `waitForReady` |
 | `client.dataConnectors` | Browse & sync connected data sources | `list`, `listFiles`, `syncFile`, `syncUrl`, `getSourceMetadata` |
+| `client.metadataImports` | Bulk-import connector source metadata into metadata collections | `createMetadataImport`, `listMetadataImports`, `createMetadataImportRun` |
 | `client.webhooks` | Event notifications | CRUD operations |
 | `client.tags` | Video tagging | CRUD operations |
 | `client.shareable` | Public sharing links | CRUD operations |

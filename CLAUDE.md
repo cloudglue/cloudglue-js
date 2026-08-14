@@ -33,7 +33,7 @@ npm run generate             # Regenerate clients
 **Layered SDK Pattern:**
 - `/generated/` - Auto-generated Zodios API clients from OpenAPI spec (do not edit manually)
 - `/src/api/` - Enhanced wrapper classes providing user-friendly interfaces over generated clients
-- `/src/client.ts` - Main `Cloudglue` class that orchestrates all 15 API clients
+- `/src/client.ts` - Main `Cloudglue` class that orchestrates all 20 API clients
 - `/src/index.ts` - Public exports
 
 **Code Generation Pipeline:**
@@ -50,12 +50,17 @@ npm run generate             # Regenerate clients
 ## API Surface
 
 The `Cloudglue` client exposes these API namespaces:
-- `files` - Upload, list, delete video files; manage segmentation
-- `collections` - Group videos for chat/search
+- `files` - Upload, list, delete video/audio/image files; sync from URL; refresh source metadata; manage segmentation
+- `collections` - Group videos for chat/search (types: media-descriptions, rich-transcripts, entities, face-analysis, metadata)
 - `chat` - LLM chat completions over video collections (model: nimbus-001)
+- `responses` - OpenAI-compatible Responses API (streaming, background jobs, tools)
 - `describe` - Rich video descriptions (visual, speech, text, audio modalities)
 - `extract` - Structured data extraction from videos
+- `query` - SQL / natural-language queries over extracted collection data
 - `search` - Semantic search across collections
+- `deepSearch` - Agentic retrieval with LLM summarization
+- `dataConnectors` - Browse & sync connected data sources (S3, GCS, Dropbox, Google Drive, Zoom, Gong, Recall, Grain, Iconik)
+- `metadataImports` - Bulk-import connector source metadata into metadata collections
 - `segments`, `segmentations` - Video segment management
 - `frames` - Frame extraction
 - `faceDetection`, `faceMatch` - Face recognition features

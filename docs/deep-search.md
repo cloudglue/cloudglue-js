@@ -25,7 +25,11 @@ const result = await client.deepSearch.createDeepSearch({
 Same as the Responses API:
 
 ```typescript
-// Collections
+// Collections — may be of type media-descriptions, rich-transcripts,
+// metadata, or entities. With an explicit scope, every collection must be
+// searchable at that scope (metadata and file-level entities collections
+// require 'file'; segment-level entities collections require 'segment');
+// omit scope to let the planner pick per collection.
 { source: 'collections', collections: ['col_id'], filter: { /* optional */ } }
 
 // Individual files

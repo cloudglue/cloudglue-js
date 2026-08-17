@@ -198,6 +198,11 @@ const endpoints = makeApi([
         schema: z.string().optional(),
       },
       {
+        name: 'recursive',
+        type: 'Query',
+        schema: z.enum(['true', 'false']).optional(),
+      },
+      {
         name: 'bucket',
         type: 'Query',
         schema: z.string().optional(),

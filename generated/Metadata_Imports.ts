@@ -15,6 +15,7 @@ type MetadataImport = Partial<{
   latest_run: MetadataImportRun | null;
   max_files: number | null;
   include_thumbnails: boolean;
+  enrich_metadata: boolean;
 }>;
 type CreateMetadataImportRequest = {
   name: string;
@@ -26,6 +27,7 @@ type CreateMetadataImportRequest = {
   start?: boolean | undefined;
   max_files?: number | undefined;
   include_thumbnails?: boolean | undefined;
+  enrich_metadata?: boolean | undefined;
 };
 type MetadataImportFilterSet = Partial<{
   from: string;
@@ -35,6 +37,7 @@ type MetadataImportFilterSet = Partial<{
   title_search: string;
   team: string;
   meeting_type: string;
+  recursive: 'true' | 'false';
 }>;
 type MetadataImportRun = Partial<{
   object: 'metadata_import_run';
@@ -50,6 +53,7 @@ type MetadataImportRun = Partial<{
   created_at: number;
   max_files: number | null;
   include_thumbnails: boolean;
+  enrich_metadata: boolean;
 }>;
 type MetadataImportRunProgress = Partial<{
   pages_listed: number;
@@ -61,6 +65,7 @@ type MetadataImportRunProgress = Partial<{
   files_queued: number;
   files_indexed: number;
   files_removed: number;
+  files_enriched: number;
 }>;
 type MetadataImportList = Partial<{
   object: 'list';
@@ -86,6 +91,7 @@ type MetadataImportDetail = Partial<{
   offset: number;
   max_files: number | null;
   include_thumbnails: boolean;
+  enrich_metadata: boolean;
 }>;
 
 const MetadataImportRunProgress: z.ZodType<MetadataImportRunProgress> = z
@@ -99,6 +105,7 @@ const MetadataImportRunProgress: z.ZodType<MetadataImportRunProgress> = z
     files_queued: z.number().int(),
     files_indexed: z.number().int(),
     files_removed: z.number().int(),
+    files_enriched: z.number().int(),
   })
   .partial()
   .strict()
@@ -124,6 +131,7 @@ const MetadataImportRun: z.ZodType<MetadataImportRun> = z
     created_at: z.number(),
     max_files: z.number().int().nullable(),
     include_thumbnails: z.boolean(),
+    enrich_metadata: z.boolean(),
   })
   .partial()
   .strict()
@@ -137,6 +145,7 @@ const MetadataImportFilterSet: z.ZodType<MetadataImportFilterSet> = z
     title_search: z.string(),
     team: z.string(),
     meeting_type: z.string(),
+    recursive: z.enum(['true', 'false']),
   })
   .partial()
   .strict();
@@ -155,6 +164,7 @@ const MetadataImport: z.ZodType<MetadataImport> = z
     latest_run: MetadataImportRun.nullable(),
     max_files: z.number().int().nullable(),
     include_thumbnails: z.boolean(),
+    enrich_metadata: z.boolean(),
   })
   .partial()
   .strict()
@@ -177,6 +187,7 @@ const MetadataImportDetail: z.ZodType<MetadataImportDetail> = z
     offset: z.number().int(),
     max_files: z.number().int().nullable(),
     include_thumbnails: z.boolean(),
+    enrich_metadata: z.boolean(),
   })
   .partial()
   .strict()
@@ -203,6 +214,7 @@ const CreateMetadataImportRequest: z.ZodType<CreateMetadataImportRequest> = z
     start: z.boolean().optional(),
     max_files: z.number().int().gte(1).lte(1000000).optional(),
     include_thumbnails: z.boolean().optional(),
+    enrich_metadata: z.boolean().optional(),
   })
   .strict()
   .passthrough();
@@ -221,6 +233,7 @@ const CreateMetadataImportRunRequest = z
     delete_missing: z.boolean(),
     max_files: z.number().int().gte(1).lte(1000000),
     include_thumbnails: z.boolean(),
+    enrich_metadata: z.boolean(),
   })
   .partial()
   .strict()

@@ -25,12 +25,20 @@ export class EnhancedMetadataImportsApi {
    * account has none.
    *
    * Filters are listing passes — `from`/`to` date window (YYYY-MM-DD, UTC),
-   * `title_search`, `folder_id` (Google Drive only), `path` (Dropbox only —
-   * non-recursive, direct children), `team`/`meeting_type` (Grain only).
-   * Empty or omitted means one unfiltered pass; overlapping passes are
-   * deduplicated. `max_files` caps each run (a capped run never runs the
-   * delete-missing sweep); `rate_limit` overrides the per-connector safe
-   * listing rate and is clamped to a per-connector ceiling at run time.
+   * `title_search`, `folder_id` (Google Drive only), `path` and `recursive`
+   * (Dropbox only — `path` lists direct children, `recursive: 'true'` lists
+   * the whole subtree under it), `team`/`meeting_type` (Grain only). Empty or
+   * omitted means one unfiltered pass; overlapping passes are deduplicated.
+   * `max_files` caps each run (a capped run never runs the delete-missing
+   * sweep); `rate_limit` overrides the per-connector safe listing rate and is
+   * clamped to a per-connector ceiling at run time.
+   *
+   * `enrich_metadata` (off by default) backfills source-metadata fields the
+   * connector's list endpoint omits, after each index batch settles: Gong
+   * parties + Call Spotlight content (batched — enriched docs are re-embedded
+   * so the content is searchable) and Dropbox `media_info` duration and
+   * dimensions (per-file). It is a no-op for other connectors, and costs
+   * upstream API budget plus, for Gong, embedding work.
    *
    * @param collectionId - The ID of the metadata collection
    * @param params - The import definition (name + connector_id required)
@@ -96,10 +104,10 @@ export class EnhancedMetadataImportsApi {
 
   /**
    * Trigger a new run of a saved import. `mode` and `delete_missing`
-   * default to the definition's saved values; `max_files` and
-   * `include_thumbnails` can be overridden per run. Only one run may be
-   * active per collection at a time — triggering while any run in the
-   * collection is active fails with a 409.
+   * default to the definition's saved values; `max_files`,
+   * `include_thumbnails`, and `enrich_metadata` can be overridden per run.
+   * Only one run may be active per collection at a time — triggering while
+   * any run in the collection is active fails with a 409.
    *
    * @param collectionId - The ID of the metadata collection
    * @param importId - The ID of the metadata import

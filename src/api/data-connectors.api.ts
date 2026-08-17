@@ -29,6 +29,13 @@ export interface ListDataConnectorFilesParams {
   folder_id?: string;
   /** Folder path to list contents of, default root (Dropbox) */
   path?: string;
+  /**
+   * Dropbox only: `'true'` lists the whole subtree under `path` (or the whole
+   * account when no `path` is given) instead of its direct children. Ignored
+   * by every other connector. Built for bulk metadata imports; interactive
+   * browsing should stay non-recursive.
+   */
+  recursive?: 'true' | 'false';
   /** Filter by bucket name — required for S3 and GCS */
   bucket?: string;
   /** Filter by key prefix (S3, GCS) */

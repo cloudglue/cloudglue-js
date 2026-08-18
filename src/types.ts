@@ -30,7 +30,7 @@ import { schemas as shareableSchemas } from '../generated/Share';
 import { schemas as dataConnectorsSchemas } from '../generated/Data_Connectors';
 import { schemas as deepSearchSchemas } from '../generated/Deep_Search';
 import { schemas as querySchemas } from '../generated/Query';
-import { schemas as metadataImportsSchemas } from '../generated/Metadata_Imports';
+import { schemas as bulkImportsSchemas } from '../generated/Bulk_Imports';
 
 /**
  * Represents a video file in the Cloudglue system
@@ -674,35 +674,35 @@ export type QueryUsage = z.infer<typeof querySchemas.QueryUsage>;
  * Represents a bulk metadata import definition, with its latest run inline
  */
 export type MetadataImport = z.infer<
-  typeof metadataImportsSchemas.MetadataImport
+  typeof bulkImportsSchemas.MetadataImport
 >;
 
 /**
  * Represents a metadata import definition with one page of its run history
  */
 export type MetadataImportDetail = z.infer<
-  typeof metadataImportsSchemas.MetadataImportDetail
+  typeof bulkImportsSchemas.MetadataImportDetail
 >;
 
 /**
  * Represents a paginated list of a collection's metadata imports
  */
 export type MetadataImportList = z.infer<
-  typeof metadataImportsSchemas.MetadataImportList
+  typeof bulkImportsSchemas.MetadataImportList
 >;
 
 /**
  * Represents a single run of a metadata import
  */
 export type MetadataImportRun = z.infer<
-  typeof metadataImportsSchemas.MetadataImportRun
+  typeof bulkImportsSchemas.MetadataImportRun
 >;
 
 /**
  * Represents progress counters for a metadata import run
  */
 export type MetadataImportRunProgress = z.infer<
-  typeof metadataImportsSchemas.MetadataImportRunProgress
+  typeof bulkImportsSchemas.MetadataImportRunProgress
 >;
 
 /**
@@ -710,19 +710,19 @@ export type MetadataImportRunProgress = z.infer<
  * search, and connector-specific narrowing)
  */
 export type MetadataImportFilterSet = z.infer<
-  typeof metadataImportsSchemas.MetadataImportFilterSet
+  typeof bulkImportsSchemas.MetadataImportFilterSet
 >;
 
 /**
  * Parameters for creating a metadata import definition
  */
 export type CreateMetadataImportParams = z.infer<
-  typeof metadataImportsSchemas.CreateMetadataImportRequest
+  typeof bulkImportsSchemas.CreateMetadataImportRequest
 >;
 
 /**
  * Per-run overrides when triggering a metadata import run
  */
 export type CreateMetadataImportRunParams = z.infer<
-  typeof metadataImportsSchemas.CreateMetadataImportRunRequest
+  typeof bulkImportsSchemas.CreateMetadataImportRunRequest
 >;

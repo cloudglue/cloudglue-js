@@ -16,5 +16,5 @@ export { SegmentsApi } from './Segments';
 export { Face_MatchApi } from './Face_Match';
 export { Face_DetectionApi } from './Face_Detection';
 export { ShareApi } from './Share';
-export { Metadata_ImportsApi } from './Metadata_Imports';
+export { Bulk_ImportsApi } from './Bulk_Imports';
 export { QueryApi } from './Query';

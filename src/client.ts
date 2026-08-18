@@ -20,7 +20,7 @@ import { createApiClient as createShareableApiClient } from '../generated/Share'
 import { createApiClient as createResponseApiClient } from '../generated/Response';
 import { createApiClient as createDataConnectorsApiClient } from '../generated/Data_Connectors';
 import { createApiClient as createDeepSearchApiClient } from '../generated/Deep_Search';
-import { createApiClient as createMetadataImportsApiClient } from '../generated/Metadata_Imports';
+import { createApiClient as createBulkImportsApiClient } from '../generated/Bulk_Imports';
 import { ZodiosOptions } from '@zodios/core';
 import { EnhancedWebhooksApi } from './api/webhooks.api';
 import { EnhancedTagsApi } from './api/tags.api';
@@ -42,7 +42,7 @@ import { EnhancedShareableApi } from './api/shareable.api';
 import { EnhancedResponseApi } from './api/response.api';
 import { EnhancedDataConnectorsApi } from './api/data-connectors.api';
 import { EnhancedDeepSearchApi } from './api/deep-search.api';
-import { EnhancedMetadataImportsApi } from './api/metadata-imports.api';
+import { EnhancedBulkImportsApi } from './api/bulk-imports.api';
 
 /**
  * Main Cloudglue client class that provides access to all API functionality
@@ -163,10 +163,19 @@ export class Cloudglue {
   public readonly deepSearch: EnhancedDeepSearchApi;
 
   /**
-   * Metadata Imports API for bulk-importing data-connector source metadata
-   * into metadata collections (definitions, runs, cancellation)
+   * Bulk Imports API for batch-importing a data connector's source files
+   * into a collection (definitions, runs, cancellation). Metadata
+   * collections import source metadata only; every other collection type
+   * imports and processes the media itself.
    */
-  public readonly metadataImports: EnhancedMetadataImportsApi;
+  public readonly bulkImports: EnhancedBulkImportsApi;
+
+  /**
+   * @deprecated Renamed to `bulkImports` in spec v0.7.21, when bulk imports
+   * grew beyond metadata collections. This property still works and refers
+   * to the same instance.
+   */
+  public readonly metadataImports: EnhancedBulkImportsApi;
 
   constructor(config: CloudglueConfig = {}) {
     this.apiKey = config.apiKey || process.env.CLOUDGLUE_API_KEY || '';
@@ -231,7 +240,7 @@ export class Cloudglue {
       this.baseUrl,
       sharedConfig,
     );
-    const metadataImportsApi = createMetadataImportsApiClient(
+    const bulkImportsApi = createBulkImportsApiClient(
       this.baseUrl,
       sharedConfig,
     );
@@ -256,7 +265,7 @@ export class Cloudglue {
       responseApi,
       dataConnectorsApi,
       deepSearchApi,
-      metadataImportsApi,
+      bulkImportsApi,
     ].forEach((client) => {
       Object.assign(client.axios.defaults, axiosConfig);
 
@@ -325,6 +334,7 @@ export class Cloudglue {
     this.responses = new EnhancedResponseApi(responseApi);
     this.dataConnectors = new EnhancedDataConnectorsApi(dataConnectorsApi);
     this.deepSearch = new EnhancedDeepSearchApi(deepSearchApi);
-    this.metadataImports = new EnhancedMetadataImportsApi(metadataImportsApi);
+    this.bulkImports = new EnhancedBulkImportsApi(bulkImportsApi);
+    this.metadataImports = this.bulkImports;
   }
 }

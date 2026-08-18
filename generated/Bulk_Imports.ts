@@ -6,6 +6,7 @@ type MetadataImport = Partial<{
   id: string;
   collection_id: string;
   connector_id: string;
+  import_type: 'metadata' | 'media';
   name: string;
   filters: Array<MetadataImportFilterSet>;
   default_mode: 'append' | 'refresh';
@@ -43,6 +44,7 @@ type MetadataImportRun = Partial<{
   object: 'metadata_import_run';
   id: string;
   import_id: string;
+  import_type: 'metadata' | 'media';
   mode: 'append' | 'refresh';
   delete_missing: boolean;
   status: 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled';
@@ -64,6 +66,7 @@ type MetadataImportRunProgress = Partial<{
   files_failed: number;
   files_queued: number;
   files_indexed: number;
+  files_imported: number;
   files_removed: number;
   files_enriched: number;
 }>;
@@ -79,6 +82,7 @@ type MetadataImportDetail = Partial<{
   id: string;
   collection_id: string;
   connector_id: string;
+  import_type: 'metadata' | 'media';
   name: string;
   filters: Array<MetadataImportFilterSet>;
   default_mode: 'append' | 'refresh';
@@ -104,6 +108,7 @@ const MetadataImportRunProgress: z.ZodType<MetadataImportRunProgress> = z
     files_failed: z.number().int(),
     files_queued: z.number().int(),
     files_indexed: z.number().int(),
+    files_imported: z.number().int(),
     files_removed: z.number().int(),
     files_enriched: z.number().int(),
   })
@@ -115,6 +120,7 @@ const MetadataImportRun: z.ZodType<MetadataImportRun> = z
     object: z.literal('metadata_import_run'),
     id: z.string().uuid(),
     import_id: z.string().uuid(),
+    import_type: z.enum(['metadata', 'media']),
     mode: z.enum(['append', 'refresh']),
     delete_missing: z.boolean(),
     status: z.enum([
@@ -155,6 +161,7 @@ const MetadataImport: z.ZodType<MetadataImport> = z
     id: z.string().uuid(),
     collection_id: z.string().uuid(),
     connector_id: z.string().uuid(),
+    import_type: z.enum(['metadata', 'media']),
     name: z.string(),
     filters: z.array(MetadataImportFilterSet),
     default_mode: z.enum(['append', 'refresh']),
@@ -175,6 +182,7 @@ const MetadataImportDetail: z.ZodType<MetadataImportDetail> = z
     id: z.string().uuid(),
     collection_id: z.string().uuid(),
     connector_id: z.string().uuid(),
+    import_type: z.enum(['metadata', 'media']),
     name: z.string(),
     filters: z.array(MetadataImportFilterSet),
     default_mode: z.enum(['append', 'refresh']),
@@ -256,7 +264,7 @@ const endpoints = makeApi([
     method: 'post',
     path: '/collections/:collection_id/imports',
     alias: 'createMetadataImport',
-    description: `Create a bulk metadata import for a metadata collection: a saved definition that lists a data connector&#x27;s source files and imports each one&#x27;s source metadata as a collection file, with no media download or processing. Runs consume no credits. By default the first run starts immediately (&#x60;start: false&#x60; saves the definition only). The response&#x27;s &#x60;latest_run&#x60; is the triggered run; it is null when &#x60;start&#x60; is false or when another import&#x27;s run currently holds the one-active-run-per-collection slot (the definition is saved and can be run once that finishes), and it is returned with status &#x60;failed&#x60; when the run could not be enqueued (trigger a new run to retry). Runs page the connector with the account&#x27;s default active API key and fail with a clear error when the account has none.`,
+    description: `Create a bulk import: a saved definition that lists a data connector&#x27;s source files and brings each match into the collection. What a run ingests follows the collection&#x27;s type (see &#x60;import_type&#x60; on the response). For a **metadata collection** it imports each file&#x27;s source metadata as a collection file, with no media download or processing, and runs consume no credits. For **any other collection type** it imports the media itself: each matching file is ingested and processed exactly like a manual add, so it is **billed per file** and counts against the account&#x27;s file usage limits. A media run that exhausts credits or a usage limit stops with a user-facing error and keeps everything it already imported — rerun in &#x60;append&#x60; mode to resume. By default the first run starts immediately (&#x60;start: false&#x60; saves the definition only). The response&#x27;s &#x60;latest_run&#x60; is the triggered run; it is null when &#x60;start&#x60; is false or when another run is already active in the collection (the definition is saved, and can be run once that one finishes), and it is returned with status &#x60;failed&#x60; when the run could not be started (trigger a new run to retry). Runs page the connector — and, for media imports, add each file — with the account&#x27;s default active API key, and fail with a clear error when the account has none.`,
     requestFormat: 'json',
     parameters: [
       {
@@ -274,7 +282,7 @@ const endpoints = makeApi([
     errors: [
       {
         status: 400,
-        description: `Invalid request — the collection is not a metadata collection, the connector does not exist, the connector type does not support metadata imports, or a filter key is not supported by the connector type`,
+        description: `Invalid request — the connector does not exist, the connector type does not support imports, a filter key is not supported by the connector type, or &#x60;include_thumbnails&#x60; or &#x60;enrich_metadata&#x60; was set on a media import (imported media gets real thumbnails from the processing pipeline, and a media run has no metadata-only record to enrich)`,
         schema: z.object({ error: z.string() }).strict().passthrough(),
       },
       {
@@ -404,7 +412,7 @@ const endpoints = makeApi([
     method: 'post',
     path: '/collections/:collection_id/imports/:import_id/runs',
     alias: 'createMetadataImportRun',
-    description: `Trigger a new run of a saved import. &#x60;mode&#x60; and &#x60;delete_missing&#x60; default to the definition&#x27;s saved values. Only one run may be active per collection at a time — concurrent runs would corrupt each other&#x27;s delete-missing bookkeeping — so triggering while any run in the collection is active returns a 409.`,
+    description: `Trigger a new run of a saved import. &#x60;mode&#x60; and &#x60;delete_missing&#x60; default to the definition&#x27;s saved values. Only one run may be active per collection at a time, so triggering while any run in the collection is active returns a 409. Rerunning is also how a media import resumes after it stopped on exhausted credits or a usage limit: an &#x60;append&#x60; run skips files it already imported and retries the rest.`,
     requestFormat: 'json',
     parameters: [
       {
@@ -425,6 +433,11 @@ const endpoints = makeApi([
     ],
     response: MetadataImportRun,
     errors: [
+      {
+        status: 400,
+        description: `Invalid request — &#x60;include_thumbnails&#x60; or &#x60;enrich_metadata&#x60; was set on a media import (imported media gets real thumbnails from the processing pipeline, and a media run has no metadata-only record to enrich)`,
+        schema: z.object({ error: z.string() }).strict().passthrough(),
+      },
       {
         status: 404,
         description: `Collection or import not found`,
@@ -481,7 +494,7 @@ const endpoints = makeApi([
   },
 ]);
 
-export const Metadata_ImportsApi = new Zodios(
+export const Bulk_ImportsApi = new Zodios(
   'https://api.cloudglue.dev/v1',
   endpoints
 );

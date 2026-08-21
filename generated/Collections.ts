@@ -372,24 +372,22 @@ type AddCollectionFile = (
   }>;
 type CollectionMomentsList = {
   moments: Array<
-    Moment &
-      Partial<{
-        file_id: string;
-        job_id: string;
-        criterion_name: string;
-      }>
+    Moment & {
+      file_id: string;
+      job_id: string;
+      criterion_name: string;
+    }
   >;
   total: number;
   next_cursor?: string | undefined;
 };
 type CollectionMomentFindingsList = {
   findings: Array<
-    MomentFinding &
-      Partial<{
-        file_id: string;
-        job_id: string;
-        criterion_name: string;
-      }>
+    MomentFinding & {
+      file_id: string;
+      job_id: string;
+      criterion_name: string;
+    }
   >;
   total: number;
   next_cursor?: string | undefined;
@@ -899,7 +897,6 @@ const CollectionMomentsList: z.ZodType<CollectionMomentsList> = z
             job_id: z.string().uuid(),
             criterion_name: z.string(),
           })
-          .partial()
           .strict()
           .passthrough()
       )
@@ -919,7 +916,6 @@ const CollectionMomentFindingsList: z.ZodType<CollectionMomentFindingsList> = z
             job_id: z.string().uuid(),
             criterion_name: z.string(),
           })
-          .partial()
           .strict()
           .passthrough()
       )

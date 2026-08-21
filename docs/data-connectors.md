@@ -24,6 +24,7 @@ const files = await client.dataConnectors.listFiles(connectorId, {
   // Provider-specific filters:
   folder_id: 'folder_123',    // Google Drive
   path: '/recordings/',        // Dropbox (folder path, default root)
+  recursive: 'true',          // Dropbox only: whole subtree under `path` (string, not boolean)
   bucket: 'my-bucket',        // S3, GCS (required for these)
   prefix: 'videos/',          // S3, GCS
   title_search: 'video-title', // Grain, Zoom, Google Drive, Dropbox, Gong, Iconik
@@ -95,4 +96,4 @@ const metadata = await client.dataConnectors.getSourceMetadata(
 );
 ```
 
-Synced connector files carry the same provider metadata on their `source_metadata` field. To re-fetch it live for an existing file (and re-index any metadata collections it belongs to), use `client.files.syncSourceMetadata(fileId)` — see [Files](./files.md). To index a connector's metadata at scale without downloading media, see [Metadata Imports](./metadata-imports.md).
+Synced connector files carry the same provider metadata on their `source_metadata` field. To re-fetch it live for an existing file (and re-index any metadata collections it belongs to), use `client.files.syncSourceMetadata(fileId)` — see [Files](./files.md). To bring a connector's files into a collection at scale — metadata only, or the media itself — see [Bulk Imports](./bulk-imports.md).

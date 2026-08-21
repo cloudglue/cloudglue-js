@@ -16,7 +16,7 @@ Files (upload video/audio/image, media URL, data connector URI)
 3. **Organize** files into collections
 4. **Query** collections via chat, search, deep search, the Responses API, or SQL/natural-language queries over extracted data
 
-Collections of type `metadata` skip step 2: they index connector source metadata + user metadata into searchable file-level documents without downloading or processing the media — see [Collections](./collections.md) and [Metadata Imports](./metadata-imports.md).
+Collections of type `metadata` skip step 2: they index connector source metadata + user metadata into searchable file-level documents without downloading or processing the media — see [Collections](./collections.md) and [Bulk Imports](./bulk-imports.md).
 
 ## SDK Architecture
 
@@ -53,7 +53,7 @@ The SDK also exports standalone URL helpers (`classifyVideoUrl`, `normalizeVideo
 | `client.faceDetection` | Detect faces in video | `createFaceDetection`, `waitForReady` |
 | `client.faceMatch` | Match faces across videos | `createFaceMatch`, `waitForReady` |
 | `client.dataConnectors` | Browse & sync connected data sources | `list`, `listFiles`, `syncFile`, `syncUrl`, `getSourceMetadata` |
-| `client.metadataImports` | Bulk-import connector source metadata into metadata collections | `createMetadataImport`, `listMetadataImports`, `createMetadataImportRun` |
+| `client.bulkImports` | Batch-import a connector's files into a collection: source metadata only (metadata collections, free) or the media itself (any other type, billed per file) | `createMetadataImport`, `listMetadataImports`, `createMetadataImportRun` |
 | `client.webhooks` | Event notifications | CRUD operations |
 | `client.tags` | Video tagging | CRUD operations |
 | `client.shareable` | Public sharing links | CRUD operations |

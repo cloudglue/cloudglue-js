@@ -9,7 +9,7 @@ import { MomentSchemaDefinition } from './common';
 
 type FindMoments = {
   job_id: string;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
+  status: 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled';
   created_at: number;
   url: string;
   find_moments_config?: {} | undefined;
@@ -87,7 +87,13 @@ const NewFindMoments: z.ZodType<NewFindMoments> = z
 const FindMoments: z.ZodType<FindMoments> = z
   .object({
     job_id: z.string().uuid(),
-    status: z.enum(['pending', 'processing', 'completed', 'failed']),
+    status: z.enum([
+      'pending',
+      'processing',
+      'completed',
+      'failed',
+      'cancelled',
+    ]),
     created_at: z.number().int(),
     url: z.string(),
     find_moments_config: z
@@ -192,7 +198,7 @@ const endpoints = makeApi([
         name: 'status',
         type: 'Query',
         schema: z
-          .enum(['pending', 'processing', 'completed', 'failed'])
+          .enum(['pending', 'processing', 'completed', 'failed', 'cancelled'])
           .optional(),
       },
       {

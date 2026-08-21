@@ -4,11 +4,8 @@ import { CloudglueError } from '../error';
 import { WaitForReadyOptions } from '../types';
 import z from 'zod';
 
-export type FindMomentsStatus =
-  | 'pending'
-  | 'processing'
-  | 'completed'
-  | 'failed';
+/** Derived from the generated schema so it cannot drift from the spec. */
+export type FindMomentsStatus = z.infer<typeof schemas.FindMoments>['status'];
 
 export interface ListFindMomentsParams {
   limit?: number;
@@ -101,30 +98,40 @@ export class EnhancedFindMomentsApi {
   /**
    * Poll a run until it reaches a terminal state.
    *
+   * Read-time shaping (`limit`, `min_score`, `sort`) is merged into the
+   * options object alongside the polling controls, matching the
+   * `waitForReady(id, options)` shape used by every other enhanced API.
+   *
+   * Note the attempt cap defaults to 60 rather than the SDK-wide 36:
+   * moment discovery reads the whole video and routinely runs past three
+   * minutes.
+   *
    * @param jobId - The run id
-   * @param params - Read-time shaping applied to the final fetch
-   * @param options - Polling interval and attempt cap
+   * @param options - Polling controls plus read-time shaping for each fetch
    * @returns The completed run
    * @throws CloudglueError if the run fails or the timeout is reached
    */
   async waitForReady(
     jobId: string,
-    params: GetFindMomentsParams = {},
-    options: WaitForReadyOptions = {},
+    options: WaitForReadyOptions & GetFindMomentsParams = {},
   ) {
-    const { pollingInterval = 5000, maxAttempts = 60 } = options;
+    const {
+      pollingInterval = 5000,
+      maxAttempts = 60,
+      ...readParams
+    } = options;
     let attempts = 0;
 
     while (attempts < maxAttempts) {
-      const run = await this.getFindMoments(jobId, params);
+      const run = await this.getFindMoments(jobId, readParams);
 
-      if (run.status === 'completed') {
+      if (['completed', 'failed', 'cancelled'].includes(run.status)) {
+        if (run.status === 'failed') {
+          throw new CloudglueError(
+            `Find-moments run failed: ${jobId}${run.error ? ` — ${run.error}` : ''}`,
+          );
+        }
         return run;
-      }
-      if (run.status === 'failed') {
-        throw new CloudglueError(
-          `Find-moments run failed: ${jobId}${run.error ? ` — ${run.error}` : ''}`,
-        );
       }
 
       await new Promise((resolve) => setTimeout(resolve, pollingInterval));

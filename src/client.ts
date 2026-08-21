@@ -21,6 +21,7 @@ import { createApiClient as createResponseApiClient } from '../generated/Respons
 import { createApiClient as createDataConnectorsApiClient } from '../generated/Data_Connectors';
 import { createApiClient as createDeepSearchApiClient } from '../generated/Deep_Search';
 import { createApiClient as createBulkImportsApiClient } from '../generated/Bulk_Imports';
+import { createApiClient as createFindMomentsApiClient } from '../generated/Find_Moments';
 import { ZodiosOptions } from '@zodios/core';
 import { EnhancedWebhooksApi } from './api/webhooks.api';
 import { EnhancedTagsApi } from './api/tags.api';
@@ -43,6 +44,7 @@ import { EnhancedResponseApi } from './api/response.api';
 import { EnhancedDataConnectorsApi } from './api/data-connectors.api';
 import { EnhancedDeepSearchApi } from './api/deep-search.api';
 import { EnhancedBulkImportsApi } from './api/bulk-imports.api';
+import { EnhancedFindMomentsApi } from './api/find-moments.api';
 
 /**
  * Main Cloudglue client class that provides access to all API functionality
@@ -177,6 +179,12 @@ export class Cloudglue {
    */
   public readonly metadataImports: EnhancedBulkImportsApi;
 
+  /**
+   * Find Moments API for rubric-driven discovery of moments inside a video
+   * (runs, read-time shaping, deletion)
+   */
+  public readonly findMoments: EnhancedFindMomentsApi;
+
   constructor(config: CloudglueConfig = {}) {
     this.apiKey = config.apiKey || process.env.CLOUDGLUE_API_KEY || '';
     this.baseUrl = config.baseUrl || 'https://api.cloudglue.dev/v1';
@@ -244,6 +252,10 @@ export class Cloudglue {
       this.baseUrl,
       sharedConfig,
     );
+    const findMomentsApi = createFindMomentsApiClient(
+      this.baseUrl,
+      sharedConfig,
+    );
     // Configure base URL and axios config for all clients
     [
       filesApi,
@@ -266,6 +278,7 @@ export class Cloudglue {
       dataConnectorsApi,
       deepSearchApi,
       bulkImportsApi,
+      findMomentsApi,
     ].forEach((client) => {
       Object.assign(client.axios.defaults, axiosConfig);
 
@@ -336,5 +349,6 @@ export class Cloudglue {
     this.deepSearch = new EnhancedDeepSearchApi(deepSearchApi);
     this.bulkImports = new EnhancedBulkImportsApi(bulkImportsApi);
     this.metadataImports = this.bulkImports;
+    this.findMoments = new EnhancedFindMomentsApi(findMomentsApi);
   }
 }

@@ -40,9 +40,38 @@ type ListCollectionParams = {
     | 'rich-transcripts'
     | 'media-descriptions'
     | 'face-analysis'
-    | 'metadata';
+    | 'metadata'
+    | 'moments';
   order?: 'name' | 'created_at';
 } & PaginationParams;
+
+type ListCollectionMomentsParams = {
+  /** Narrow to one criterion by name */
+  criterion_name?: string;
+  /** Narrow to one criterion attachment */
+  attachment_id?: string;
+  /** Narrow to one file */
+  file_id?: string;
+  /** Drop moments whose criterion score is below this value */
+  min_score?: number;
+  /**
+   * `position` (the API default) sorts by `file_id`, then `start_time`.
+   * `criterion_score` and `rank_score` require a single-criterion filter
+   * (`criterion_name` or `attachment_id`).
+   */
+  sort?: 'position' | 'criterion_score' | 'rank_score';
+  limit?: number;
+  cursor?: string;
+};
+
+type ListCollectionMomentFindingsParams = {
+  criterion_name?: string;
+  file_id?: string;
+  /** Narrow to one finding kind */
+  kind?: 'absence' | 'observation';
+  limit?: number;
+  cursor?: string;
+};
 
 type ListCollectionVideosParams = {
   status?: 'pending' | 'processing' | 'completed' | 'failed' | 'not_applicable';
@@ -317,5 +346,82 @@ export class EnhancedCollectionsApi {
     throw new CloudglueError(
       `Timeout waiting for video ${fileId} in collection ${collectionId} to process after ${maxAttempts} attempts`,
     );
+  }
+
+  /**
+   * List moments across a moments collection's current members, with an
+   * exact total.
+   *
+   * Removing a file from the collection drops its moments from this
+   * enumeration; the underlying find-moments runs persist as job history.
+   *
+   * @param collectionId - The ID of the moments collection
+   * @param params - Filters, sort, and cursor pagination
+   */
+  async listCollectionMoments(
+    collectionId: string,
+    params: ListCollectionMomentsParams = {},
+  ) {
+    return this.api.listCollectionMoments({
+      params: { collection_id: collectionId },
+      queries: params,
+    });
+  }
+
+  /**
+   * List findings (the non-temporal counterpart to moments) across a
+   * moments collection's current members.
+   *
+   * @param collectionId - The ID of the moments collection
+   * @param params - Filters and cursor pagination
+   */
+  async listCollectionMomentFindings(
+    collectionId: string,
+    params: ListCollectionMomentFindingsParams = {},
+  ) {
+    return this.api.listCollectionMomentFindings({
+      params: { collection_id: collectionId },
+      queries: params,
+    });
+  }
+
+  /**
+   * Attach a criterion to a moments collection and backfill existing
+   * members.
+   *
+   * The attach response charges nothing (cost header 0); per-file runs
+   * charge as they execute, and a matching prior run satisfies a pair at no
+   * extra execution. Track progress with the attachment's `backfill_status`
+   * and `files_total` / `files_completed` / `files_failed` counters, read
+   * back from `getCollection`'s `moments_config`.
+   *
+   * @param collectionId - The ID of the moments collection
+   * @param params - The criterion plus optional per-attachment run options
+   * @returns The criterion attachment
+   */
+  async createCollectionMomentCriterion(
+    collectionId: string,
+    params: z.infer<typeof collectionsSchemas.NewMomentCriterionAttachment>,
+  ) {
+    return this.api.createCollectionMomentCriterion(params, {
+      params: { collection_id: collectionId },
+    });
+  }
+
+  /**
+   * Detach a criterion from a moments collection. Its moments and findings
+   * leave collection enumeration; the underlying runs persist as job
+   * history.
+   *
+   * @param collectionId - The ID of the moments collection
+   * @param attachmentId - The ID of the criterion attachment
+   */
+  async deleteCollectionMomentCriterion(
+    collectionId: string,
+    attachmentId: string,
+  ) {
+    return this.api.deleteCollectionMomentCriterion(undefined, {
+      params: { collection_id: collectionId, attachment_id: attachmentId },
+    });
   }
 }

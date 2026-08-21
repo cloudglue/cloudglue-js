@@ -421,6 +421,23 @@ export type IconikSourceMetadata = {
   created_by_user?: (string | null) | undefined;
   iconik_metadata?: ({} | null) | undefined;
 };
+export type MomentCriterion = {
+  name: string;
+  instructions: string;
+  moment_schema?: MomentSchemaDefinition | undefined;
+  finding_schema?: MomentSchemaDefinition | undefined;
+  anchors?: {} | undefined;
+  scoring?:
+    | {
+        key: string;
+        min: number;
+        max: number;
+        higher_is_better?: boolean | undefined;
+        description?: string | undefined;
+      }
+    | undefined;
+};
+export type MomentSchemaDefinition = {};
 export type Describe = {
   job_id: string;
   status: 'pending' | 'processing' | 'completed' | 'failed' | 'not_applicable';
@@ -564,6 +581,29 @@ export type FrameExtraction = {
       }
     | undefined;
 };
+export type Moment = {
+  moment_id: string;
+  start_time: number;
+  end_time: number;
+  anchors?: {} | undefined;
+  title: string;
+  reason: string;
+  speakers?: Array<string> | undefined;
+  criterion_score?: CriterionScore | undefined;
+  rank_score: number;
+  properties?: {} | undefined;
+  evidence?:
+    | Partial<{
+        signals: Array<string>;
+      }>
+    | undefined;
+};
+export type CriterionScore = {
+  key: string;
+  value: number;
+  min: number;
+  max: number;
+};
 export type ThumbnailList = {
   object: 'list';
   total: number;
@@ -603,6 +643,11 @@ export type VideoTag = {
   type: 'file' | 'segment';
   file_id: string;
   segment_id?: string | undefined;
+};
+export type MomentFinding = {
+  finding_id: string;
+  kind: 'absence' | 'observation';
+  properties: {};
 };
 
 export const VideoTag = z
@@ -1178,6 +1223,43 @@ export const ThumbnailList = z
   })
   .strict()
   .passthrough();
+export const MomentSchemaDefinition = z
+  .object({})
+  .partial()
+  .strict()
+  .passthrough();
+export const MomentCriterion = z
+  .object({
+    name: z
+      .string()
+      .max(64)
+      .regex(/^[a-z][a-z0-9_]*$/),
+    instructions: z.string().min(1),
+    moment_schema: MomentSchemaDefinition.optional(),
+    finding_schema: MomentSchemaDefinition.optional(),
+    anchors: z
+      .record(
+        z
+          .object({ required: z.boolean(), description: z.string() })
+          .partial()
+          .strict()
+          .passthrough()
+      )
+      .optional(),
+    scoring: z
+      .object({
+        key: z.string(),
+        min: z.number(),
+        max: z.number(),
+        higher_is_better: z.boolean().optional(),
+        description: z.string().optional(),
+      })
+      .strict()
+      .passthrough()
+      .optional(),
+  })
+  .strict()
+  .passthrough();
 export const DescribeOutputPart = z
   .object({ text: z.string(), start_time: z.number(), end_time: z.number() })
   .partial()
@@ -1367,6 +1449,36 @@ export const DescribeList: z.ZodType<DescribeList> = z
   })
   .strict()
   .passthrough();
+export const CriterionScore = z
+  .object({
+    key: z.string(),
+    value: z.number(),
+    min: z.number(),
+    max: z.number(),
+  })
+  .strict()
+  .passthrough();
+export const Moment = z
+  .object({
+    moment_id: z.string().uuid(),
+    start_time: z.number(),
+    end_time: z.number(),
+    anchors: z.record(z.number()).optional(),
+    title: z.string(),
+    reason: z.string(),
+    speakers: z.array(z.string()).optional(),
+    criterion_score: CriterionScore.optional(),
+    rank_score: z.number().gte(0).lte(1),
+    properties: z.object({}).partial().strict().passthrough().optional(),
+    evidence: z
+      .object({ signals: z.array(z.string()) })
+      .partial()
+      .strict()
+      .passthrough()
+      .optional(),
+  })
+  .strict()
+  .passthrough();
 export const FrameExtractionUniformConfig = z
   .object({
     frames_per_second: z.number().gte(0.1).lte(30),
@@ -1429,6 +1541,14 @@ export const FaceBoundingBox = z
     width: z.number().gte(0).lte(1),
     top: z.number().gte(0).lte(1),
     left: z.number().gte(0).lte(1),
+  })
+  .strict()
+  .passthrough();
+export const MomentFinding = z
+  .object({
+    finding_id: z.string().uuid(),
+    kind: z.enum(['absence', 'observation']),
+    properties: z.object({}).partial().strict().passthrough(),
   })
   .strict()
   .passthrough();

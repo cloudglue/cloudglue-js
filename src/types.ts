@@ -31,6 +31,8 @@ import { schemas as dataConnectorsSchemas } from '../generated/Data_Connectors';
 import { schemas as deepSearchSchemas } from '../generated/Deep_Search';
 import { schemas as querySchemas } from '../generated/Query';
 import { schemas as bulkImportsSchemas } from '../generated/Bulk_Imports';
+import { schemas as findMomentsSchemas } from '../generated/Find_Moments';
+import { schemas as collectionsMomentSchemas } from '../generated/Collections';
 
 /**
  * Represents a video file in the Cloudglue system
@@ -725,4 +727,86 @@ export type CreateMetadataImportParams = z.infer<
  */
 export type CreateMetadataImportRunParams = z.infer<
   typeof bulkImportsSchemas.CreateMetadataImportRunRequest
+>;
+
+
+/**
+ * Moment-related record types, re-exported from the generated common
+ * module (which `generated/index.ts` does not re-export):
+ *
+ * - `Moment` — a scored, bounded span discovered inside a video
+ * - `MomentFinding` — the non-temporal counterpart, emitted when the
+ *   criterion declares a `finding_schema`
+ * - `MomentCriterion` — the inline rubric plus its typed output declarations
+ * - `CriterionScore` — the rubric's judgment on its own declared scale
+ * - `MomentSchemaDefinition` — the validated JSON Schema subset used by
+ *   `moment_schema` / `finding_schema`
+ */
+export type {
+  Moment,
+  MomentFinding,
+  MomentCriterion,
+  CriterionScore,
+  MomentSchemaDefinition,
+} from '../generated/common';
+
+/**
+ * Represents a find-moments run, including its moments and findings when
+ * completed
+ */
+export type FindMoments = z.infer<typeof findMomentsSchemas.FindMoments>;
+
+/**
+ * Parameters for starting a find-moments run (source url + inline criterion)
+ */
+export type NewFindMomentsParams = z.infer<
+  typeof findMomentsSchemas.NewFindMoments
+>;
+
+/**
+ * Represents a paginated list of find-moments runs
+ */
+export type FindMomentsList = z.infer<typeof findMomentsSchemas.FindMomentsList>;
+
+/**
+ * Represents the result of deleting a find-moments run
+ */
+export type DeleteFindMomentsResult = z.infer<
+  typeof findMomentsSchemas.DeleteFindMomentsResult
+>;
+
+/**
+ * Represents a criterion attached to a moments collection, with its
+ * backfill progress
+ */
+export type MomentCriterionAttachment = z.infer<
+  typeof collectionsMomentSchemas.MomentCriterionAttachment
+>;
+
+/**
+ * Parameters for attaching a criterion to a moments collection
+ */
+export type NewMomentCriterionAttachment = z.infer<
+  typeof collectionsMomentSchemas.NewMomentCriterionAttachment
+>;
+
+/**
+ * Represents a moments collection's criteria configuration
+ */
+export type MomentsConfig = z.infer<
+  typeof collectionsMomentSchemas.MomentsConfig
+>;
+
+/**
+ * Represents a paginated list of moments across a collection's members
+ */
+export type CollectionMomentsList = z.infer<
+  typeof collectionsMomentSchemas.CollectionMomentsList
+>;
+
+/**
+ * Represents a paginated list of findings across a collection's members
+ */
+export type CollectionMomentFindingsList = z.infer<
+  typeof collectionsMomentSchemas.CollectionMomentFindingsList
 >;

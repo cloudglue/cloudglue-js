@@ -200,6 +200,14 @@ export type SegmentSearchResult = z.infer<
 export type FaceSearchResult = z.infer<typeof searchSchemas.FaceSearchResult>;
 
 /**
+ * Represents a moment-level search result (scope='moment'): the full moment
+ * record plus provenance and a query-relevance search_score
+ */
+export type MomentSearchResult = z.infer<
+  typeof searchSchemas.MomentSearchResult
+>;
+
+/**
  * Represents a grouped segment search result
  */
 export type SegmentGroupResult = z.infer<

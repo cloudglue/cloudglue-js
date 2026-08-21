@@ -1,6 +1,8 @@
 import { makeApi, Zodios, type ZodiosOptions } from '@zodios/core';
 import { z } from 'zod';
 
+import { MomentCriterion } from './common';
+import { MomentSchemaDefinition } from './common';
 import { SegmentationConfig } from './common';
 import { SegmentationUniformConfig } from './common';
 import { SegmentationShotDetectorConfig } from './common';
@@ -8,8 +10,6 @@ import { SegmentationManualConfig } from './common';
 import { NarrativeConfig } from './common';
 import { KeyframeConfig } from './common';
 import { ThumbnailsConfig } from './common';
-import { MomentCriterion } from './common';
-import { MomentSchemaDefinition } from './common';
 import { File } from './common';
 import { SourceMetadata } from './common';
 import { GrainSourceMetadata } from './common';
@@ -157,8 +157,16 @@ type MomentCriterionAttachment = {
   attachment_id: string;
   criterion_name: string;
   criterion_hash: string;
-  criterion?: {} | undefined;
-  options?: {} | undefined;
+  criterion?: MomentCriterion | undefined;
+  options?:
+    | Partial<{
+        signals_required: Array<string>;
+        boundary_policy: 'sentence' | 'tight' | 'loose';
+        speaker_filter: {};
+        min_duration_seconds: number;
+        max_duration_seconds: number;
+      }>
+    | undefined;
   backfill_status:
     | 'pending'
     | 'processing'
@@ -392,8 +400,19 @@ const MomentCriterionAttachment: z.ZodType<MomentCriterionAttachment> = z
     attachment_id: z.string().uuid(),
     criterion_name: z.string(),
     criterion_hash: z.string(),
-    criterion: z.object({}).partial().strict().passthrough().optional(),
-    options: z.object({}).partial().strict().passthrough().optional(),
+    criterion: MomentCriterion.optional(),
+    options: z
+      .object({
+        signals_required: z.array(z.string()),
+        boundary_policy: z.enum(['sentence', 'tight', 'loose']),
+        speaker_filter: z.object({}).partial().strict().passthrough(),
+        min_duration_seconds: z.number(),
+        max_duration_seconds: z.number(),
+      })
+      .partial()
+      .strict()
+      .passthrough()
+      .optional(),
     backfill_status: z.enum([
       'pending',
       'processing',

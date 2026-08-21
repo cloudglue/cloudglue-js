@@ -1,18 +1,31 @@
 import { makeApi, Zodios, type ZodiosOptions } from '@zodios/core';
 import { z } from 'zod';
 
+import { MomentCriterion } from './common';
+import { MomentSchemaDefinition } from './common';
 import { Moment } from './common';
 import { CriterionScore } from './common';
 import { MomentFinding } from './common';
-import { MomentCriterion } from './common';
-import { MomentSchemaDefinition } from './common';
 
 type FindMoments = {
   job_id: string;
   status: 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled';
   created_at: number;
   url: string;
-  find_moments_config?: {} | undefined;
+  find_moments_config?:
+    | Partial<{
+        criterion: MomentCriterion;
+        criterion_hash: string;
+        describe_job_id: string;
+        signals_required: Array<string>;
+        boundary_policy: 'sentence' | 'tight' | 'loose';
+        speaker_filter: {};
+        min_duration_seconds: number;
+        max_duration_seconds: number;
+        cache_policy: 'reuse' | 'refresh';
+        engine_version: number;
+      }>
+    | undefined;
   moments?: Array<Moment> | undefined;
   findings?: Array<MomentFinding> | undefined;
   total_moments?: number | undefined;
@@ -97,7 +110,18 @@ const FindMoments: z.ZodType<FindMoments> = z
     created_at: z.number().int(),
     url: z.string(),
     find_moments_config: z
-      .object({})
+      .object({
+        criterion: MomentCriterion,
+        criterion_hash: z.string(),
+        describe_job_id: z.string().uuid(),
+        signals_required: z.array(z.string()),
+        boundary_policy: z.enum(['sentence', 'tight', 'loose']),
+        speaker_filter: z.object({}).partial().strict().passthrough(),
+        min_duration_seconds: z.number(),
+        max_duration_seconds: z.number(),
+        cache_policy: z.enum(['reuse', 'refresh']),
+        engine_version: z.number().int(),
+      })
       .partial()
       .strict()
       .passthrough()

@@ -35,7 +35,7 @@ Only provide the config that matches the `collection_type` — other configs are
 
 `collection_type: 'metadata'` indexes connector source metadata and user metadata into file-level search documents **without downloading or processing the media**. Indexing is free. Supported sources: google-drive, dropbox, zoom, gong, recall, grain, and iconik URLs. No processing configs are accepted.
 
-Populate one via `addMedia` with connector-synced files, or in bulk with the [Metadata Imports API](./metadata-imports.md) (`client.metadataImports`). Query with search/deep search at `file` scope (the `doc_lexical` modality matches the metadata docs), or run metadata-mode extraction over the files (see [Extract](./extract.md)). Refresh a single file's source metadata — and re-index its documents — with `client.files.syncSourceMetadata(fileId)`.
+Populate one via `addMedia` with connector-synced files, or in bulk with the [Bulk Imports API](./bulk-imports.md) (`client.bulkImports`). Query with search/deep search at `file` scope (the `doc_lexical` modality matches the metadata docs), or run metadata-mode extraction over the files (see [Extract](./extract.md)). Refresh a single file's source metadata — and re-index its documents — with `client.files.syncSourceMetadata(fileId)`.
 
 ## Add Videos
 

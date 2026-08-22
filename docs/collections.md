@@ -11,6 +11,7 @@ Collections group videos together for batch processing and querying (chat, searc
 | `entities` | Structured extracted data | Query API (SQL), Search & Deep Search (file scope, `doc_lexical`), Responses API (entity-backed with nimbus-002-preview) |
 | `face-analysis` | Face detection data | Face-specific queries |
 | `metadata` | Connector source metadata + user metadata indexed into file-level search docs — no media download or processing, free to index | Search & Deep Search (file scope, `doc_lexical`), metadata-mode extraction |
+| `moments` | Rubric-driven moments discovered across every current and future member | Search (`moment` scope), moment & finding enumeration — see [Find Moments](./find-moments.md) |
 
 ## Create a Collection
 

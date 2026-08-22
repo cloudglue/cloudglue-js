@@ -1,6 +1,8 @@
 import { makeApi, Zodios, type ZodiosOptions } from '@zodios/core';
 import { z } from 'zod';
 
+import { MomentCriterion } from './common';
+import { MomentSchemaDefinition } from './common';
 import { SegmentationConfig } from './common';
 import { SegmentationUniformConfig } from './common';
 import { SegmentationShotDetectorConfig } from './common';
@@ -22,6 +24,9 @@ import { DescribeOutputPart } from './common';
 import { SpeechOutputPart } from './common';
 import { WordTimestamp } from './common';
 import { FileSegmentationConfig } from './common';
+import { Moment } from './common';
+import { CriterionScore } from './common';
+import { MomentFinding } from './common';
 
 type Collection = {
   id: string;
@@ -33,7 +38,13 @@ type Collection = {
     | 'entities'
     | 'rich-transcripts'
     | 'face-analysis'
-    | 'metadata';
+    | 'metadata'
+    | 'moments';
+  moments_config?:
+    | Partial<{
+        criteria: Array<MomentCriterionAttachment>;
+      }>
+    | undefined;
   extract_config?:
     | Partial<{
         prompt: string;
@@ -90,7 +101,9 @@ type NewCollection = {
     | 'entities'
     | 'rich-transcripts'
     | 'face-analysis'
-    | 'metadata';
+    | 'metadata'
+    | 'moments';
+  moments_config?: MomentsConfig | undefined;
   name: string;
   description?: (string | null) | undefined;
   describe_config?:
@@ -139,6 +152,54 @@ type NewCollection = {
         }>;
       }>
     | undefined;
+};
+type MomentCriterionAttachment = {
+  attachment_id: string;
+  criterion_name: string;
+  criterion_hash: string;
+  criterion?: MomentCriterion | undefined;
+  options?:
+    | Partial<{
+        signals_required: Array<string>;
+        boundary_policy: 'sentence' | 'tight' | 'loose';
+        speaker_filter: {};
+        min_duration_seconds: number;
+        max_duration_seconds: number;
+      }>
+    | undefined;
+  backfill_status:
+    | 'pending'
+    | 'processing'
+    | 'completed'
+    | 'completed_with_failures';
+  files_total?: number | undefined;
+  files_completed?: number | undefined;
+  files_failed?: number | undefined;
+  created_at?: number | undefined;
+};
+type MomentsConfig = {
+  criteria: Array<NewMomentCriterionAttachment>;
+};
+type NewMomentCriterionAttachment = {
+  criterion: MomentCriterion;
+  signals_required?:
+    | Array<
+        | 'speech'
+        | 'visual_scene_description'
+        | 'scene_text'
+        | 'audio_description'
+      >
+    | undefined;
+  boundary_policy?: ('sentence' | 'tight' | 'loose') | undefined;
+  speaker_filter?:
+    | Partial<{
+        include: Array<string>;
+        exclude: Array<string>;
+        match: 'any' | 'all';
+      }>
+    | undefined;
+  min_duration_seconds?: number | undefined;
+  max_duration_seconds?: number | undefined;
 };
 type DefaultSegmentationConfig = {
   strategy: 'uniform' | 'shot-detector' | 'narrative';
@@ -309,7 +370,60 @@ type AddCollectionFile = (
     thumbnails_config: ThumbnailsConfig;
     metadata: {};
   }>;
+type CollectionMomentsList = {
+  moments: Array<
+    Moment & {
+      file_id: string;
+      job_id: string;
+      criterion_name: string;
+    }
+  >;
+  total: number;
+  next_cursor?: string | undefined;
+};
+type CollectionMomentFindingsList = {
+  findings: Array<
+    MomentFinding & {
+      file_id: string;
+      job_id: string;
+      criterion_name: string;
+    }
+  >;
+  total: number;
+  next_cursor?: string | undefined;
+};
 
+const MomentCriterionAttachment: z.ZodType<MomentCriterionAttachment> = z
+  .object({
+    attachment_id: z.string().uuid(),
+    criterion_name: z.string(),
+    criterion_hash: z.string(),
+    criterion: MomentCriterion.optional(),
+    options: z
+      .object({
+        signals_required: z.array(z.string()),
+        boundary_policy: z.enum(['sentence', 'tight', 'loose']),
+        speaker_filter: z.object({}).partial().strict().passthrough(),
+        min_duration_seconds: z.number(),
+        max_duration_seconds: z.number(),
+      })
+      .partial()
+      .strict()
+      .passthrough()
+      .optional(),
+    backfill_status: z.enum([
+      'pending',
+      'processing',
+      'completed',
+      'completed_with_failures',
+    ]),
+    files_total: z.number().int().optional(),
+    files_completed: z.number().int().optional(),
+    files_failed: z.number().int().optional(),
+    created_at: z.number().int().optional(),
+  })
+  .strict()
+  .passthrough();
 const Collection: z.ZodType<Collection> = z
   .object({
     id: z.string(),
@@ -322,7 +436,14 @@ const Collection: z.ZodType<Collection> = z
       'rich-transcripts',
       'face-analysis',
       'metadata',
+      'moments',
     ]),
+    moments_config: z
+      .object({ criteria: z.array(MomentCriterionAttachment) })
+      .partial()
+      .strict()
+      .passthrough()
+      .optional(),
     extract_config: z
       .object({
         prompt: z.string(),
@@ -394,6 +515,43 @@ const Collection: z.ZodType<Collection> = z
   })
   .strict()
   .passthrough();
+const NewMomentCriterionAttachment: z.ZodType<NewMomentCriterionAttachment> = z
+  .object({
+    criterion: MomentCriterion,
+    signals_required: z
+      .array(
+        z.enum([
+          'speech',
+          'visual_scene_description',
+          'scene_text',
+          'audio_description',
+        ])
+      )
+      .min(1)
+      .optional()
+      .optional(),
+    boundary_policy: z
+      .enum(['sentence', 'tight', 'loose'])
+      .optional()
+      .optional(),
+    speaker_filter: z
+      .object({
+        include: z.array(z.string()),
+        exclude: z.array(z.string()),
+        match: z.enum(['any', 'all']),
+      })
+      .partial()
+      .strict()
+      .passthrough()
+      .optional(),
+    min_duration_seconds: z.number().gt(0).optional(),
+    max_duration_seconds: z.number().gt(0).optional(),
+  })
+  .strict();
+const MomentsConfig: z.ZodType<MomentsConfig> = z
+  .object({ criteria: z.array(NewMomentCriterionAttachment).min(1) })
+  .strict()
+  .passthrough();
 const DefaultSegmentationConfig: z.ZodType<DefaultSegmentationConfig> = z
   .object({
     strategy: z.enum(['uniform', 'shot-detector', 'narrative']),
@@ -414,7 +572,9 @@ const NewCollection: z.ZodType<NewCollection> = z
       'rich-transcripts',
       'face-analysis',
       'metadata',
+      'moments',
     ]),
+    moments_config: MomentsConfig.optional(),
     name: z.string(),
     description: z.string().nullish(),
     describe_config: z
@@ -727,6 +887,44 @@ const CollectionMediaDescriptionsList: z.ZodType<CollectionMediaDescriptionsList
     })
     .strict()
     .passthrough();
+const CollectionMomentsList: z.ZodType<CollectionMomentsList> = z
+  .object({
+    moments: z.array(
+      Moment.and(
+        z
+          .object({
+            file_id: z.string().uuid(),
+            job_id: z.string().uuid(),
+            criterion_name: z.string(),
+          })
+          .strict()
+          .passthrough()
+      )
+    ),
+    total: z.number().int(),
+    next_cursor: z.string().optional(),
+  })
+  .strict()
+  .passthrough();
+const CollectionMomentFindingsList: z.ZodType<CollectionMomentFindingsList> = z
+  .object({
+    findings: z.array(
+      MomentFinding.and(
+        z
+          .object({
+            file_id: z.string().uuid(),
+            job_id: z.string().uuid(),
+            criterion_name: z.string(),
+          })
+          .strict()
+          .passthrough()
+      )
+    ),
+    total: z.number().int(),
+    next_cursor: z.string().optional(),
+  })
+  .strict()
+  .passthrough();
 const CollectionDelete = z
   .object({ id: z.string(), object: z.literal('collection') })
   .strict()
@@ -863,7 +1061,10 @@ const FileFaceDetections = z
   .passthrough();
 
 export const schemas = {
+  MomentCriterionAttachment,
   Collection,
+  NewMomentCriterionAttachment,
+  MomentsConfig,
   DefaultSegmentationConfig,
   NewCollection,
   CollectionList,
@@ -874,6 +1075,8 @@ export const schemas = {
   RichTranscript,
   CollectionRichTranscriptsList,
   CollectionMediaDescriptionsList,
+  CollectionMomentsList,
+  CollectionMomentFindingsList,
   CollectionDelete,
   CollectionUpdate,
   CollectionFileDelete,
@@ -958,6 +1161,7 @@ const endpoints = makeApi([
             'rich-transcripts',
             'face-analysis',
             'metadata',
+            'moments',
           ])
           .optional(),
       },
@@ -1778,6 +1982,214 @@ const endpoints = makeApi([
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
+        schema: z.object({ error: z.string() }).strict().passthrough(),
+      },
+    ],
+  },
+  {
+    method: 'get',
+    path: '/collections/:collection_id/moments',
+    alias: 'listCollectionMoments',
+    description: `Moments across current collection members, with exact total. Default sort is positional (file_id, then start_time); criterion_score and rank_score sorts require a single-criterion filter. Removing a file from the collection drops its moments from this enumeration; the underlying runs persist.`,
+    requestFormat: 'json',
+    parameters: [
+      {
+        name: 'collection_id',
+        type: 'Path',
+        schema: z.string().uuid(),
+      },
+      {
+        name: 'criterion_name',
+        type: 'Query',
+        schema: z.string().optional(),
+      },
+      {
+        name: 'attachment_id',
+        type: 'Query',
+        schema: z.string().uuid().optional(),
+      },
+      {
+        name: 'file_id',
+        type: 'Query',
+        schema: z.string().uuid().optional(),
+      },
+      {
+        name: 'min_score',
+        type: 'Query',
+        schema: z.number().optional(),
+      },
+      {
+        name: 'sort',
+        type: 'Query',
+        schema: z
+          .enum(['position', 'criterion_score', 'rank_score'])
+          .optional()
+          .optional(),
+      },
+      {
+        name: 'limit',
+        type: 'Query',
+        schema: z.number().int().gte(1).lte(100).optional(),
+      },
+      {
+        name: 'cursor',
+        type: 'Query',
+        schema: z.string().optional(),
+      },
+    ],
+    response: CollectionMomentsList,
+    errors: [
+      {
+        status: 400,
+        description: `Not a moments collection, or a score sort without a single-criterion filter`,
+        schema: z.object({ error: z.string() }).strict().passthrough(),
+      },
+      {
+        status: 404,
+        description: `Collection not found`,
+        schema: z.object({ error: z.string() }).strict().passthrough(),
+      },
+      {
+        status: 500,
+        description: `Internal server error`,
+        schema: z.object({ error: z.string() }).strict().passthrough(),
+      },
+    ],
+  },
+  {
+    method: 'get',
+    path: '/collections/:collection_id/moments/findings',
+    alias: 'listCollectionMomentFindings',
+    requestFormat: 'json',
+    parameters: [
+      {
+        name: 'collection_id',
+        type: 'Path',
+        schema: z.string().uuid(),
+      },
+      {
+        name: 'criterion_name',
+        type: 'Query',
+        schema: z.string().optional(),
+      },
+      {
+        name: 'file_id',
+        type: 'Query',
+        schema: z.string().uuid().optional(),
+      },
+      {
+        name: 'kind',
+        type: 'Query',
+        schema: z.enum(['absence', 'observation']).optional(),
+      },
+      {
+        name: 'limit',
+        type: 'Query',
+        schema: z.number().int().gte(1).lte(100).optional(),
+      },
+      {
+        name: 'cursor',
+        type: 'Query',
+        schema: z.string().optional(),
+      },
+    ],
+    response: CollectionMomentFindingsList,
+    errors: [
+      {
+        status: 400,
+        description: `Not a moments collection`,
+        schema: z.object({ error: z.string() }).strict().passthrough(),
+      },
+      {
+        status: 404,
+        description: `Collection not found`,
+        schema: z.object({ error: z.string() }).strict().passthrough(),
+      },
+      {
+        status: 500,
+        description: `Internal server error`,
+        schema: z.object({ error: z.string() }).strict().passthrough(),
+      },
+    ],
+  },
+  {
+    method: 'post',
+    path: '/collections/:collection_id/moment-criteria',
+    alias: 'createCollectionMomentCriterion',
+    description: `Adds a criterion attachment and backfills existing members. The attach response charges nothing (cost header 0); per-file runs charge as they execute, and a matching prior run satisfies a pair at no extra execution.`,
+    requestFormat: 'json',
+    parameters: [
+      {
+        name: 'body',
+        type: 'Body',
+        schema: NewMomentCriterionAttachment,
+      },
+      {
+        name: 'collection_id',
+        type: 'Path',
+        schema: z.string().uuid(),
+      },
+    ],
+    response: MomentCriterionAttachment,
+    errors: [
+      {
+        status: 400,
+        description: `Invalid criterion, or not a moments collection`,
+        schema: z.object({ error: z.string() }).strict().passthrough(),
+      },
+      {
+        status: 402,
+        description: `Balance cannot cover the backfill precheck`,
+        schema: z.object({ error: z.string() }).strict().passthrough(),
+      },
+      {
+        status: 404,
+        description: `Collection not found`,
+        schema: z.object({ error: z.string() }).strict().passthrough(),
+      },
+      {
+        status: 500,
+        description: `Internal server error`,
+        schema: z.object({ error: z.string() }).strict().passthrough(),
+      },
+    ],
+  },
+  {
+    method: 'delete',
+    path: '/collections/:collection_id/moment-criteria/:attachment_id',
+    alias: 'deleteCollectionMomentCriterion',
+    description: `Removes the attachment; its moments and findings leave collection enumeration. Underlying runs persist as job history.`,
+    requestFormat: 'json',
+    parameters: [
+      {
+        name: 'collection_id',
+        type: 'Path',
+        schema: z.string().uuid(),
+      },
+      {
+        name: 'attachment_id',
+        type: 'Path',
+        schema: z.string().uuid(),
+      },
+    ],
+    response: z
+      .object({ attachment_id: z.string().uuid(), deleted: z.boolean() })
+      .strict()
+      .passthrough(),
+    errors: [
+      {
+        status: 400,
+        description: `Not a moments collection`,
+        schema: z.object({ error: z.string() }).strict().passthrough(),
+      },
+      {
+        status: 404,
+        description: `Attachment not found`,
+        schema: z.object({ error: z.string() }).strict().passthrough(),
+      },
+      {
+        status: 500,
+        description: `Internal server error`,
         schema: z.object({ error: z.string() }).strict().passthrough(),
       },
     ],

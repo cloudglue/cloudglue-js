@@ -1,6 +1,8 @@
 import { makeApi, Zodios, type ZodiosOptions } from '@zodios/core';
 import { z } from 'zod';
 
+import { Moment } from './common';
+import { CriterionScore } from './common';
 import { SearchFilter } from './common';
 import { SearchFilterCriteria } from './common';
 
@@ -8,7 +10,7 @@ type SearchResponse = {
   id: string;
   object: 'search';
   query?: string | undefined;
-  scope: 'file' | 'segment' | 'face';
+  scope: 'file' | 'segment' | 'face' | 'moment';
   group_by_key?: 'file' | undefined;
   group_count?: number | undefined;
   search_modalities?: SearchModalities | undefined;
@@ -16,6 +18,7 @@ type SearchResponse = {
     | FileSearchResult
     | SegmentSearchResult
     | FaceSearchResult
+    | MomentSearchResult
     | SegmentGroupResult
     | FaceGroupResult
   >;
@@ -23,9 +26,10 @@ type SearchResponse = {
   limit: number;
 };
 type SearchRequest = Partial<{
-  scope: 'file' | 'segment' | 'face';
+  scope: 'file' | 'segment' | 'face' | 'moment';
   collections: Array<string>;
   query: string;
+  criterion_name: string;
   source_image: Partial<{
     url: string;
     base64: string;
@@ -132,6 +136,15 @@ type FaceSearchResult = {
     | undefined;
   thumbnail_url?: string | undefined;
 };
+type MomentSearchResult = Moment & {
+  type: 'moment';
+  file_id: string;
+  collection_id: string;
+  job_id: string;
+  criterion_name: string;
+  search_score: number;
+  filename: string | null;
+};
 type SegmentGroupResult = {
   type: 'segment_group';
   matched_items: Array<SegmentSearchResult>;
@@ -152,7 +165,7 @@ type SearchResponseList = {
     id: string;
     object: 'search';
     query?: string | undefined;
-    scope: 'file' | 'segment' | 'face';
+    scope: 'file' | 'segment' | 'face' | 'moment';
     group_by_key?: 'file' | undefined;
     group_count?: number | undefined;
     search_modalities?: SearchModalities | undefined;
@@ -176,9 +189,10 @@ const SearchModalities = z.array(
 );
 const SearchRequest: z.ZodType<SearchRequest> = z
   .object({
-    scope: z.enum(['file', 'segment', 'face']),
+    scope: z.enum(['file', 'segment', 'face', 'moment']),
     collections: z.array(z.string().uuid()).min(1),
     query: z.string().min(1),
+    criterion_name: z.string(),
     source_image: z
       .object({ url: z.string(), base64: z.string() })
       .partial()
@@ -204,7 +218,7 @@ const SearchResponseList: z.ZodType<SearchResponseList> = z
           id: z.string().uuid(),
           object: z.literal('search'),
           query: z.string().optional(),
-          scope: z.enum(['file', 'segment', 'face']),
+          scope: z.enum(['file', 'segment', 'face', 'moment']),
           group_by_key: z.literal('file').optional(),
           group_count: z.number().int().optional(),
           search_modalities: SearchModalities.max(5).optional(),
@@ -333,6 +347,20 @@ const FaceSearchResult: z.ZodType<FaceSearchResult> = z
   })
   .strict()
   .passthrough();
+const MomentSearchResult = Moment.and(
+  z
+    .object({
+      type: z.literal('moment'),
+      file_id: z.string().uuid(),
+      collection_id: z.string().uuid(),
+      job_id: z.string().uuid(),
+      criterion_name: z.string(),
+      search_score: z.number(),
+      filename: z.string().nullable(),
+    })
+    .strict()
+    .passthrough()
+);
 const SegmentGroupResult: z.ZodType<SegmentGroupResult> = z
   .object({
     type: z.literal('segment_group'),
@@ -358,7 +386,7 @@ const SearchResponse: z.ZodType<SearchResponse> = z
     id: z.string().uuid(),
     object: z.literal('search'),
     query: z.string().optional(),
-    scope: z.enum(['file', 'segment', 'face']),
+    scope: z.enum(['file', 'segment', 'face', 'moment']),
     group_by_key: z.literal('file').optional(),
     group_count: z.number().int().optional(),
     search_modalities: SearchModalities.max(5).optional(),
@@ -367,6 +395,7 @@ const SearchResponse: z.ZodType<SearchResponse> = z
         FileSearchResult,
         SegmentSearchResult,
         FaceSearchResult,
+        MomentSearchResult,
         SegmentGroupResult,
         FaceGroupResult,
       ])
@@ -385,6 +414,7 @@ export const schemas = {
   FileSearchResult,
   SegmentSearchResult,
   FaceSearchResult,
+  MomentSearchResult,
   SegmentGroupResult,
   FaceGroupResult,
   SearchResponse,

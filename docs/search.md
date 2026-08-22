@@ -32,6 +32,7 @@ const results = await client.search.searchContent({
 | Scope | Returns | Use When |
 |-------|---------|----------|
 | `segment` | Timestamp-level matches within videos | Finding specific moments |
+| `moment` | Moments discovered by a rubric in a `moments` collection, each carrying its `criterion_name` | Retrieving against a standing standard — see [Find Moments](./find-moments.md) |
 | `file` | Whole-video relevance scores | Finding which videos are relevant |
 | `face` | Face matches (use with `source_image`) | Finding a person across videos |
 

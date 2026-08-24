@@ -8,12 +8,20 @@ type ResponseStatus = 'in_progress' | 'completed' | 'failed' | 'cancelled';
 export type ResponseKnowledgeBaseCollections = {
   source?: 'collections';
   type?: 'general_question_answering' | 'entity_backed_knowledge';
-  collections: string[];
+  /**
+   * Collection IDs to search for relevant context. Optional when `type` is
+   * `entity_backed_knowledge` with at least one entity collection — omit it
+   * for an entity/moments-only knowledge base. At least one of `collections`
+   * or `entity_backed_knowledge_config.entity_collections` must be present.
+   */
+  collections?: string[];
   filter?: SearchFilter;
   entity_backed_knowledge_config?: {
     entity_collections: Array<{
-      name: string;
-      description: string;
+      /** Falls back to the collection's stored name if omitted. */
+      name?: string;
+      /** Falls back to the collection's stored description if omitted. */
+      description?: string;
       collection_id: string;
     }>;
     description?: string;

@@ -426,7 +426,7 @@ export type MomentCriterion = {
   instructions: string;
   moment_schema?: MomentSchemaDefinition | undefined;
   finding_schema?: MomentSchemaDefinition | undefined;
-  anchors?: {} | undefined;
+  anchors?: Record<string, Partial<{ required: boolean; description: string }>> | undefined;
   scoring?:
     | {
         key: string;
@@ -585,7 +585,7 @@ export type Moment = {
   moment_id: string;
   start_time: number;
   end_time: number;
-  anchors?: {} | undefined;
+  anchors?: Record<string, number> | undefined;
   title: string;
   reason: string;
   speakers?: Array<string> | undefined;

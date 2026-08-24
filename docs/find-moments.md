@@ -204,6 +204,25 @@ const results = await client.search.searchContent({
 
 Each hit is a moment plus its `criterion_name`, so a result carries both the timestamped content and the standard it was found under. See [Search](./search.md).
 
+## Asking Questions over Moments (Responses API)
+
+A moments collection can back a **moments-only knowledge base**: pass it as an entity collection with no `collections` at all, and the model answers from the structured moment data (plus moment-scope search) with no transcript corpus. Requires `nimbus-002-preview`.
+
+```typescript
+const response = await client.responses.createResponse({
+  model: 'nimbus-002-preview',
+  input: 'What were the strongest pricing moments across these calls, and when do they occur?',
+  knowledge_base: {
+    type: 'entity_backed_knowledge',
+    entity_backed_knowledge_config: {
+      entity_collections: [{ collection_id: collectionId }],
+    },
+  },
+});
+```
+
+See [Responses](./responses.md) for the full knowledge-base reference.
+
 ## Webhooks
 
 Three events track run lifecycle — `find_moments.job.processing`, `find_moments.job.completed`, `find_moments.job.failed`. See [Advanced](./advanced.md).

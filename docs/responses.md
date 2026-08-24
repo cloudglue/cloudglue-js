@@ -62,11 +62,22 @@ knowledge_base: {
     description: 'Product catalog from video reviews',
     entity_collections: [
       {
-        name: 'Products',
-        description: 'Extracted product entities',
+        name: 'Products', // optional — falls back to the collection's stored name
+        description: 'Extracted product entities', // optional — falls back to the stored description
         collection_id: 'entities_col_id',
       },
     ],
+  },
+}
+```
+
+`collections` is optional here: omit it (keeping at least one entity collection) for an **entity/moments-only knowledge base** that answers from structured entity data — and moment search when the entity collection is a moments collection — with no transcript corpus. At least one of `collections` or `entity_backed_knowledge_config.entity_collections` must be present.
+
+```typescript
+knowledge_base: {
+  type: 'entity_backed_knowledge',
+  entity_backed_knowledge_config: {
+    entity_collections: [{ collection_id: 'moments_col_id' }],
   },
 }
 ```

@@ -539,4 +539,24 @@ for (const file of generatedFiles) {
     fs.writeFileSync(commonPath, commonContent);
 }
 
+// The generator's TS-type printer drops record value types — additionalProperties
+// schemas render as `{}` — while the zod consts keep them (z.record(...)). The
+// moment types are re-exported from common.ts as TS types (src/types.ts), so
+// restore the record shapes their zod schemas declare.
+{
+    const recordFieldFixes = [
+        ['Moment', 'anchors', 'Record<string, number>'],
+        ['MomentCriterion', 'anchors', 'Record<string, Partial<{ required: boolean; description: string }>>'],
+    ];
+    const commonPath = path.join(generatedDir, 'common.ts');
+    let commonContent = fs.readFileSync(commonPath, 'utf8');
+    for (const [typeName, field, tsType] of recordFieldFixes) {
+        commonContent = commonContent.replace(
+            new RegExp(`(export type ${typeName} = \\{[\\s\\S]*?\\n\\};)`),
+            (block) => block.replace(`${field}?: {} | undefined;`, `${field}?: ${tsType} | undefined;`)
+        );
+    }
+    fs.writeFileSync(commonPath, commonContent);
+}
+
 console.log('Generation complete!'); 

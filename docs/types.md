@@ -99,13 +99,17 @@ type ThumbnailType = 'segment' | 'keyframe' | 'file' | 'frame';
 type ResponseKnowledgeBaseCollections = {
   source?: 'collections';
   type?: 'general_question_answering' | 'entity_backed_knowledge';
-  collections: string[];
+  // Optional when type is 'entity_backed_knowledge' with at least one entity
+  // collection — omit for an entity/moments-only knowledge base. At least one
+  // of collections or entity_backed_knowledge_config.entity_collections must
+  // be present.
+  collections?: string[];
   filter?: SearchFilter;  // SearchFilter is from generated/common.ts; Filter (from src/types.ts) is used for list/search queries
   entity_backed_knowledge_config?: {
     description?: string;
     entity_collections: Array<{
-      name: string;
-      description: string;
+      name?: string;         // falls back to the collection's stored name
+      description?: string;  // falls back to the collection's stored description
       collection_id: string;
     }>;
   };

@@ -93,13 +93,13 @@ type ResponseKnowledgeBase =
   | KnowledgeBaseCollections
   | KnowledgeBaseFiles
   | KnowledgeBaseDefault;
-type KnowledgeBaseCollections = {
-  source?: 'collections' | undefined;
-  type?: ('general_question_answering' | 'entity_backed_knowledge') | undefined;
+type KnowledgeBaseCollections = Partial<{
+  source: 'collections';
+  type: 'general_question_answering' | 'entity_backed_knowledge';
   collections: Array<string>;
-  filter?: SearchFilter | undefined;
-  entity_backed_knowledge_config?: EntityBackedKnowledgeConfig | undefined;
-};
+  filter: SearchFilter;
+  entity_backed_knowledge_config: EntityBackedKnowledgeConfig;
+}>;
 type EntityBackedKnowledgeConfig = {
   entity_collections: Array<EntityCollectionConfig>;
   description?: string | undefined;
@@ -169,14 +169,13 @@ const EntityBackedKnowledgeConfig: z.ZodType<EntityBackedKnowledgeConfig> = z
   .passthrough();
 const KnowledgeBaseCollections: z.ZodType<KnowledgeBaseCollections> = z
   .object({
-    source: z.literal('collections').optional(),
-    type: z
-      .enum(['general_question_answering', 'entity_backed_knowledge'])
-      .optional(),
+    source: z.literal('collections'),
+    type: z.enum(['general_question_answering', 'entity_backed_knowledge']),
     collections: z.array(z.string().uuid()).min(1),
-    filter: SearchFilter.optional(),
-    entity_backed_knowledge_config: EntityBackedKnowledgeConfig.optional(),
+    filter: SearchFilter,
+    entity_backed_knowledge_config: EntityBackedKnowledgeConfig,
   })
+  .partial()
   .strict()
   .passthrough();
 const KnowledgeBaseFiles: z.ZodType<KnowledgeBaseFiles> = z

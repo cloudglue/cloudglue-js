@@ -165,4 +165,5 @@ All available via `import type { ... } from '@cloudglue/cloudglue-js'`:
 - `EntitySegment`, `CollectionVideoEntities`
 - `DataConnector`, `DataConnectorList`
 - `ShareableAsset`
+- `SiteRoutePreview`, `SiteRoutePreviewInput`, `SiteRoutePreviewList`
 - `CloudglueError`

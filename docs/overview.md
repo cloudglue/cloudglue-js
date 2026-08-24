@@ -47,6 +47,7 @@ The SDK also exports standalone URL helpers (`classifyVideoUrl`, `normalizeVideo
 | `client.responses` | OpenAI-compatible Responses API | `createResponse`, `createStreamingResponse`, `waitForReady` |
 | `client.search` | Semantic search | `searchContent` |
 | `client.deepSearch` | Agentic retrieval with LLM summary | `createDeepSearch`, `createStreamingDeepSearch`, `waitForReady` |
+| `client.findMoments` | Rubric-driven discovery of moments inside a video | `createFindMoments`, `listFindMoments`, `getFindMoments`, `deleteFindMoments`, `waitForReady` |
 | `client.segmentations` | Video segmentation | `getSegmentation`, `deleteSegmentation` |
 | `client.segments` | Standalone segmentation jobs | `createSegmentJob`, `getSegmentJob`, `waitForReady` |
 | `client.frames` | Frame extraction | Frame management |

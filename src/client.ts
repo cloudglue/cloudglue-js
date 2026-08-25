@@ -22,6 +22,7 @@ import { createApiClient as createDataConnectorsApiClient } from '../generated/D
 import { createApiClient as createDeepSearchApiClient } from '../generated/Deep_Search';
 import { createApiClient as createBulkImportsApiClient } from '../generated/Bulk_Imports';
 import { createApiClient as createFindMomentsApiClient } from '../generated/Find_Moments';
+import { createApiClient as createSitesApiClient } from '../generated/Sites';
 import { ZodiosOptions } from '@zodios/core';
 import { EnhancedWebhooksApi } from './api/webhooks.api';
 import { EnhancedTagsApi } from './api/tags.api';
@@ -45,6 +46,7 @@ import { EnhancedDataConnectorsApi } from './api/data-connectors.api';
 import { EnhancedDeepSearchApi } from './api/deep-search.api';
 import { EnhancedBulkImportsApi } from './api/bulk-imports.api';
 import { EnhancedFindMomentsApi } from './api/find-moments.api';
+import { EnhancedSitesApi } from './api/sites.api';
 
 /**
  * Main Cloudglue client class that provides access to all API functionality
@@ -185,6 +187,13 @@ export class Cloudglue {
    */
   public readonly findMoments: EnhancedFindMomentsApi;
 
+  /**
+   * Sites API for per-route unfurl previews on published sites
+   * (list/replace/delete the previews that give each site page its own
+   * unfurl card, hero, and clip window)
+   */
+  public readonly sites: EnhancedSitesApi;
+
   constructor(config: CloudglueConfig = {}) {
     this.apiKey = config.apiKey || process.env.CLOUDGLUE_API_KEY || '';
     this.baseUrl = config.baseUrl || 'https://api.cloudglue.dev/v1';
@@ -256,6 +265,7 @@ export class Cloudglue {
       this.baseUrl,
       sharedConfig,
     );
+    const sitesApi = createSitesApiClient(this.baseUrl, sharedConfig);
     // Configure base URL and axios config for all clients
     [
       filesApi,
@@ -279,6 +289,7 @@ export class Cloudglue {
       deepSearchApi,
       bulkImportsApi,
       findMomentsApi,
+      sitesApi,
     ].forEach((client) => {
       Object.assign(client.axios.defaults, axiosConfig);
 
@@ -350,5 +361,6 @@ export class Cloudglue {
     this.bulkImports = new EnhancedBulkImportsApi(bulkImportsApi);
     this.metadataImports = this.bulkImports;
     this.findMoments = new EnhancedFindMomentsApi(findMomentsApi);
+    this.sites = new EnhancedSitesApi(sitesApi);
   }
 }

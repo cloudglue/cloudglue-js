@@ -33,6 +33,7 @@ import { schemas as querySchemas } from '../generated/Query';
 import { schemas as bulkImportsSchemas } from '../generated/Bulk_Imports';
 import { schemas as findMomentsSchemas } from '../generated/Find_Moments';
 import { schemas as collectionsMomentSchemas } from '../generated/Collections';
+import { schemas as sitesSchemas } from '../generated/Sites';
 
 /**
  * Represents a video file in the Cloudglue system
@@ -817,4 +818,26 @@ export type CollectionMomentsList = z.infer<
  */
 export type CollectionMomentFindingsList = z.infer<
   typeof collectionsMomentSchemas.CollectionMomentFindingsList
+>;
+
+/**
+ * One registered (site, route) unfurl preview on a published site, as
+ * stored: canonical route, card overrides, hero share, and optional clip
+ * window
+ */
+export type SiteRoutePreview = z.infer<typeof sitesSchemas.SiteRoutePreview>;
+
+/**
+ * One entry of a route-previews replace call: a route plus its preview
+ * card, hero share, and optional clip window
+ */
+export type SiteRoutePreviewInput = z.infer<
+  typeof sitesSchemas.SiteRoutePreviewInput
+>;
+
+/**
+ * Represents a site's complete set of per-route unfurl previews
+ */
+export type SiteRoutePreviewList = z.infer<
+  typeof sitesSchemas.SiteRoutePreviewList
 >;

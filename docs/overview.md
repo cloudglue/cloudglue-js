@@ -58,6 +58,7 @@ The SDK also exports standalone URL helpers (`classifyVideoUrl`, `normalizeVideo
 | `client.webhooks` | Event notifications | CRUD operations |
 | `client.tags` | Video tagging | CRUD operations |
 | `client.shareable` | Public sharing links | CRUD operations |
+| `client.sites` | Per-route unfurl previews on published sites — each page gets its own card, hero share, and clip window (see [Sites](./sites.md)) | `listSiteRoutePreviews`, `replaceSiteRoutePreviews`, `deleteSiteRoutePreview` |
 
 ## Documentation Hierarchy
 

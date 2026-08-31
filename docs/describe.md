@@ -26,11 +26,14 @@ const job = await client.describe.createDescribe(
     // thumbnails_config: { ... },
     // segmentation_id: 'existing_seg_id',  // use existing segmentation
     // participants: [{ name: 'Ada Lovelace' }, { name: 'Alan Turing' }],
+    // prompt: 'Spell product names as Cloudglue and Aviary; call out any pricing discussed.',
   }
 );
 ```
 
 **Participants:** pass `participants` to constrain speaker naming — transcript speaker labels will only use one of the given names (or a generic "Speaker N"), never an invented name. Intended for uploaded files, which carry no participant metadata; for data-connector files (e.g. Grain) participants are populated automatically and need not be supplied.
+
+**Prompt** (spec v0.7.32): pass `prompt` (max 2000 chars) as free-form guidance — domain terms and their spellings, what to pay attention to, output style. It steers emphasis and vocabulary across the visual, scene-text, speech, and summary passes; it cannot make the description report content that isn't in the media, and it never changes the response shape. A prompt is context, not a constraint — use `participants` to constrain speaker labels. The prompt is part of the describe cache key (changing it produces a new job, not a cache hit) and is echoed back on `describe_config.prompt`.
 
 ## Wait for Completion
 

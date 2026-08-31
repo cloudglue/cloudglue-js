@@ -69,6 +69,7 @@ type DescribeConfig = Partial<{
   enable_visual_scene_description: boolean;
   enable_scene_text: boolean;
   enable_audio_description: boolean;
+  prompt: string;
 }>;
 type SegmentDescribeJsonData = Partial<{
   visual_scene_description: Array<SegmentDescribeOutputEntry>;
@@ -155,6 +156,7 @@ const DescribeConfig: z.ZodType<DescribeConfig> = z
     enable_visual_scene_description: z.boolean(),
     enable_scene_text: z.boolean(),
     enable_audio_description: z.boolean(),
+    prompt: z.string().max(2000),
   })
   .partial()
   .strict()

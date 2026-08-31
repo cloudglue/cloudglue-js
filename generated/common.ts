@@ -456,6 +456,7 @@ export type Describe = {
           name: string;
           scope?: string | undefined;
         }>;
+        prompt: string;
       }>
     | undefined;
   use_in_default_index?: boolean | undefined;
@@ -1376,6 +1377,7 @@ export const Describe: z.ZodType<Describe> = z
               .passthrough()
           )
           .max(50),
+        prompt: z.string(),
       })
       .partial()
       .strict()

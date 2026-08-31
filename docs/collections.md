@@ -21,7 +21,8 @@ const collection = await client.collections.createCollection({
   collection_type: 'media-descriptions',  // default
   // Optional configs:
   // default_segmentation_config: { strategy: 'shot-detector' },
-  // describe_config: { enable_speech: true, enable_visual_scene_description: true },
+  // describe_config: { enable_speech: true, enable_visual_scene_description: true,
+  //                    prompt: 'Spell product names as Cloudglue and Aviary.' },
   // default_thumbnails_config: { ... },
   // For 'entities' collections:
   // extract_config: { prompt, schema, enable_video_level_entities,
@@ -31,6 +32,8 @@ const collection = await client.collections.createCollection({
 ```
 
 Only provide the config that matches the `collection_type` — other configs are ignored.
+
+`describe_config.prompt` (spec v0.7.32, max 2000 chars) is free-form guidance applied when describing **every** file in the collection — domain terms and spellings, what to pay attention to. Like the rest of the describe config it is fixed at creation; see [Describe](./describe.md) for what a prompt can and cannot steer.
 
 ## Metadata Collections
 

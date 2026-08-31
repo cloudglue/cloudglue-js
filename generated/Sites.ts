@@ -62,7 +62,7 @@ const SiteRoutePreviewInput: z.ZodType<SiteRoutePreviewInput> = z
   .passthrough();
 const ReplaceSiteRoutePreviewsRequest: z.ZodType<ReplaceSiteRoutePreviewsRequest> =
   z
-    .object({ previews: z.array(SiteRoutePreviewInput).max(1000) })
+    .object({ previews: z.array(SiteRoutePreviewInput).max(20000) })
     .strict()
     .passthrough();
 

@@ -30,6 +30,17 @@ export class EnhancedDescribeApi {
        * populated automatically and need not be supplied.
        */
       participants?: Array<{ name: string; scope?: string }>;
+      /**
+       * Optional free-form guidance for the description (max 2000 chars):
+       * domain terms and their spellings, what to pay attention to, output
+       * style. Steers emphasis and vocabulary across the visual, scene-text,
+       * speech, and summary passes; it cannot make the description report
+       * content that isn't in the media, and it never changes the response
+       * shape. To constrain transcript speaker labels use `participants` —
+       * a prompt is context, not a constraint. Changing it produces a new
+       * describe job rather than reusing a cached one.
+       */
+      prompt?: string;
     } = {},
   ) {
     return this.api.createDescribe({

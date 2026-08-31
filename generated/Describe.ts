@@ -42,6 +42,7 @@ type NewDescribe = {
         scope?: string | undefined;
       }>
     | undefined;
+  prompt?: string | undefined;
   include_metadata?: boolean | undefined;
 } & FileSegmentationConfig;
 
@@ -66,6 +67,7 @@ const NewDescribe: z.ZodType<NewDescribe> = z
       )
       .max(50)
       .optional(),
+    prompt: z.string().max(2000).optional(),
     include_metadata: z.boolean().optional(),
   })
   .strict()

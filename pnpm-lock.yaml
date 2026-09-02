@@ -4,30 +4,16 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-overrides:
-  js-yaml: ^4.3.1
-  axios: ^1.18.0
-  glob: ^13.0.3
-  ajv: ^8.18.0
-  fast-uri: ^3.1.5
-  minimatch: ^10.2.3
-  handlebars: ^4.7.9
-  brace-expansion: ^5.0.9
-  yaml: ^2.8.3
-  form-data: ^4.0.6
-  '@babel/core': ^7.29.6
-  esbuild: ^0.28.1
-
 importers:
 
   .:
     dependencies:
       '@zodios/core':
         specifier: ^10.0.0
-        version: 10.9.6(axios@1.19.0)(zod@3.25.76)
+        version: 10.9.6(axios@1.20.0(debug@4.4.3))(zod@3.25.76)
       axios:
         specifier: ^1.18.0
-        version: 1.19.0
+        version: 1.20.0(debug@4.4.3)
       zod:
         specifier: ^3.22.4
         version: 3.25.76
@@ -37,7 +23,7 @@ importers:
         version: 26.1.0
       openapi-zod-client:
         specifier: ^1.18.3
-        version: 1.18.3
+        version: 1.18.3(debug@4.4.3)
       prettier:
         specifier: ^3.7.4
         version: 3.9.6
@@ -101,7 +87,7 @@ packages:
     resolution: {integrity: sha512-UPUVSyXbOh627KiCIGQSgwWzGeBKLkaJ9PJEdrngIwMSzxLR4jS4+f1f1jb7VzBbg8nFLaYotvVPFCTqdrmTAg==}
     engines: {node: '>=6.9.0'}
     peerDependencies:
-      '@babel/core': ^7.29.6
+      '@babel/core': ^7.0.0
 
   '@babel/helper-string-parser@7.27.1':
     resolution: {integrity: sha512-qMlSxKbpRlAridDExk92nSobyDdpPijUq2DW6oDnUqd0iOGxmQjyqhMIihI9+zv4LPyZdRje2cavWPbCbWm3eA==}
@@ -343,7 +329,7 @@ packages:
   '@zodios/core@10.9.6':
     resolution: {integrity: sha512-aH4rOdb3AcezN7ws8vDgBfGboZMk2JGGzEq/DtW65MhnRxyTGRuLJRWVQ/2KxDgWvV2F5oTkAS+5pnjKbl0n+A==}
     peerDependencies:
-      axios: ^1.18.0
+      axios: ^0.x || ^1.0.0
       zod: ^3.x
 
   agent-base@6.0.2:
@@ -353,7 +339,7 @@ packages:
   ajv-draft-04@1.0.0:
     resolution: {integrity: sha512-mv00Te6nmYbRp5DCwclxtt7yV/joXJPGS7nM+97GdxvuttCOfgI3K4U25zboyeX0O+myI8ERluxQe5wljMmVIw==}
     peerDependencies:
-      ajv: ^8.18.0
+      ajv: ^8.5.0
     peerDependenciesMeta:
       ajv:
         optional: true
@@ -367,8 +353,8 @@ packages:
   asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
 
-  axios@1.19.0:
-    resolution: {integrity: sha512-ht/iuYZXEjFxLH/Hkezgd7m6JKlHHXEUSneaDz8uZe1Gj5QZtCnpyDsckvAiEnT89OEbCLmnte4R4sn7P0EKFw==}
+  axios@1.20.0:
+    resolution: {integrity: sha512-r8aOh8j9cGKpgQAqpzrUHnSIc6a59Y3Xf/cv8sy1DrHCkZHzQGEuoq1tARk6qSyDdtQGSDgpb9kFlruzPvrgwg==}
 
   balanced-match@4.0.4:
     resolution: {integrity: sha512-BLrgEcRTwX2o6gGxGOCNyMvGSp35YofuYzw9h1IMTRmKqttAZZVU67bdb9Pr2vUHA8+j3i2tJfjO6C6+4myGTA==}
@@ -969,9 +955,9 @@ snapshots:
     dependencies:
       undici-types: 8.3.0
 
-  '@zodios/core@10.9.6(axios@1.19.0)(zod@3.25.76)':
+  '@zodios/core@10.9.6(axios@1.20.0(debug@4.4.3))(zod@3.25.76)':
     dependencies:
-      axios: 1.19.0
+      axios: 1.20.0(debug@4.4.3)
       zod: 3.25.76
 
   agent-base@6.0.2:
@@ -995,9 +981,9 @@ snapshots:
 
   asynckit@0.4.0: {}
 
-  axios@1.19.0:
+  axios@1.20.0(debug@4.4.3):
     dependencies:
-      follow-redirects: 1.16.0
+      follow-redirects: 1.16.0(debug@4.4.3)
       form-data: 4.0.6
       https-proxy-agent: 5.0.1
       proxy-from-env: 2.1.0
@@ -1101,7 +1087,9 @@ snapshots:
 
   fast-uri@3.1.5: {}
 
-  follow-redirects@1.16.0: {}
+  follow-redirects@1.16.0(debug@4.4.3):
+    optionalDependencies:
+      debug: 4.4.3
 
   form-data@4.0.6:
     dependencies:
@@ -1226,12 +1214,12 @@ snapshots:
 
   openapi-types@12.1.3: {}
 
-  openapi-zod-client@1.18.3:
+  openapi-zod-client@1.18.3(debug@4.4.3):
     dependencies:
       '@apidevtools/swagger-parser': 10.1.1(openapi-types@12.1.3)
       '@liuli-util/fs-extra': 0.1.0
-      '@zodios/core': 10.9.6(axios@1.19.0)(zod@3.25.76)
-      axios: 1.19.0
+      '@zodios/core': 10.9.6(axios@1.20.0(debug@4.4.3))(zod@3.25.76)
+      axios: 1.20.0(debug@4.4.3)
       cac: 6.7.14
       handlebars: 4.7.9
       openapi-types: 12.1.3

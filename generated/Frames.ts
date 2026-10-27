@@ -2,6 +2,7 @@ import { makeApi, Zodios, type ZodiosOptions } from '@zodios/core';
 import { z } from 'zod';
 
 import { FrameExtraction } from './common';
+import { ApiErrorResponse } from './common';
 import { FrameExtractionConfig } from './common';
 import { FrameExtractionUniformConfig } from './common';
 import { FrameExtractionThumbnailsConfig } from './common';
@@ -35,12 +36,12 @@ const endpoints = makeApi([
       {
         status: 404,
         description: `Frame extraction not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -62,12 +63,12 @@ const endpoints = makeApi([
       {
         status: 404,
         description: `Frame extraction not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },

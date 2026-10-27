@@ -559,4 +559,18 @@ for (const file of generatedFiles) {
     fs.writeFileSync(commonPath, commonContent);
 }
 
-console.log('Generation complete!'); 
+// As of spec v0.7.33 the shared `Error` response schema (now carrying an
+// optional `code`) is extracted into common.ts as a const named `Error`,
+// which shadows the global Error constructor in every module importing it.
+// Rename it to ApiErrorResponse — same idea as the CloudglueFile alias.
+for (const file of generatedFiles) {
+    const filePath = path.join(generatedDir, file);
+    const original = fs.readFileSync(filePath, 'utf8');
+    const renamed = original
+        .replace(/^export const Error = /m, 'export const ApiErrorResponse = ')
+        .replace(/^(import \{[^}\n]*)\bError\b([^}\n]*\} from ["']\.\/common["'];?)$/gm, '$1ApiErrorResponse$2')
+        .replace(/\bschema: Error\b/g, 'schema: ApiErrorResponse');
+    if (renamed !== original) fs.writeFileSync(filePath, renamed);
+}
+
+console.log('Generation complete!');

@@ -1,6 +1,7 @@
 import { makeApi, Zodios, type ZodiosOptions } from '@zodios/core';
 import { z } from 'zod';
 
+import { ApiErrorResponse } from './common';
 import { ThumbnailsConfig } from './common';
 import { FileSegmentationConfig } from './common';
 import { SegmentationConfig } from './common';
@@ -216,22 +217,22 @@ const endpoints = makeApi([
       {
         status: 400,
         description: `Invalid request or missing required prompt/schema`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
+      },
+      {
+        status: 403,
+        description: `Usage limit reached (monthly extract jobs, or the file limits when given a new URL) — &#x60;code: usage_limit_reached&#x60;`,
+        schema: ApiErrorResponse,
       },
       {
         status: 404,
         description: `Extract job not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
-      },
-      {
-        status: 429,
-        description: `Monthly extract jobs limit reached`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -291,22 +292,17 @@ const endpoints = makeApi([
       {
         status: 400,
         description: `Invalid request or extract config requires at least one option enabled`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 404,
         description: `Extract job not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
-      },
-      {
-        status: 429,
-        description: `Monthly extract jobs limit reached`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -353,12 +349,12 @@ const endpoints = makeApi([
       {
         status: 404,
         description: `Job not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -380,12 +376,12 @@ const endpoints = makeApi([
       {
         status: 404,
         description: `Job not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },

@@ -662,6 +662,13 @@ export const VideoTag = z
   })
   .strict()
   .passthrough();
+export const ApiErrorResponse = z
+  .object({
+    error: z.string(),
+    code: z.literal('usage_limit_reached').optional(),
+  })
+  .strict()
+  .passthrough();
 export const PaginationResponse = z
   .object({
     object: z.literal('list'),

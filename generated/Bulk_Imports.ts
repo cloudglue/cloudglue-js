@@ -1,6 +1,8 @@
 import { makeApi, Zodios, type ZodiosOptions } from '@zodios/core';
 import { z } from 'zod';
 
+import { ApiErrorResponse } from './common';
+
 type MetadataImport = Partial<{
   object: 'metadata_import';
   id: string;
@@ -283,17 +285,17 @@ const endpoints = makeApi([
       {
         status: 400,
         description: `Invalid request — the connector does not exist, the connector type does not support imports, a filter key is not supported by the connector type, or &#x60;include_thumbnails&#x60; or &#x60;enrich_metadata&#x60; was set on a media import (imported media gets real thumbnails from the processing pipeline, and a media run has no metadata-only record to enrich)`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 404,
         description: `Collection not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -325,12 +327,12 @@ const endpoints = makeApi([
       {
         status: 404,
         description: `Collection not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -367,12 +369,12 @@ const endpoints = makeApi([
       {
         status: 404,
         description: `Collection or import not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -399,12 +401,12 @@ const endpoints = makeApi([
       {
         status: 404,
         description: `Collection or import not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -436,22 +438,27 @@ const endpoints = makeApi([
       {
         status: 400,
         description: `Invalid request — &#x60;include_thumbnails&#x60; or &#x60;enrich_metadata&#x60; was set on a media import (imported media gets real thumbnails from the processing pipeline, and a media run has no metadata-only record to enrich)`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
+      },
+      {
+        status: 403,
+        description: `Usage limit reached (monthly metadata-import files) — &#x60;code: usage_limit_reached&#x60;`,
+        schema: ApiErrorResponse,
       },
       {
         status: 404,
         description: `Collection or import not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 409,
         description: `A run of this import is already active, or another import in this collection has an active run`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `The run could not be enqueued and was marked failed — trigger a new run to retry`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -483,12 +490,12 @@ const endpoints = makeApi([
       {
         status: 404,
         description: `Collection, import, or run not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },

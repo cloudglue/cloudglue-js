@@ -46,7 +46,7 @@ type NewDescribe = {
   include_metadata?: boolean | undefined;
 } & FileSegmentationConfig;
 
-const NewDescribe: z.ZodType<NewDescribe> = z
+const NewDescribe: z.ZodType<NewDescribe, NewDescribe> = z
   .object({
     url: z.string(),
     enable_summary: z.boolean().optional(),

@@ -82,7 +82,7 @@ type ExtractList = {
   offset: number;
 };
 
-const Extract: z.ZodType<Extract> = z
+const Extract: z.ZodType<Extract, Extract> = z
   .object({
     job_id: z.string(),
     status: z.enum([
@@ -163,7 +163,7 @@ const Extract: z.ZodType<Extract> = z
   })
   .strict()
   .passthrough();
-const ExtractList: z.ZodType<ExtractList> = z
+const ExtractList: z.ZodType<ExtractList, ExtractList> = z
   .object({
     object: z.literal('list'),
     data: z.array(Extract),
@@ -173,7 +173,7 @@ const ExtractList: z.ZodType<ExtractList> = z
   })
   .strict()
   .passthrough();
-const NewExtract: z.ZodType<NewExtract> = z
+const NewExtract: z.ZodType<NewExtract, NewExtract> = z
   .object({
     url: z.string(),
     prompt: z.string().optional(),

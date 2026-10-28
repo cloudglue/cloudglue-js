@@ -28,7 +28,7 @@ type ShareableAssetListResponse = {
   offset: number;
 };
 
-const ShareableAsset: z.ZodType<ShareableAsset> = z
+const ShareableAsset: z.ZodType<ShareableAsset, ShareableAsset> = z
   .object({
     id: z.string().uuid(),
     file_id: z.string().uuid(),
@@ -50,7 +50,7 @@ const ShareableAsset: z.ZodType<ShareableAsset> = z
   })
   .strict()
   .passthrough();
-const ShareableAssetListResponse: z.ZodType<ShareableAssetListResponse> = z
+const ShareableAssetListResponse: z.ZodType<ShareableAssetListResponse, ShareableAssetListResponse> = z
   .object({
     object: z.literal('list'),
     data: z.array(ShareableAsset),

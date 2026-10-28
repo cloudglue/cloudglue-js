@@ -72,7 +72,7 @@ type TranscribeList = {
   limit: number;
 };
 
-const Transcribe: z.ZodType<Transcribe> = z
+const Transcribe: z.ZodType<Transcribe, Transcribe> = z
   .object({
     job_id: z.string(),
     status: z.enum([
@@ -123,7 +123,7 @@ const Transcribe: z.ZodType<Transcribe> = z
   })
   .strict()
   .passthrough();
-const NewTranscribe: z.ZodType<NewTranscribe> = z
+const NewTranscribe: z.ZodType<NewTranscribe, NewTranscribe> = z
   .object({
     url: z.string(),
     enable_summary: z.boolean().optional(),
@@ -137,7 +137,7 @@ const NewTranscribe: z.ZodType<NewTranscribe> = z
   .strict()
   .passthrough()
   .and(FileSegmentationConfig);
-const TranscribeList: z.ZodType<TranscribeList> = z
+const TranscribeList: z.ZodType<TranscribeList, TranscribeList> = z
   .object({
     object: z.literal('list'),
     data: z.array(Transcribe),

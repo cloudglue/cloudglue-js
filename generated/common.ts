@@ -1065,7 +1065,7 @@ export const IconikSourceMetadata = z
   })
   .strict()
   .passthrough();
-export const SourceMetadata: z.ZodType<SourceMetadata> = z.discriminatedUnion('source_type', [
+export const SourceMetadata: z.ZodType<SourceMetadata, SourceMetadata> = z.discriminatedUnion('source_type', [
   GrainSourceMetadata,
   ZoomSourceMetadata,
   RecallSourceMetadata,
@@ -1074,7 +1074,7 @@ export const SourceMetadata: z.ZodType<SourceMetadata> = z.discriminatedUnion('s
   GongSourceMetadata,
   IconikSourceMetadata,
 ]);
-export const File: z.ZodType<File> = z
+export const File: z.ZodType<File, File> = z
   .object({
     id: z.string(),
     status: z.enum([
@@ -1239,7 +1239,7 @@ export const MomentCriterion = z
     moment_schema: MomentSchemaDefinition.optional(),
     finding_schema: MomentSchemaDefinition.optional(),
     anchors: z
-      .record(
+      .record(z.string(),
         z
           .object({ required: z.boolean(), description: z.string() })
           .partial()
@@ -1348,7 +1348,7 @@ export const SearchFilter = z
   .partial()
   .strict()
   .passthrough();
-export const Describe: z.ZodType<Describe> = z
+export const Describe: z.ZodType<Describe, Describe> = z
   .object({
     job_id: z.string(),
     status: z.enum([
@@ -1441,7 +1441,7 @@ export const Describe: z.ZodType<Describe> = z
   })
   .strict()
   .passthrough();
-export const DescribeList: z.ZodType<DescribeList> = z
+export const DescribeList: z.ZodType<DescribeList, DescribeList> = z
   .object({
     object: z.literal('list'),
     data: z.array(Describe),
@@ -1465,7 +1465,7 @@ export const Moment = z
     moment_id: z.string().uuid(),
     start_time: z.number(),
     end_time: z.number(),
-    anchors: z.record(z.number()).optional(),
+    anchors: z.record(z.string(), z.number()).optional(),
     title: z.string(),
     reason: z.string(),
     speakers: z.array(z.string()).optional(),

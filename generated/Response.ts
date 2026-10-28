@@ -140,11 +140,11 @@ type ResponseListItem = Partial<{
   usage: ResponseUsage;
 }>;
 
-const ResponseInputContent: z.ZodType<ResponseInputContent> = z
+const ResponseInputContent: z.ZodType<ResponseInputContent, ResponseInputContent> = z
   .object({ type: z.literal('input_text'), text: z.string() })
   .strict()
   .passthrough();
-const ResponseInputMessage: z.ZodType<ResponseInputMessage> = z
+const ResponseInputMessage: z.ZodType<ResponseInputMessage, ResponseInputMessage> = z
   .object({
     type: z.literal('message'),
     role: z.enum(['developer', 'user', 'assistant']),
@@ -152,7 +152,7 @@ const ResponseInputMessage: z.ZodType<ResponseInputMessage> = z
   })
   .strict()
   .passthrough();
-const EntityCollectionConfig: z.ZodType<EntityCollectionConfig> = z
+const EntityCollectionConfig: z.ZodType<EntityCollectionConfig, EntityCollectionConfig> = z
   .object({
     name: z.string().optional(),
     description: z.string().optional(),
@@ -160,14 +160,14 @@ const EntityCollectionConfig: z.ZodType<EntityCollectionConfig> = z
   })
   .strict()
   .passthrough();
-const EntityBackedKnowledgeConfig: z.ZodType<EntityBackedKnowledgeConfig> = z
+const EntityBackedKnowledgeConfig: z.ZodType<EntityBackedKnowledgeConfig, EntityBackedKnowledgeConfig> = z
   .object({
     entity_collections: z.array(EntityCollectionConfig).min(1),
     description: z.string().max(2000).optional(),
   })
   .strict()
   .passthrough();
-const KnowledgeBaseCollections: z.ZodType<KnowledgeBaseCollections> = z
+const KnowledgeBaseCollections: z.ZodType<KnowledgeBaseCollections, KnowledgeBaseCollections> = z
   .object({
     source: z.literal('collections'),
     type: z.enum(['general_question_answering', 'entity_backed_knowledge']),
@@ -178,20 +178,20 @@ const KnowledgeBaseCollections: z.ZodType<KnowledgeBaseCollections> = z
   .partial()
   .strict()
   .passthrough();
-const KnowledgeBaseFiles: z.ZodType<KnowledgeBaseFiles> = z
+const KnowledgeBaseFiles: z.ZodType<KnowledgeBaseFiles, KnowledgeBaseFiles> = z
   .object({ source: z.literal('files'), files: z.array(z.string()).min(1) })
   .strict()
   .passthrough();
-const KnowledgeBaseDefault: z.ZodType<KnowledgeBaseDefault> = z
+const KnowledgeBaseDefault: z.ZodType<KnowledgeBaseDefault, KnowledgeBaseDefault> = z
   .object({ source: z.literal('default') })
   .strict()
   .passthrough();
-const ResponseKnowledgeBase: z.ZodType<ResponseKnowledgeBase> = z.union([
+const ResponseKnowledgeBase: z.ZodType<ResponseKnowledgeBase, ResponseKnowledgeBase> = z.union([
   KnowledgeBaseCollections,
   KnowledgeBaseFiles,
   KnowledgeBaseDefault,
 ]);
-const ResponseToolDefinition: z.ZodType<ResponseToolDefinition> = z
+const ResponseToolDefinition: z.ZodType<ResponseToolDefinition, ResponseToolDefinition> = z
   .object({
     type: z.literal('function'),
     name: z.string().min(1),
@@ -201,7 +201,7 @@ const ResponseToolDefinition: z.ZodType<ResponseToolDefinition> = z
   })
   .strict()
   .passthrough();
-const CreateResponseRequest: z.ZodType<CreateResponseRequest> = z
+const CreateResponseRequest: z.ZodType<CreateResponseRequest, CreateResponseRequest> = z
   .object({
     model: z.string().min(1),
     input: z.union([z.string(), z.array(ResponseInputMessage)]),
@@ -218,7 +218,7 @@ const CreateResponseRequest: z.ZodType<CreateResponseRequest> = z
   })
   .strict()
   .passthrough();
-const ResponseAnnotation: z.ZodType<ResponseAnnotation> = z
+const ResponseAnnotation: z.ZodType<ResponseAnnotation, ResponseAnnotation> = z
   .object({
     type: z.literal('cloudglue_citation'),
     collection_id: z.string().uuid().optional(),
@@ -235,7 +235,7 @@ const ResponseAnnotation: z.ZodType<ResponseAnnotation> = z
   })
   .strict()
   .passthrough();
-const ResponseOutputContent: z.ZodType<ResponseOutputContent> = z
+const ResponseOutputContent: z.ZodType<ResponseOutputContent, ResponseOutputContent> = z
   .object({
     type: z.literal('output_text'),
     text: z.string(),
@@ -244,7 +244,7 @@ const ResponseOutputContent: z.ZodType<ResponseOutputContent> = z
   .partial()
   .strict()
   .passthrough();
-const ResponseOutputMessage: z.ZodType<ResponseOutputMessage> = z
+const ResponseOutputMessage: z.ZodType<ResponseOutputMessage, ResponseOutputMessage> = z
   .object({
     type: z.literal('message'),
     role: z.literal('assistant'),
@@ -253,7 +253,7 @@ const ResponseOutputMessage: z.ZodType<ResponseOutputMessage> = z
   .partial()
   .strict()
   .passthrough();
-const ResponseFunctionCall: z.ZodType<ResponseFunctionCall> = z
+const ResponseFunctionCall: z.ZodType<ResponseFunctionCall, ResponseFunctionCall> = z
   .object({
     type: z.literal('function_call'),
     id: z.string(),
@@ -264,7 +264,7 @@ const ResponseFunctionCall: z.ZodType<ResponseFunctionCall> = z
   .partial()
   .strict()
   .passthrough();
-const ResponseQueryCall: z.ZodType<ResponseQueryCall> = z
+const ResponseQueryCall: z.ZodType<ResponseQueryCall, ResponseQueryCall> = z
   .object({
     type: z.literal('cloudglue_query_call'),
     id: z.string(),
@@ -278,7 +278,7 @@ const ResponseQueryCall: z.ZodType<ResponseQueryCall> = z
   .partial()
   .strict()
   .passthrough();
-const ResponseUsage: z.ZodType<ResponseUsage> = z
+const ResponseUsage: z.ZodType<ResponseUsage, ResponseUsage> = z
   .object({
     input_tokens: z.number().int(),
     output_tokens: z.number().int(),
@@ -287,12 +287,12 @@ const ResponseUsage: z.ZodType<ResponseUsage> = z
   .partial()
   .strict()
   .passthrough();
-const ResponseError: z.ZodType<ResponseError> = z
+const ResponseError: z.ZodType<ResponseError, ResponseError> = z
   .object({ message: z.string(), type: z.string(), code: z.string() })
   .partial()
   .strict()
   .passthrough();
-const Response: z.ZodType<Response> = z
+const Response: z.ZodType<Response, Response> = z
   .object({
     id: z.string().uuid(),
     object: z.literal('response'),
@@ -315,7 +315,7 @@ const Response: z.ZodType<Response> = z
   .partial()
   .strict()
   .passthrough();
-const ResponseListItem: z.ZodType<ResponseListItem> = z
+const ResponseListItem: z.ZodType<ResponseListItem, ResponseListItem> = z
   .object({
     id: z.string().uuid(),
     object: z.literal('response'),
@@ -328,7 +328,7 @@ const ResponseListItem: z.ZodType<ResponseListItem> = z
   .partial()
   .strict()
   .passthrough();
-const ResponseList: z.ZodType<ResponseList> = z
+const ResponseList: z.ZodType<ResponseList, ResponseList> = z
   .object({
     object: z.literal('list'),
     data: z.array(ResponseListItem),

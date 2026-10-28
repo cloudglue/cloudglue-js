@@ -86,7 +86,7 @@ type QuerySchemaCollection = Partial<{
   prompt: string | null;
 }>;
 
-const QueryUsage: z.ZodType<QueryUsage> = z
+const QueryUsage: z.ZodType<QueryUsage, QueryUsage> = z
   .object({
     files_scanned: z.number().int(),
     entity_rows: z.number().int(),
@@ -97,7 +97,7 @@ const QueryUsage: z.ZodType<QueryUsage> = z
   .partial()
   .strict()
   .passthrough();
-const QueryResult: z.ZodType<QueryResult> = z
+const QueryResult: z.ZodType<QueryResult, QueryResult> = z
   .object({
     id: z.string().uuid(),
     object: z.literal('query_result'),
@@ -133,7 +133,7 @@ const QueryResult: z.ZodType<QueryResult> = z
   .partial()
   .strict()
   .passthrough();
-const QueryListItem: z.ZodType<QueryListItem> = z
+const QueryListItem: z.ZodType<QueryListItem, QueryListItem> = z
   .object({
     id: z.string().uuid(),
     object: z.literal('query_result'),
@@ -154,7 +154,7 @@ const QueryListItem: z.ZodType<QueryListItem> = z
   .partial()
   .strict()
   .passthrough();
-const QueryListResponse: z.ZodType<QueryListResponse> = z
+const QueryListResponse: z.ZodType<QueryListResponse, QueryListResponse> = z
   .object({
     object: z.literal('list'),
     data: z.array(QueryListItem),
@@ -165,7 +165,7 @@ const QueryListResponse: z.ZodType<QueryListResponse> = z
   .partial()
   .strict()
   .passthrough();
-const QuerySchemaTable: z.ZodType<QuerySchemaTable> = z
+const QuerySchemaTable: z.ZodType<QuerySchemaTable, QuerySchemaTable> = z
   .object({
     name: z.string(),
     description: z.string(),
@@ -180,7 +180,7 @@ const QuerySchemaTable: z.ZodType<QuerySchemaTable> = z
   .partial()
   .strict()
   .passthrough();
-const QuerySchemaCollection: z.ZodType<QuerySchemaCollection> = z
+const QuerySchemaCollection: z.ZodType<QuerySchemaCollection, QuerySchemaCollection> = z
   .object({
     collection_id: z.string().uuid(),
     fields: z.array(
@@ -200,7 +200,7 @@ const QuerySchemaCollection: z.ZodType<QuerySchemaCollection> = z
   .partial()
   .strict()
   .passthrough();
-const QuerySchema: z.ZodType<QuerySchema> = z
+const QuerySchema: z.ZodType<QuerySchema, QuerySchema> = z
   .object({
     object: z.literal('query_schema'),
     tables: z.array(QuerySchemaTable),

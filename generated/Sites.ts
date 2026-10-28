@@ -29,7 +29,7 @@ type SiteRoutePreviewInput = {
   endSeconds?: number | undefined;
 };
 
-const SiteRoutePreview: z.ZodType<SiteRoutePreview> = z
+const SiteRoutePreview: z.ZodType<SiteRoutePreview, SiteRoutePreview> = z
   .object({
     id: z.string().uuid(),
     route: z.string().max(512),
@@ -44,11 +44,11 @@ const SiteRoutePreview: z.ZodType<SiteRoutePreview> = z
   })
   .strict()
   .passthrough();
-const SiteRoutePreviewList: z.ZodType<SiteRoutePreviewList> = z
+const SiteRoutePreviewList: z.ZodType<SiteRoutePreviewList, SiteRoutePreviewList> = z
   .object({ previews: z.array(SiteRoutePreview) })
   .strict()
   .passthrough();
-const SiteRoutePreviewInput: z.ZodType<SiteRoutePreviewInput> = z
+const SiteRoutePreviewInput: z.ZodType<SiteRoutePreviewInput, SiteRoutePreviewInput> = z
   .object({
     route: z.string().max(512),
     previewTitle: z.string().optional(),
@@ -60,7 +60,7 @@ const SiteRoutePreviewInput: z.ZodType<SiteRoutePreviewInput> = z
   })
   .strict()
   .passthrough();
-const ReplaceSiteRoutePreviewsRequest: z.ZodType<ReplaceSiteRoutePreviewsRequest> =
+const ReplaceSiteRoutePreviewsRequest: z.ZodType<ReplaceSiteRoutePreviewsRequest, ReplaceSiteRoutePreviewsRequest> =
   z
     .object({ previews: z.array(SiteRoutePreviewInput).max(20000) })
     .strict()

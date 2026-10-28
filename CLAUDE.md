@@ -39,7 +39,7 @@ npm run generate             # Regenerate clients
 **Code Generation Pipeline:**
 1. OpenAPI spec lives in `spec/` submodule (from cloudglue-api-spec repo)
 2. `npm run generate` uses `openapi-zod-client` to generate Zodios clients with Zod schemas
-3. `generate.js` applies post-generation transforms (File→CloudglueFile aliasing, nullish type fixes)
+3. `generate.js` applies post-generation transforms (File→CloudglueFile aliasing, nullish type fixes, then zod 4 fixes from `scripts/zod4-transforms.js`; run that script alone to re-apply them to committed `generated/` files)
 4. `scripts/build.js` replaces `__SDK_VERSION__` placeholder during build
 
 **Key Technologies:**

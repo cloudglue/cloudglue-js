@@ -395,7 +395,7 @@ type CollectionMomentFindingsList = {
   next_cursor?: string | undefined;
 };
 
-const MomentCriterionAttachment: z.ZodType<MomentCriterionAttachment> = z
+const MomentCriterionAttachment: z.ZodType<MomentCriterionAttachment, MomentCriterionAttachment> = z
   .object({
     attachment_id: z.string().uuid(),
     criterion_name: z.string(),
@@ -426,7 +426,7 @@ const MomentCriterionAttachment: z.ZodType<MomentCriterionAttachment> = z
   })
   .strict()
   .passthrough();
-const Collection: z.ZodType<Collection> = z
+const Collection: z.ZodType<Collection, Collection> = z
   .object({
     id: z.string(),
     object: z.literal('collection'),
@@ -518,7 +518,7 @@ const Collection: z.ZodType<Collection> = z
   })
   .strict()
   .passthrough();
-const NewMomentCriterionAttachment: z.ZodType<NewMomentCriterionAttachment> = z
+const NewMomentCriterionAttachment: z.ZodType<NewMomentCriterionAttachment, NewMomentCriterionAttachment> = z
   .object({
     criterion: MomentCriterion,
     signals_required: z
@@ -551,11 +551,11 @@ const NewMomentCriterionAttachment: z.ZodType<NewMomentCriterionAttachment> = z
     max_duration_seconds: z.number().gt(0).optional(),
   })
   .strict();
-const MomentsConfig: z.ZodType<MomentsConfig> = z
+const MomentsConfig: z.ZodType<MomentsConfig, MomentsConfig> = z
   .object({ criteria: z.array(NewMomentCriterionAttachment).min(1) })
   .strict()
   .passthrough();
-const DefaultSegmentationConfig: z.ZodType<DefaultSegmentationConfig> = z
+const DefaultSegmentationConfig: z.ZodType<DefaultSegmentationConfig, DefaultSegmentationConfig> = z
   .object({
     strategy: z.enum(['uniform', 'shot-detector', 'narrative']),
     uniform_config: SegmentationUniformConfig.optional(),
@@ -567,7 +567,7 @@ const DefaultSegmentationConfig: z.ZodType<DefaultSegmentationConfig> = z
   })
   .strict()
   .passthrough();
-const NewCollection: z.ZodType<NewCollection> = z
+const NewCollection: z.ZodType<NewCollection, NewCollection> = z
   .object({
     collection_type: z.enum([
       'media-descriptions',
@@ -650,7 +650,7 @@ const NewCollection: z.ZodType<NewCollection> = z
   })
   .strict()
   .passthrough();
-const CollectionList: z.ZodType<CollectionList> = z
+const CollectionList: z.ZodType<CollectionList, CollectionList> = z
   .object({
     object: z.literal('list'),
     data: z.array(Collection),
@@ -660,7 +660,7 @@ const CollectionList: z.ZodType<CollectionList> = z
   })
   .strict()
   .passthrough();
-const AddCollectionFile: z.ZodType<AddCollectionFile> = z
+const AddCollectionFile: z.ZodType<AddCollectionFile, AddCollectionFile> = z
   .union([
     z.object({ file_id: z.string() }).strict().passthrough(),
     z.object({ url: z.string() }).strict().passthrough(),
@@ -676,7 +676,7 @@ const AddCollectionFile: z.ZodType<AddCollectionFile> = z
       .strict()
       .passthrough()
   );
-const CollectionFile: z.ZodType<CollectionFile> = z
+const CollectionFile: z.ZodType<CollectionFile, CollectionFile> = z
   .object({
     collection_id: z.string(),
     file_id: z.string(),
@@ -712,7 +712,7 @@ const CollectionFile: z.ZodType<CollectionFile> = z
   })
   .strict()
   .passthrough();
-const CollectionFileList: z.ZodType<CollectionFileList> = z
+const CollectionFileList: z.ZodType<CollectionFileList, CollectionFileList> = z
   .object({
     object: z.literal('list'),
     data: z.array(CollectionFile),
@@ -722,7 +722,7 @@ const CollectionFileList: z.ZodType<CollectionFileList> = z
   })
   .strict()
   .passthrough();
-const MediaDescription: z.ZodType<MediaDescription> = z
+const MediaDescription: z.ZodType<MediaDescription, MediaDescription> = z
   .object({
     collection_id: z.string(),
     file_id: z.string(),
@@ -778,7 +778,7 @@ const MediaDescription: z.ZodType<MediaDescription> = z
   .strict()
   .passthrough()
   .and(DescribeOutput);
-const RichTranscript: z.ZodType<RichTranscript> = z
+const RichTranscript: z.ZodType<RichTranscript, RichTranscript> = z
   .object({
     collection_id: z.string(),
     file_id: z.string(),
@@ -805,7 +805,7 @@ const RichTranscript: z.ZodType<RichTranscript> = z
   .strict()
   .passthrough()
   .and(DescribeOutput);
-const CollectionRichTranscriptsList: z.ZodType<CollectionRichTranscriptsList> =
+const CollectionRichTranscriptsList: z.ZodType<CollectionRichTranscriptsList, CollectionRichTranscriptsList> =
   z
     .object({
       object: z.literal('list'),
@@ -847,7 +847,7 @@ const CollectionRichTranscriptsList: z.ZodType<CollectionRichTranscriptsList> =
     })
     .strict()
     .passthrough();
-const CollectionMediaDescriptionsList: z.ZodType<CollectionMediaDescriptionsList> =
+const CollectionMediaDescriptionsList: z.ZodType<CollectionMediaDescriptionsList, CollectionMediaDescriptionsList> =
   z
     .object({
       object: z.literal('list'),
@@ -891,7 +891,7 @@ const CollectionMediaDescriptionsList: z.ZodType<CollectionMediaDescriptionsList
     })
     .strict()
     .passthrough();
-const CollectionMomentsList: z.ZodType<CollectionMomentsList> = z
+const CollectionMomentsList: z.ZodType<CollectionMomentsList, CollectionMomentsList> = z
   .object({
     moments: z.array(
       Moment.and(
@@ -910,7 +910,7 @@ const CollectionMomentsList: z.ZodType<CollectionMomentsList> = z
   })
   .strict()
   .passthrough();
-const CollectionMomentFindingsList: z.ZodType<CollectionMomentFindingsList> = z
+const CollectionMomentFindingsList: z.ZodType<CollectionMomentFindingsList, CollectionMomentFindingsList> = z
   .object({
     findings: z.array(
       MomentFinding.and(

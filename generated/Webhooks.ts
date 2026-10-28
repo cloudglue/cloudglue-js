@@ -73,7 +73,7 @@ const WebhookEvents = z.enum([
   'find_moments.job.completed',
   'find_moments.job.failed',
 ]);
-const Webhook: z.ZodType<Webhook> = z
+const Webhook: z.ZodType<Webhook, Webhook> = z
   .object({
     id: z.string(),
     object: z.literal('webhook'),
@@ -86,7 +86,7 @@ const Webhook: z.ZodType<Webhook> = z
   })
   .strict()
   .passthrough();
-const WebhookList: z.ZodType<WebhookList> = z
+const WebhookList: z.ZodType<WebhookList, WebhookList> = z
   .object({
     object: z.literal('list'),
     data: z.array(Webhook),
@@ -96,7 +96,7 @@ const WebhookList: z.ZodType<WebhookList> = z
   })
   .strict()
   .passthrough();
-const WebhookCreateRequest: z.ZodType<WebhookCreateRequest> = z
+const WebhookCreateRequest: z.ZodType<WebhookCreateRequest, WebhookCreateRequest> = z
   .object({
     description: z.string(),
     endpoint: z.string(),
@@ -105,7 +105,7 @@ const WebhookCreateRequest: z.ZodType<WebhookCreateRequest> = z
   .partial()
   .strict()
   .passthrough();
-const WebhookUpdateRequest: z.ZodType<WebhookUpdateRequest> = z
+const WebhookUpdateRequest: z.ZodType<WebhookUpdateRequest, WebhookUpdateRequest> = z
   .object({
     description: z.string(),
     endpoint: z.string(),

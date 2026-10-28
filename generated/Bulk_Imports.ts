@@ -98,7 +98,7 @@ type MetadataImportDetail = Partial<{
   enrich_metadata: boolean;
 }>;
 
-const MetadataImportRunProgress: z.ZodType<MetadataImportRunProgress> = z
+const MetadataImportRunProgress: z.ZodType<MetadataImportRunProgress, MetadataImportRunProgress> = z
   .object({
     pages_listed: z.number().int(),
     files_listed: z.number().int(),
@@ -115,7 +115,7 @@ const MetadataImportRunProgress: z.ZodType<MetadataImportRunProgress> = z
   .partial()
   .strict()
   .passthrough();
-const MetadataImportRun: z.ZodType<MetadataImportRun> = z
+const MetadataImportRun: z.ZodType<MetadataImportRun, MetadataImportRun> = z
   .object({
     object: z.literal('metadata_import_run'),
     id: z.string().uuid(),
@@ -142,7 +142,7 @@ const MetadataImportRun: z.ZodType<MetadataImportRun> = z
   .partial()
   .strict()
   .passthrough();
-const MetadataImportFilterSet: z.ZodType<MetadataImportFilterSet> = z
+const MetadataImportFilterSet: z.ZodType<MetadataImportFilterSet, MetadataImportFilterSet> = z
   .object({
     from: z.string(),
     to: z.string(),
@@ -155,7 +155,7 @@ const MetadataImportFilterSet: z.ZodType<MetadataImportFilterSet> = z
   })
   .partial()
   .strict();
-const MetadataImport: z.ZodType<MetadataImport> = z
+const MetadataImport: z.ZodType<MetadataImport, MetadataImport> = z
   .object({
     object: z.literal('metadata_import'),
     id: z.string().uuid(),
@@ -176,7 +176,7 @@ const MetadataImport: z.ZodType<MetadataImport> = z
   .partial()
   .strict()
   .passthrough();
-const MetadataImportDetail: z.ZodType<MetadataImportDetail> = z
+const MetadataImportDetail: z.ZodType<MetadataImportDetail, MetadataImportDetail> = z
   .object({
     object: z.literal('metadata_import'),
     id: z.string().uuid(),
@@ -200,7 +200,7 @@ const MetadataImportDetail: z.ZodType<MetadataImportDetail> = z
   .partial()
   .strict()
   .passthrough();
-const MetadataImportList: z.ZodType<MetadataImportList> = z
+const MetadataImportList: z.ZodType<MetadataImportList, MetadataImportList> = z
   .object({
     object: z.literal('list'),
     data: z.array(MetadataImport),
@@ -211,7 +211,7 @@ const MetadataImportList: z.ZodType<MetadataImportList> = z
   .partial()
   .strict()
   .passthrough();
-const CreateMetadataImportRequest: z.ZodType<CreateMetadataImportRequest> = z
+const CreateMetadataImportRequest: z.ZodType<CreateMetadataImportRequest, CreateMetadataImportRequest> = z
   .object({
     name: z.string().min(1).max(255),
     connector_id: z.string().uuid(),

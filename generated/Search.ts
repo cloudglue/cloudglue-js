@@ -187,7 +187,7 @@ const SearchModalities = z.array(
     'doc_lexical',
   ])
 );
-const SearchRequest: z.ZodType<SearchRequest> = z
+const SearchRequest: z.ZodType<SearchRequest, SearchRequest> = z
   .object({
     scope: z.enum(['file', 'segment', 'face', 'moment']),
     collections: z.array(z.string().uuid()).min(1),
@@ -209,7 +209,7 @@ const SearchRequest: z.ZodType<SearchRequest> = z
   .partial()
   .strict()
   .passthrough();
-const SearchResponseList: z.ZodType<SearchResponseList> = z
+const SearchResponseList: z.ZodType<SearchResponseList, SearchResponseList> = z
   .object({
     object: z.literal('list'),
     data: z.array(
@@ -234,12 +234,12 @@ const SearchResponseList: z.ZodType<SearchResponseList> = z
   })
   .strict()
   .passthrough();
-const SearchTagResponse: z.ZodType<SearchTagResponse> = z
+const SearchTagResponse: z.ZodType<SearchTagResponse, SearchTagResponse> = z
   .object({ id: z.string().uuid(), value: z.string(), label: z.string() })
   .partial()
   .strict()
   .passthrough();
-const FileSearchResult: z.ZodType<FileSearchResult> = z
+const FileSearchResult: z.ZodType<FileSearchResult, FileSearchResult> = z
   .object({
     type: z.literal('file'),
     file_id: z.string().uuid(),
@@ -254,7 +254,7 @@ const FileSearchResult: z.ZodType<FileSearchResult> = z
   })
   .strict()
   .passthrough();
-const SegmentSearchResult: z.ZodType<SegmentSearchResult> = z
+const SegmentSearchResult: z.ZodType<SegmentSearchResult, SegmentSearchResult> = z
   .object({
     type: z.literal('segment'),
     file_id: z.string().uuid(),
@@ -324,7 +324,7 @@ const SegmentSearchResult: z.ZodType<SegmentSearchResult> = z
   })
   .strict()
   .passthrough();
-const FaceSearchResult: z.ZodType<FaceSearchResult> = z
+const FaceSearchResult: z.ZodType<FaceSearchResult, FaceSearchResult> = z
   .object({
     type: z.literal('face'),
     file_id: z.string().uuid(),
@@ -361,7 +361,7 @@ const MomentSearchResult = Moment.and(
     .strict()
     .passthrough()
 );
-const SegmentGroupResult: z.ZodType<SegmentGroupResult> = z
+const SegmentGroupResult: z.ZodType<SegmentGroupResult, SegmentGroupResult> = z
   .object({
     type: z.literal('segment_group'),
     matched_items: z.array(SegmentSearchResult),
@@ -371,7 +371,7 @@ const SegmentGroupResult: z.ZodType<SegmentGroupResult> = z
   })
   .strict()
   .passthrough();
-const FaceGroupResult: z.ZodType<FaceGroupResult> = z
+const FaceGroupResult: z.ZodType<FaceGroupResult, FaceGroupResult> = z
   .object({
     type: z.literal('face_group'),
     matched_items: z.array(FaceSearchResult),
@@ -381,7 +381,7 @@ const FaceGroupResult: z.ZodType<FaceGroupResult> = z
   })
   .strict()
   .passthrough();
-const SearchResponse: z.ZodType<SearchResponse> = z
+const SearchResponse: z.ZodType<SearchResponse, SearchResponse> = z
   .object({
     id: z.string().uuid(),
     object: z.literal('search'),

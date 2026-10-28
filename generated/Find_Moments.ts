@@ -61,7 +61,7 @@ type FindMomentsList = {
   next_cursor?: string | undefined;
 };
 
-const NewFindMoments: z.ZodType<NewFindMoments> = z
+const NewFindMoments: z.ZodType<NewFindMoments, NewFindMoments> = z
   .object({
     url: z.string(),
     describe_job_id: z.string().uuid().optional(),
@@ -97,7 +97,7 @@ const NewFindMoments: z.ZodType<NewFindMoments> = z
     cache_policy: z.enum(['reuse', 'refresh']).optional(),
   })
   .strict();
-const FindMoments: z.ZodType<FindMoments> = z
+const FindMoments: z.ZodType<FindMoments, FindMoments> = z
   .object({
     job_id: z.string().uuid(),
     status: z.enum([
@@ -133,7 +133,7 @@ const FindMoments: z.ZodType<FindMoments> = z
   })
   .strict()
   .passthrough();
-const FindMomentsList: z.ZodType<FindMomentsList> = z
+const FindMomentsList: z.ZodType<FindMomentsList, FindMomentsList> = z
   .object({
     runs: z.array(FindMoments),
     total: z.number().int(),

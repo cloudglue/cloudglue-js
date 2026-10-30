@@ -1,6 +1,8 @@
 import { makeApi, Zodios, type ZodiosOptions } from '@zodios/core';
 import { z } from 'zod';
 
+import { ApiErrorResponse } from './common';
+
 type QueryResult = Partial<{
   id: string;
   object: 'query_result';
@@ -255,42 +257,42 @@ Each query costs 2 credits. Results are returned inline and stored, so completed
       {
         status: 400,
         description: `Invalid request parameters or rejected SQL (multiple statements, a non-SELECT statement, SQL that could not be parsed, or a face-analysis collection in scope)`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 402,
         description: `Insufficient credit balance`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 404,
         description: `One or more collections not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 408,
         description: `Query exceeded the execution time limit`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 409,
         description: `The selected collections exceed the maximum queryable dataset size`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 422,
         description: `A natural-language query could not be compiled into valid SQL — refine the question or send sql directly`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 429,
         description: `Too many concurrent queries, or the per-minute rate limit was exceeded`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -334,7 +336,7 @@ Each query costs 2 credits. Results are returned inline and stored, so completed
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -358,17 +360,17 @@ Fields with level &#x27;file&#x27; appear as rows in the entities table; fields 
       {
         status: 400,
         description: `Invalid request parameters`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 404,
         description: `One or more collections not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -390,12 +392,12 @@ Fields with level &#x27;file&#x27; appear as rows in the entities table; fields 
       {
         status: 404,
         description: `Query result not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -417,7 +419,7 @@ Fields with level &#x27;file&#x27; appear as rows in the entities table; fields 
       {
         status: 404,
         description: `Query result not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },

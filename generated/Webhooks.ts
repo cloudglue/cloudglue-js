@@ -1,6 +1,8 @@
 import { makeApi, Zodios, type ZodiosOptions } from '@zodios/core';
 import { z } from 'zod';
 
+import { ApiErrorResponse } from './common';
+
 type WebhookList = {
   object: 'list';
   data: Array<Webhook>;
@@ -163,7 +165,7 @@ const endpoints = makeApi([
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -184,14 +186,19 @@ const endpoints = makeApi([
     response: Webhook,
     errors: [
       {
+        status: 403,
+        description: `Usage limit reached (total webhook endpoints) — &#x60;code: usage_limit_reached&#x60;`,
+        schema: ApiErrorResponse,
+      },
+      {
         status: 404,
         description: `Webhook not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -213,12 +220,12 @@ const endpoints = makeApi([
       {
         status: 404,
         description: `Webhook not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -240,12 +247,12 @@ const endpoints = makeApi([
       {
         status: 404,
         description: `Webhook not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -273,12 +280,12 @@ const endpoints = makeApi([
       {
         status: 404,
         description: `Webhook not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },

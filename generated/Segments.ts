@@ -1,6 +1,7 @@
 import { makeApi, Zodios, type ZodiosOptions } from '@zodios/core';
 import { z } from 'zod';
 
+import { ApiErrorResponse } from './common';
 import { NarrativeConfig } from './common';
 import { Shot } from './common';
 import { Chapter } from './common';
@@ -181,22 +182,22 @@ const endpoints = makeApi([
       {
         status: 400,
         description: `Invalid request, missing required parameters, unsupported URL type (e.g., YouTube URLs with shot-based segmentation), or unsupported strategy for YouTube URLs and audio files (only &#x27;balanced&#x27; and &#x27;transcript&#x27; are accepted)`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
+      },
+      {
+        status: 403,
+        description: `Usage limit reached (monthly segments jobs, or the file limits when given a new URL) — &#x60;code: usage_limit_reached&#x60;`,
+        schema: ApiErrorResponse,
       },
       {
         status: 404,
         description: `File not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
-      },
-      {
-        status: 429,
-        description: `Monthly segments jobs limit reached`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -250,12 +251,12 @@ const endpoints = makeApi([
       {
         status: 400,
         description: `Invalid request parameters`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -277,12 +278,12 @@ const endpoints = makeApi([
       {
         status: 404,
         description: `Job not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -304,12 +305,12 @@ const endpoints = makeApi([
       {
         status: 404,
         description: `Segments job not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },

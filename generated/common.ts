@@ -662,6 +662,10 @@ export const VideoTag = z
   })
   .strict()
   .passthrough();
+export const ApiErrorResponse = z
+  .object({ error: z.string(), code: z.string().optional() })
+  .strict()
+  .passthrough();
 export const PaginationResponse = z
   .object({
     object: z.literal('list'),

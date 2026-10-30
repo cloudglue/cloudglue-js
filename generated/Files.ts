@@ -111,7 +111,7 @@ type FrameExtractionList = {
   offset: number;
 };
 
-const FileList: z.ZodType<FileList> = z
+const FileList: z.ZodType<FileList, FileList> = z
   .object({
     object: z.literal('list'),
     data: z.array(CloudglueFile),
@@ -121,11 +121,11 @@ const FileList: z.ZodType<FileList> = z
   })
   .strict()
   .passthrough();
-const SegmentDescribeOutputEntry: z.ZodType<SegmentDescribeOutputEntry> = z
+const SegmentDescribeOutputEntry: z.ZodType<SegmentDescribeOutputEntry, SegmentDescribeOutputEntry> = z
   .object({ text: z.string(), start_time: z.number(), end_time: z.number() })
   .strict()
   .passthrough();
-const SegmentDescribeSpeechEntry: z.ZodType<SegmentDescribeSpeechEntry> = z
+const SegmentDescribeSpeechEntry: z.ZodType<SegmentDescribeSpeechEntry, SegmentDescribeSpeechEntry> = z
   .object({
     text: z.string(),
     start_time: z.number(),
@@ -134,7 +134,7 @@ const SegmentDescribeSpeechEntry: z.ZodType<SegmentDescribeSpeechEntry> = z
   })
   .strict()
   .passthrough();
-const SegmentDescribeJsonData: z.ZodType<SegmentDescribeJsonData> = z
+const SegmentDescribeJsonData: z.ZodType<SegmentDescribeJsonData, SegmentDescribeJsonData> = z
   .object({
     visual_scene_description: z.array(SegmentDescribeOutputEntry),
     speech: z.array(SegmentDescribeSpeechEntry),
@@ -149,7 +149,7 @@ const SegmentDescribeJsonData: z.ZodType<SegmentDescribeJsonData> = z
   .partial()
   .strict()
   .passthrough();
-const DescribeConfig: z.ZodType<DescribeConfig> = z
+const DescribeConfig: z.ZodType<DescribeConfig, DescribeConfig> = z
   .object({
     enable_summary: z.boolean(),
     enable_speech: z.boolean(),
@@ -161,11 +161,11 @@ const DescribeConfig: z.ZodType<DescribeConfig> = z
   .partial()
   .strict()
   .passthrough();
-const SegmentDescribeMarkdownData: z.ZodType<SegmentDescribeMarkdownData> = z
+const SegmentDescribeMarkdownData: z.ZodType<SegmentDescribeMarkdownData, SegmentDescribeMarkdownData> = z
   .object({ content: z.string() })
   .strict()
   .passthrough();
-const SegmentDescribe: z.ZodType<SegmentDescribe> = z
+const SegmentDescribe: z.ZodType<SegmentDescribe, SegmentDescribe> = z
   .object({
     job_id: z.string().uuid(),
     segment_id: z.string().uuid(),
@@ -190,7 +190,7 @@ const SegmentDescribe: z.ZodType<SegmentDescribe> = z
   })
   .strict()
   .passthrough();
-const SegmentDescribeListResponse: z.ZodType<SegmentDescribeListResponse> = z
+const SegmentDescribeListResponse: z.ZodType<SegmentDescribeListResponse, SegmentDescribeListResponse> = z
   .object({
     object: z.literal('list'),
     data: z.array(SegmentDescribe),
@@ -200,7 +200,7 @@ const SegmentDescribeListResponse: z.ZodType<SegmentDescribeListResponse> = z
   })
   .strict()
   .passthrough();
-const SegmentationListItem: z.ZodType<SegmentationListItem> = z
+const SegmentationListItem: z.ZodType<SegmentationListItem, SegmentationListItem> = z
   .object({
     segmentation_id: z.string().uuid(),
     status: z.enum([
@@ -218,7 +218,7 @@ const SegmentationListItem: z.ZodType<SegmentationListItem> = z
   })
   .strict()
   .passthrough();
-const SegmentationList: z.ZodType<SegmentationList> = z
+const SegmentationList: z.ZodType<SegmentationList, SegmentationList> = z
   .object({
     object: z.literal('list'),
     data: z.array(SegmentationListItem),
@@ -228,7 +228,7 @@ const SegmentationList: z.ZodType<SegmentationList> = z
   })
   .strict()
   .passthrough();
-const FrameExtractionList: z.ZodType<FrameExtractionList> = z
+const FrameExtractionList: z.ZodType<FrameExtractionList, FrameExtractionList> = z
   .object({
     object: z.literal('list'),
     data: z.array(
@@ -250,7 +250,7 @@ const FrameExtractionList: z.ZodType<FrameExtractionList> = z
   })
   .strict()
   .passthrough();
-const FileSegment: z.ZodType<FileSegment> = z
+const FileSegment: z.ZodType<FileSegment, FileSegment> = z
   .object({
     id: z.string().uuid(),
     file_id: z.string().uuid(),
@@ -262,7 +262,7 @@ const FileSegment: z.ZodType<FileSegment> = z
   })
   .strict()
   .passthrough();
-const FileSegmentListResponse: z.ZodType<FileSegmentListResponse> = z
+const FileSegmentListResponse: z.ZodType<FileSegmentListResponse, FileSegmentListResponse> = z
   .object({
     object: z.literal('list'),
     data: z.array(FileSegment),

@@ -66,7 +66,7 @@ type SourceMetadataResponse = {
   source_metadata: SourceMetadata;
 };
 
-const DataConnector: z.ZodType<DataConnector> = z
+const DataConnector: z.ZodType<DataConnector, DataConnector> = z
   .object({
     id: z.string(),
     object: z.literal('data_connector'),
@@ -87,7 +87,7 @@ const DataConnector: z.ZodType<DataConnector> = z
   })
   .strict()
   .passthrough();
-const DataConnectorList: z.ZodType<DataConnectorList> = z
+const DataConnectorList: z.ZodType<DataConnectorList, DataConnectorList> = z
   .object({
     object: z.literal('list'),
     data: z.array(DataConnector),
@@ -97,7 +97,7 @@ const DataConnectorList: z.ZodType<DataConnectorList> = z
   })
   .strict()
   .passthrough();
-const DataConnectorFile: z.ZodType<DataConnectorFile> = z
+const DataConnectorFile: z.ZodType<DataConnectorFile, DataConnectorFile> = z
   .object({
     object: z.literal('data_connector_file'),
     type: z.enum(['file', 'folder']),
@@ -115,7 +115,7 @@ const DataConnectorFile: z.ZodType<DataConnectorFile> = z
   })
   .strict()
   .passthrough();
-const DataConnectorFileList: z.ZodType<DataConnectorFileList> = z
+const DataConnectorFileList: z.ZodType<DataConnectorFileList, DataConnectorFileList> = z
   .object({
     object: z.literal('list'),
     data: z.array(DataConnectorFile),
@@ -124,7 +124,7 @@ const DataConnectorFileList: z.ZodType<DataConnectorFileList> = z
   })
   .strict()
   .passthrough();
-const SourceMetadataResponse: z.ZodType<SourceMetadataResponse> = z
+const SourceMetadataResponse: z.ZodType<SourceMetadataResponse, SourceMetadataResponse> = z
   .object({
     object: z.literal('source_metadata'),
     source_metadata: SourceMetadata,

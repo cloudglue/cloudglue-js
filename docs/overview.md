@@ -29,6 +29,7 @@ const client = new Cloudglue({ apiKey: process.env.CLOUDGLUE_API_KEY });
 
 Internally, the SDK uses:
 - **Zodios** (`@zodios/core`) for type-safe HTTP with Zod schema validation
+- **Zod 4** (`zod@^4.6.6`) for the exported schemas (`schemas` on each generated module); compose them with zod 4, not zod 3
 - **Axios** for HTTP transport (file uploads use axios directly for multipart/form-data)
 - Server-side validation only (`validate: false`)
 

@@ -60,12 +60,12 @@ type FaceMatchListResponse = PaginationResponse &
     }>;
   }>;
 
-const SourceImage: z.ZodType<SourceImage> = z
+const SourceImage: z.ZodType<SourceImage, SourceImage> = z
   .object({ url: z.string(), base64_image: z.string() })
   .partial()
   .strict()
   .passthrough();
-const FaceMatchRequest: z.ZodType<FaceMatchRequest> = z
+const FaceMatchRequest: z.ZodType<FaceMatchRequest, FaceMatchRequest> = z
   .object({
     source_image: SourceImage,
     target_video_url: z.string(),
@@ -76,7 +76,7 @@ const FaceMatchRequest: z.ZodType<FaceMatchRequest> = z
   })
   .strict()
   .passthrough();
-const FaceMatchResult: z.ZodType<FaceMatchResult> = z
+const FaceMatchResult: z.ZodType<FaceMatchResult, FaceMatchResult> = z
   .object({
     id: z.string().uuid(),
     face_bounding_box: FaceBoundingBox,
@@ -87,7 +87,7 @@ const FaceMatchResult: z.ZodType<FaceMatchResult> = z
   })
   .strict()
   .passthrough();
-const FaceMatch: z.ZodType<FaceMatch> = z
+const FaceMatch: z.ZodType<FaceMatch, FaceMatch> = z
   .object({
     face_match_id: z.string().uuid(),
     face_detection_id: z.string().uuid().optional(),
@@ -111,7 +111,7 @@ const FaceMatch: z.ZodType<FaceMatch> = z
   })
   .strict()
   .passthrough();
-const FaceMatchListResponse: z.ZodType<FaceMatchListResponse> =
+const FaceMatchListResponse: z.ZodType<FaceMatchListResponse, FaceMatchListResponse> =
   PaginationResponse.and(
     z
       .object({

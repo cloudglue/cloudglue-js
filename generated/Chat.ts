@@ -128,7 +128,7 @@ type ChatCompletionList = {
   offset: number;
 };
 
-const ChatMessage: z.ZodType<ChatMessage> = z
+const ChatMessage: z.ZodType<ChatMessage, ChatMessage> = z
   .object({
     role: z.enum(['system', 'user', 'assistant']),
     content: z.string(),
@@ -136,7 +136,7 @@ const ChatMessage: z.ZodType<ChatMessage> = z
   })
   .strict()
   .passthrough();
-const ChatCompletionRequest: z.ZodType<ChatCompletionRequest> = z
+const ChatCompletionRequest: z.ZodType<ChatCompletionRequest, ChatCompletionRequest> = z
   .object({
     model: z.literal('nimbus-001'),
     messages: z.array(ChatMessage),
@@ -210,7 +210,7 @@ const ChatCompletionRequest: z.ZodType<ChatCompletionRequest> = z
   })
   .strict()
   .passthrough();
-const ChatCompletionPayload: z.ZodType<ChatCompletionPayload> = z
+const ChatCompletionPayload: z.ZodType<ChatCompletionPayload, ChatCompletionPayload> = z
   .object({
     messages: z.array(ChatMessage),
     temperature: z.number(),
@@ -220,7 +220,7 @@ const ChatCompletionPayload: z.ZodType<ChatCompletionPayload> = z
   .partial()
   .strict()
   .passthrough();
-const ChatCompletionResponse: z.ZodType<ChatCompletionResponse> = z
+const ChatCompletionResponse: z.ZodType<ChatCompletionResponse, ChatCompletionResponse> = z
   .object({
     id: z.string(),
     object: z.string(),
@@ -273,7 +273,7 @@ const ChatCompletionResponse: z.ZodType<ChatCompletionResponse> = z
   .partial()
   .strict()
   .passthrough();
-const ChatCompletionList: z.ZodType<ChatCompletionList> = z
+const ChatCompletionList: z.ZodType<ChatCompletionList, ChatCompletionList> = z
   .object({
     object: z.literal('list'),
     data: z.array(

@@ -48,7 +48,7 @@ type FaceDetectionListResponse = PaginationResponse &
     }>;
   }>;
 
-const FaceDetectionRequest: z.ZodType<FaceDetectionRequest> = z
+const FaceDetectionRequest: z.ZodType<FaceDetectionRequest, FaceDetectionRequest> = z
   .object({
     url: z.string(),
     frame_extraction_id: z.string().uuid().optional(),
@@ -56,7 +56,7 @@ const FaceDetectionRequest: z.ZodType<FaceDetectionRequest> = z
   })
   .strict()
   .passthrough();
-const DetectedFace: z.ZodType<DetectedFace> = z
+const DetectedFace: z.ZodType<DetectedFace, DetectedFace> = z
   .object({
     id: z.string().uuid(),
     face_bounding_box: FaceBoundingBox,
@@ -66,7 +66,7 @@ const DetectedFace: z.ZodType<DetectedFace> = z
   })
   .strict()
   .passthrough();
-const FaceDetection: z.ZodType<FaceDetection> = z
+const FaceDetection: z.ZodType<FaceDetection, FaceDetection> = z
   .object({
     face_detection_id: z.string().uuid(),
     frame_extraction_id: z.string().uuid().optional(),
@@ -88,7 +88,7 @@ const FaceDetection: z.ZodType<FaceDetection> = z
   })
   .strict()
   .passthrough();
-const FaceDetectionListResponse: z.ZodType<FaceDetectionListResponse> =
+const FaceDetectionListResponse: z.ZodType<FaceDetectionListResponse, FaceDetectionListResponse> =
   PaginationResponse.and(
     z
       .object({

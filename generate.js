@@ -6,6 +6,7 @@
 // The transforms are:
 // - Uses a renamed alias for File called CloudglueFile in the Files.ts file for instances where it
 //  should be CloudglueFile vs the global File type, due to naming conflicts.
+// - Zod 4 fixes for the generator's zod 3 style output (see scripts/zod4-transforms.js).
 
 
 const { execSync } = require('child_process');
@@ -573,4 +574,9 @@ for (const file of generatedFiles) {
     if (renamed !== original) fs.writeFileSync(filePath, renamed);
 }
 
-console.log('Generation complete!');
+// openapi-zod-client emits zod 3 style code; adapt it to zod 4. Runs last so
+// it also covers the z.ZodType<...> annotations added above.
+console.log('Applying zod 4 transforms...');
+require('./scripts/zod4-transforms').applyZod4Transforms(generatedDir);
+
+console.log('Generation complete!'); 

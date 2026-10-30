@@ -97,7 +97,7 @@ type DeepSearchListItem = Partial<{
   usage: DeepSearchUsage;
 }>;
 
-const DeepSearchKBCollections: z.ZodType<DeepSearchKBCollections> = z
+const DeepSearchKBCollections: z.ZodType<DeepSearchKBCollections, DeepSearchKBCollections> = z
   .object({
     source: z.literal('collections'),
     collections: z.array(z.string().uuid()).min(1),
@@ -105,15 +105,15 @@ const DeepSearchKBCollections: z.ZodType<DeepSearchKBCollections> = z
   })
   .strict()
   .passthrough();
-const DeepSearchKBFiles: z.ZodType<DeepSearchKBFiles> = z
+const DeepSearchKBFiles: z.ZodType<DeepSearchKBFiles, DeepSearchKBFiles> = z
   .object({ source: z.literal('files'), files: z.array(z.string()).min(1) })
   .strict()
   .passthrough();
-const DeepSearchKBDefault: z.ZodType<DeepSearchKBDefault> = z
+const DeepSearchKBDefault: z.ZodType<DeepSearchKBDefault, DeepSearchKBDefault> = z
   .object({ source: z.literal('default') })
   .strict()
   .passthrough();
-const CreateDeepSearchRequest: z.ZodType<CreateDeepSearchRequest> = z
+const CreateDeepSearchRequest: z.ZodType<CreateDeepSearchRequest, CreateDeepSearchRequest> = z
   .object({
     knowledge_base: z.union([
       DeepSearchKBCollections,
@@ -130,7 +130,7 @@ const CreateDeepSearchRequest: z.ZodType<CreateDeepSearchRequest> = z
   })
   .strict()
   .passthrough();
-const DeepSearchResult: z.ZodType<DeepSearchResult> = z
+const DeepSearchResult: z.ZodType<DeepSearchResult, DeepSearchResult> = z
   .object({
     type: z.enum(['segment', 'file']),
     id: z.string().uuid(),
@@ -151,7 +151,7 @@ const DeepSearchResult: z.ZodType<DeepSearchResult> = z
   .partial()
   .strict()
   .passthrough();
-const DeepSearchSearchQueryPlan: z.ZodType<DeepSearchSearchQueryPlan> = z
+const DeepSearchSearchQueryPlan: z.ZodType<DeepSearchSearchQueryPlan, DeepSearchSearchQueryPlan> = z
   .object({
     query: z.string(),
     search_modalities: z.array(z.string()),
@@ -162,7 +162,7 @@ const DeepSearchSearchQueryPlan: z.ZodType<DeepSearchSearchQueryPlan> = z
   .partial()
   .strict()
   .passthrough();
-const DeepSearchUsage: z.ZodType<DeepSearchUsage> = z
+const DeepSearchUsage: z.ZodType<DeepSearchUsage, DeepSearchUsage> = z
   .object({
     input_tokens: z.number().int(),
     output_tokens: z.number().int(),
@@ -172,7 +172,7 @@ const DeepSearchUsage: z.ZodType<DeepSearchUsage> = z
   .partial()
   .strict()
   .passthrough();
-const DeepSearch: z.ZodType<DeepSearch> = z
+const DeepSearch: z.ZodType<DeepSearch, DeepSearch> = z
   .object({
     id: z.string().uuid(),
     object: z.literal('deep_search'),
@@ -196,7 +196,7 @@ const DeepSearch: z.ZodType<DeepSearch> = z
   .partial()
   .strict()
   .passthrough();
-const DeepSearchListItem: z.ZodType<DeepSearchListItem> = z
+const DeepSearchListItem: z.ZodType<DeepSearchListItem, DeepSearchListItem> = z
   .object({
     id: z.string().uuid(),
     object: z.literal('deep_search'),
@@ -210,7 +210,7 @@ const DeepSearchListItem: z.ZodType<DeepSearchListItem> = z
   .partial()
   .strict()
   .passthrough();
-const DeepSearchList: z.ZodType<DeepSearchList> = z
+const DeepSearchList: z.ZodType<DeepSearchList, DeepSearchList> = z
   .object({
     object: z.literal('list'),
     data: z.array(DeepSearchListItem),

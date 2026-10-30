@@ -59,7 +59,7 @@ type SegmentsListItem = {
   narrative_config?: NarrativeConfig | undefined;
 };
 
-const ShotConfig: z.ZodType<ShotConfig> = z
+const ShotConfig: z.ZodType<ShotConfig, ShotConfig> = z
   .object({
     detector: z.enum(['content', 'adaptive']),
     max_duration_seconds: z.number().gte(1).lte(600),
@@ -69,7 +69,7 @@ const ShotConfig: z.ZodType<ShotConfig> = z
   .partial()
   .strict()
   .passthrough();
-const NewSegments: z.ZodType<NewSegments> = z
+const NewSegments: z.ZodType<NewSegments, NewSegments> = z
   .object({
     url: z.string(),
     criteria: z.enum(['shot', 'narrative']),
@@ -78,7 +78,7 @@ const NewSegments: z.ZodType<NewSegments> = z
   })
   .strict()
   .passthrough();
-const Segment: z.ZodType<Segment> = z
+const Segment: z.ZodType<Segment, Segment> = z
   .object({
     start_time: z.number().gte(0),
     end_time: z.number().gte(0),
@@ -88,7 +88,7 @@ const Segment: z.ZodType<Segment> = z
   })
   .strict()
   .passthrough();
-const Segments: z.ZodType<Segments> = z
+const Segments: z.ZodType<Segments, Segments> = z
   .object({
     job_id: z.string().uuid(),
     file_id: z.string().uuid(),
@@ -107,7 +107,7 @@ const Segments: z.ZodType<Segments> = z
   })
   .strict()
   .passthrough();
-const SegmentsListItem: z.ZodType<SegmentsListItem> = z
+const SegmentsListItem: z.ZodType<SegmentsListItem, SegmentsListItem> = z
   .object({
     job_id: z.string().uuid(),
     file_id: z.string().uuid(),
@@ -120,7 +120,7 @@ const SegmentsListItem: z.ZodType<SegmentsListItem> = z
   })
   .strict()
   .passthrough();
-const SegmentsList: z.ZodType<SegmentsList> = z
+const SegmentsList: z.ZodType<SegmentsList, SegmentsList> = z
   .object({
     object: z.literal('list'),
     data: z.array(SegmentsListItem),

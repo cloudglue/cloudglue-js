@@ -1,6 +1,8 @@
 import { makeApi, Zodios, type ZodiosOptions } from '@zodios/core';
 import { z } from 'zod';
 
+import { ApiErrorResponse } from './common';
+
 type ShareableAsset = {
   id: string;
   file_id: string;
@@ -110,22 +112,27 @@ const endpoints = makeApi([
       {
         status: 400,
         description: `Invalid request parameters or configuration`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
+      },
+      {
+        status: 403,
+        description: `Usage limit reached (monthly shareable assets) — &#x60;code: usage_limit_reached&#x60;`,
+        schema: ApiErrorResponse,
       },
       {
         status: 404,
         description: `File or file segment not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 409,
         description: `Shareable asset already exists`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -202,7 +209,7 @@ const endpoints = makeApi([
       {
         status: 404,
         description: `Shareable asset not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -227,7 +234,7 @@ const endpoints = makeApi([
       {
         status: 404,
         description: `Shareable asset not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -255,7 +262,7 @@ const endpoints = makeApi([
       {
         status: 404,
         description: `Shareable asset not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },

@@ -1,6 +1,8 @@
 import { makeApi, Zodios, type ZodiosOptions } from '@zodios/core';
 import { z } from 'zod';
 
+import { ApiErrorResponse } from './common';
+
 type SiteRoutePreviewList = {
   previews: Array<SiteRoutePreview>;
 };
@@ -92,7 +94,7 @@ const endpoints = makeApi([
       {
         status: 404,
         description: `Site not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -120,12 +122,12 @@ const endpoints = makeApi([
       {
         status: 400,
         description: `Invalid route previews (empty or duplicate canonical routes, non-video heroes, private heroes on a public site, or an invalid clip window)`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 404,
         description: `Site not found, or a previewShareId does not reference a share in this account`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -152,7 +154,7 @@ const endpoints = makeApi([
       {
         status: 404,
         description: `Site or route preview not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },

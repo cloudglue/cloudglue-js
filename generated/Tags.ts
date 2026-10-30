@@ -2,6 +2,7 @@ import { makeApi, Zodios, type ZodiosOptions } from '@zodios/core';
 import { z } from 'zod';
 
 import { VideoTag } from './common';
+import { ApiErrorResponse } from './common';
 import { ListVideoTagsResponse } from './common';
 import { PaginationResponse } from './common';
 
@@ -45,22 +46,22 @@ const endpoints = makeApi([
       {
         status: 400,
         description: `Invalid request or missing required label/value`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
+      },
+      {
+        status: 403,
+        description: `Usage limit reached (total tags per file or segment) — &#x60;code: usage_limit_reached&#x60;`,
+        schema: ApiErrorResponse,
       },
       {
         status: 404,
         description: `File not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
-      },
-      {
-        status: 429,
-        description: `Resource limits exceeded (total tags per file or segment)`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -107,7 +108,7 @@ const endpoints = makeApi([
       {
         status: 404,
         description: `Tag not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -129,7 +130,7 @@ const endpoints = makeApi([
       {
         status: 404,
         description: `Tag not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },

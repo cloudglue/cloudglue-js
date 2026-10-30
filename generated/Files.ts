@@ -1,7 +1,7 @@
 import { makeApi, Zodios, type ZodiosOptions } from '@zodios/core';
 import { z } from 'zod';
 import { File as CloudglueFile } from "./common";
-import { SourceMetadata, GrainSourceMetadata, ZoomSourceMetadata, RecallSourceMetadata, GoogleDriveSourceMetadata, DropboxSourceMetadata, GongSourceMetadata, IconikSourceMetadata, Segmentation, SegmentationConfig, SegmentationUniformConfig, SegmentationShotDetectorConfig, SegmentationManualConfig, NarrativeConfig, KeyframeConfig, ThumbnailsConfig, Shot, Chapter, ThumbnailList, Thumbnail, ThumbnailType, ListVideoTagsResponse, PaginationResponse, VideoTag, FrameExtraction, FrameExtractionConfig, FrameExtractionUniformConfig, FrameExtractionThumbnailsConfig } from "./common";
+import { ApiErrorResponse, SourceMetadata, GrainSourceMetadata, ZoomSourceMetadata, RecallSourceMetadata, GoogleDriveSourceMetadata, DropboxSourceMetadata, GongSourceMetadata, IconikSourceMetadata, Segmentation, SegmentationConfig, SegmentationUniformConfig, SegmentationShotDetectorConfig, SegmentationManualConfig, NarrativeConfig, KeyframeConfig, ThumbnailsConfig, Shot, Chapter, ThumbnailList, Thumbnail, ThumbnailType, ListVideoTagsResponse, PaginationResponse, VideoTag, FrameExtraction, FrameExtractionConfig, FrameExtractionUniformConfig, FrameExtractionThumbnailsConfig } from "./common";
 
 type FileList = {
   object: 'list';
@@ -345,22 +345,22 @@ const endpoints = makeApi([
       {
         status: 400,
         description: `Invalid request, missing file, invalid metadata, or video duration exceeds limits`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
+      },
+      {
+        status: 403,
+        description: `Usage limit reached (monthly uploads, total duration, total file size, or total files) — &#x60;code: usage_limit_reached&#x60;`,
+        schema: ApiErrorResponse,
       },
       {
         status: 415,
         description: `Unsupported file type`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
-      },
-      {
-        status: 429,
-        description: `Resource limits exceeded (monthly upload limit, total duration, file size, or total files)`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -425,7 +425,7 @@ const endpoints = makeApi([
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -447,37 +447,32 @@ const endpoints = makeApi([
       {
         status: 400,
         description: `Bad request (e.g. an unsupported URL such as YouTube or a connector-native URI, a page link from an unsupported host, a file exceeding size or duration limits, or a URL that does not serve a media file)`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 402,
         description: `Insufficient credit balance (TikTok URLs consume scrape credits)`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 403,
-        description: `The source file is not accessible (e.g. a login-gated, expired, or restricted share link)`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        description: `The source file is not accessible (e.g. a login-gated, expired, or restricted share link). Also returned when a usage limit is reached (monthly uploads, total duration, total file size, or total files) — &#x60;code: usage_limit_reached&#x60;`,
+        schema: ApiErrorResponse,
       },
       {
         status: 404,
         description: `The URL was not found or not accessible`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 415,
         description: `The URL does not serve a supported video or audio content type`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
-      },
-      {
-        status: 429,
-        description: `Resource limits exceeded (monthly upload limit, total duration, file size, or total files)`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -499,12 +494,12 @@ const endpoints = makeApi([
       {
         status: 404,
         description: `File not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -526,12 +521,12 @@ const endpoints = makeApi([
       {
         status: 404,
         description: `File not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -559,7 +554,7 @@ const endpoints = makeApi([
       {
         status: 400,
         description: `Invalid request or malformed file update parameters`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -581,12 +576,12 @@ const endpoints = makeApi([
       {
         status: 400,
         description: `File has no connector URI, the source does not support metadata lookup, or the account has no connector of that type`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 404,
         description: `File not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -614,17 +609,17 @@ const endpoints = makeApi([
       {
         status: 400,
         description: `Invalid request or file duration is less than window size`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 404,
         description: `File not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -656,12 +651,12 @@ const endpoints = makeApi([
       {
         status: 404,
         description: `File not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -708,12 +703,12 @@ const endpoints = makeApi([
       {
         status: 404,
         description: `File not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -780,7 +775,7 @@ const endpoints = makeApi([
       {
         status: 400,
         description: `Invalid query parameters (e.g., min_duration &gt; max_duration, start_time_after &gt;&#x3D; end_time_before)`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -807,12 +802,12 @@ const endpoints = makeApi([
       {
         status: 404,
         description: `File segment not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -849,17 +844,17 @@ const endpoints = makeApi([
       {
         status: 400,
         description: `Invalid request or malformed file segment update parameters`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 404,
         description: `File segment not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -931,7 +926,7 @@ const endpoints = makeApi([
       {
         status: 404,
         description: `File or segment not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -968,7 +963,7 @@ const endpoints = makeApi([
       {
         status: 404,
         description: `CloudglueFile, segment, or describe job not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -996,17 +991,17 @@ const endpoints = makeApi([
       {
         status: 400,
         description: `Invalid request or file duration is less than specified time range`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 404,
         description: `File not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -1038,12 +1033,12 @@ const endpoints = makeApi([
       {
         status: 404,
         description: `File not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },

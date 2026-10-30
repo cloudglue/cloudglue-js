@@ -1,6 +1,7 @@
 import { makeApi, Zodios, type ZodiosOptions } from '@zodios/core';
 import { z } from 'zod';
 
+import { ApiErrorResponse } from './common';
 import { File } from './common';
 import { SourceMetadata } from './common';
 import { GrainSourceMetadata } from './common';
@@ -151,7 +152,7 @@ const endpoints = makeApi([
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -233,22 +234,22 @@ const endpoints = makeApi([
       {
         status: 400,
         description: `Bad request (e.g. missing required bucket parameter, unsupported connector type)`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 404,
         description: `Data connector not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 502,
         description: `Error communicating with the external service`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -275,32 +276,32 @@ const endpoints = makeApi([
       {
         status: 400,
         description: `Bad request (e.g. URL source does not match the connector type, or the link points to a folder)`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 403,
-        description: `The source file is not accessible (e.g. a login-gated, expired, or restricted Dropbox share link)`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        description: `The source file is not accessible (e.g. a login-gated, expired, or restricted Dropbox share link). Also returned when a usage limit is reached (monthly uploads, total duration, total file size, or total files) — &#x60;code: usage_limit_reached&#x60;`,
+        schema: ApiErrorResponse,
       },
       {
         status: 404,
         description: `Data connector not found, or the referenced file/recording was not found at the source`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 429,
         description: `The external service rate-limited the request (e.g. Dropbox or Zoom); retry shortly`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 500,
         description: `An unexpected error occurred on the server`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 502,
         description: `Error communicating with the external service`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },
@@ -327,22 +328,22 @@ const endpoints = makeApi([
       {
         status: 400,
         description: `Bad request (e.g. URL source does not match the connector type)`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 404,
         description: `Data connector not found`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 501,
         description: `Source metadata lookup is not implemented for this connector type`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
       {
         status: 502,
         description: `Error communicating with the external service`,
-        schema: z.object({ error: z.string() }).strict().passthrough(),
+        schema: ApiErrorResponse,
       },
     ],
   },

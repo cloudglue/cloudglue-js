@@ -26,7 +26,7 @@ importers:
         version: 1.18.3(debug@4.4.3)
       prettier:
         specifier: ^3.7.4
-        version: 3.9.10
+        version: 3.10.1
       rimraf:
         specifier: ^6.1.2
         version: 6.1.4
@@ -642,8 +642,8 @@ packages:
     engines: {node: '>=10.13.0'}
     hasBin: true
 
-  prettier@3.9.10:
-    resolution: {integrity: sha512-skGHTH1Yb9QvaTC4hWnRTzEYtCpApF0UMBPz+t/0ZPzP8ihefo/btKd+QA7pUE0fEwA1SbS/NmhyEcstdXOIdA==}
+  prettier@3.10.1:
+    resolution: {integrity: sha512-70vp3ZUYoPlFbF9uiTdXHUUCGEIp7d4+6p+8DYbkm2jP7x/3i/paXVF6dopSI3zd/CEitrZN1rc4i85xWmmXlg==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -1334,7 +1334,7 @@ snapshots:
 
   prettier@2.8.8: {}
 
-  prettier@3.9.10: {}
+  prettier@3.10.1: {}
 
   proxy-from-env@2.1.0: {}
 
